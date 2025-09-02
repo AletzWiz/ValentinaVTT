@@ -300,7 +300,7 @@ export default function ValentinaVTTPage() {
             ValentinaVTT
           </h1>
           <p className="mt-2 max-w-xl text-purple-700/80">
-            Streamer • Comunidad kawaii 💖. Directos semanales, clips diarios y contenido
+            Streamer • Comunidad VTT 💖. Directos semanales, clips diarios y contenido
             divertido.
           </p>
 
