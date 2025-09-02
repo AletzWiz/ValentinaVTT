@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   Twitch,
@@ -92,7 +91,6 @@ function SparkleParticles({ count = 50 }: { count?: number }) {
 
 /* =========================================================
    Showcase lateral: slideshow + banner “Código de Creador”
-   (banner en esquina inferior derecha)
 ========================================================= */
 function SideShowcase() {
   const images = [
@@ -202,15 +200,15 @@ function Panel({
   ctaText: string;
 }) {
   return (
-    <div className="relative min-h-[260px] overflow-hidden rounded-3xl border border-pink-200/40 bg-white/70 p-0 backdrop-blur">
+    <div className="relative min-h-[240px] sm:min-h-[260px] overflow-hidden rounded-3xl border border-pink-200/40 bg-white/70 p-0 backdrop-blur">
       {/* Banda vertical */}
       <div
-        className={`absolute left-0 top-0 flex h-full w-16 items-center justify-center ${bandColor} text-white [writing-mode:vertical-rl] rotate-180 text-lg font-extrabold tracking-widest shadow-inner`}
+        className={`absolute left-0 top-0 flex h-full w-12 sm:w-16 items-center justify-center ${bandColor} text-white [writing-mode:vertical-rl] rotate-180 text-base sm:text-lg font-extrabold tracking-widest shadow-inner`}
       >
         {bandText}
       </div>
       {/* Contenido */}
-      <div className="p-6 pl-20">
+      <div className="p-5 sm:p-6 pl-16 sm:pl-20">
         <div className="flex items-center gap-2">
           {icon}
           <h3 className="text-lg font-semibold text-pink-800">{title}</h3>
@@ -235,7 +233,17 @@ export default function ValentinaVTTPage() {
     return () => clearTimeout(t);
   }, []);
 
-  // Mis redes (sin Discord aquí; Discord está en Panel grande)
+  // menos partículas en móviles
+  const [isSmall, setIsSmall] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const update = () => setIsSmall(mq.matches);
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
+  }, []);
+
+  // Mis redes
   const links = [
     {
       title: 'Twitch',
@@ -280,11 +288,11 @@ export default function ValentinaVTTPage() {
 
       {/* Fondo decorativo + partículas */}
       <SideShowcase />
-      <SparkleParticles count={50} />
+      <SparkleParticles count={isSmall ? 22 : 50} />
 
       {/* Contenido */}
       <div
-        className={`relative z-20 mx-auto max-w-5xl px-4 pb-24 pt-16 transform transition-all duration-700 ${
+        className={`relative z-20 mx-auto max-w-5xl px-3 sm:px-4 pb-20 sm:pb-24 pt-10 sm:pt-16 transform transition-all duration-700 ${
           ready ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
         }`}
       >
@@ -294,24 +302,23 @@ export default function ValentinaVTTPage() {
             src="/logo.png"
             alt="Avatar de ValentinaVTT"
             loading="lazy"
-            className="h-28 w-28 rounded-full object-cover ring-4 ring-pink-300 shadow-xl"
+            className="h-20 w-20 sm:h-24 sm:w-24 rounded-full object-cover ring-4 ring-pink-300 shadow-xl"
           />
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-pink-700 drop-shadow">
+          <h1 className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-pink-700 drop-shadow">
             ValentinaVTT
           </h1>
-          <p className="mt-2 max-w-xl text-purple-700/80">
-            Streamer • Directos semanales, clips diarios y contenido
-            divertido.
+          <p className="mt-2 max-w-xl text-[15px] sm:text-base text-purple-700/80">
+            Streamer • Directos semanales, clips diarios y contenido divertido.
           </p>
 
           {/* Botones principales */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <a href="https://www.twitch.tv/valentinavtt" className={reactiveBtn} aria-label="Ver en Twitch">
+          <div className="mt-6 flex w-full max-w-lg flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center">
+            <a href="https://www.twitch.tv/valentinavtt" className={`${reactiveBtn} w-full sm:w-auto min-h-[44px]`} aria-label="Ver en Twitch">
               <Twitch className="h-5 w-5 text-white" /> Ver en Twitch
             </a>
             <a
               href="https://www.youtube.com/@valentinavtt"
-              className={reactiveBtn.replace('shadow-lg', 'shadow-md')}
+              className={`${reactiveBtn.replace('shadow-lg', 'shadow-md')} w-full sm:w-auto min-h-[44px]`}
               aria-label="Últimos videos en YouTube"
             >
               <Youtube className="h-5 w-5 text-white" /> Últimos videos
@@ -320,21 +327,21 @@ export default function ValentinaVTTPage() {
         </header>
 
         {/* Embed de Twitch */}
-        <section className="mt-10">
-          <div className="rounded-3xl border border-pink-300/30 bg-white/50 p-2 shadow-xl backdrop-blur">
-            <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+        <section className="mt-6 sm:mt-10">
+          <div className="rounded-2xl sm:rounded-3xl border border-pink-300/30 bg-white/50 p-2 shadow-xl backdrop-blur">
+            <div className="relative aspect-video w-full overflow-hidden rounded-xl sm:rounded-2xl bg-black">
               <iframe
-  title="Twitch Player"
-  src={
-    "https://player.twitch.tv/?channel=ValentinaVTT"
-    + "&parent=localhost"
-    + "&parent=valentina-vtt.vercel.app"
-  }
-  allowFullScreen
-  className="h-full w-full"
-/>
+                title="Twitch Player"
+                src={
+                  'https://player.twitch.tv/?channel=ValentinaVTT' +
+                  '&parent=localhost' +
+                  '&parent=valentina-vtt.vercel.app'
+                }
+                allowFullScreen
+                className="h-full w-full"
+              />
             </div>
-            <div className="flex items-center justify-between px-4 py-3 text-xs text-purple-700/70">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:items-center sm:justify-between px-4 py-3 text-xs text-purple-700/70">
               <span>En vivo / Último directo</span>
               <a
                 href="https://www.twitch.tv/valentinavtt"
@@ -348,21 +355,21 @@ export default function ValentinaVTTPage() {
 
         {/* Mis redes */}
         <section className="mt-10">
-          <h2 className="mb-4 text-xl font-semibold text-pink-700">Mis redes</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <h2 className="mb-3 sm:mb-4 text-lg sm:text-xl font-semibold text-pink-700">Mis redes</h2>
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {links.map((l) => (
               <a
                 key={l.title}
                 href={l.href}
-                className="group rounded-3xl border border-pink-300/30 bg-white/70 p-4 backdrop-blur transition hover:scale-[1.02] hover:bg-pink-100 active:scale-[0.99]"
+                className="group rounded-3xl border border-pink-300/30 bg-white/70 p-3 sm:p-4 backdrop-blur transition hover:scale-[1.02] hover:bg-pink-100 active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-pink-200">
+                  <div className="grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-2xl bg-pink-200">
                     {l.icon}
                   </div>
                   <div>
-                    <div className="text-base font-bold text-pink-800">{l.title}</div>
-                    <div className="text-sm text-purple-700/70">{l.subtitle}</div>
+                    <div className="text-[15px] sm:text-base font-bold text-pink-800">{l.title}</div>
+                    <div className="text-xs sm:text-sm text-purple-700/70">{l.subtitle}</div>
                   </div>
                 </div>
               </a>
@@ -423,24 +430,26 @@ export default function ValentinaVTTPage() {
             </div>
           </div>
 
-          <div className="relative h-56 sm:h-64 max-sm:h-44">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 -rotate-6 scale-90 opacity-60">
+          <div className="relative h-48 sm:h-56 lg:h-64">
+            {/* laterales: ocultos en móvil */}
+            <div className="absolute left-0 top-1/2 hidden sm:block -translate-y-1/2 -translate-x-4 -rotate-6 scale-90 opacity-60">
               <LockedSponsorCard />
             </div>
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 rotate-6 scale-90 opacity-60">
+            <div className="absolute right-0 top-1/2 hidden sm:block -translate-y-1/2 translate-x-4 rotate-6 scale-90 opacity-60">
               <LockedSponsorCard />
             </div>
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            {/* central */}
+            <div className="absolute left-1/2 top-1/2 w-full max-w-[520px] -translate-x-1/2 -translate-y-1/2 px-4">
               <LockedSponsorCard size="lg" />
             </div>
           </div>
         </section>
 
         {/* Contacto */}
-        <section id="contacto" className="mt-12">
-          <div className="rounded-3xl border border-pink-200/40 bg-white/70 p-6 text-center backdrop-blur">
-            <h2 className="text-xl font-semibold text-pink-700">Contacto</h2>
-            <p className="mt-2 text-purple-700/80">
+        <section id="contacto" className="mt-10 sm:mt-12">
+          <div className="rounded-3xl border border-pink-200/40 bg-white/70 p-5 sm:p-6 text-center backdrop-blur">
+            <h2 className="text-lg sm:text-xl font-semibold text-pink-700">Contacto</h2>
+            <p className="mt-2 text-[13px] sm:text-sm text-purple-700/80">
               Contáctame para colaborar:{' '}
               <a
                 href="mailto:valentinavtt7@gmail.com"
@@ -453,7 +462,7 @@ export default function ValentinaVTTPage() {
         </section>
 
         {/* Footer */}
-        <footer className="mt-12 flex flex-col items-center gap-2 text-center text-xs text-purple-700/70">
+        <footer className="mt-10 sm:mt-12 flex flex-col items-center gap-2 text-center text-[11px] sm:text-xs text-purple-700/70">
           <p>© {new Date().getFullYear()} ValentinaVTT. Todos los derechos reservados.</p>
           <p>
             Hecho con <span aria-hidden>💖</span> para la comunidad | Creado por{' '}
