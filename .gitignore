@@ -1,0 +1,18 @@
+# Next.js / Node
+node_modules
+.next
+out
+dist
+build
+
+# Env / sistema
+.env
+.env.local
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
