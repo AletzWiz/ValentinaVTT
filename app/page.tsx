@@ -300,7 +300,7 @@ export default function ValentinaVTTPage() {
             ValentinaVTT
           </h1>
           <p className="mt-2 max-w-xl text-purple-700/80">
-            Streamer • Comunidad kawaii 💖. Directos semanales, clips diarios y contenido
+            Streamer • Directos semanales, clips diarios y contenido
             divertido.
           </p>
 
@@ -453,7 +453,7 @@ export default function ValentinaVTTPage() {
         <footer className="mt-12 flex flex-col items-center gap-2 text-center text-xs text-purple-700/70">
           <p>© {new Date().getFullYear()} ValentinaVTT. Todos los derechos reservados.</p>
           <p>
-            Hecho con <span aria-hidden>💖</span> para la comunidad kawaii. | Creado por{' '}
+            Hecho con <span aria-hidden>💖</span> para la comunidad | Creado por{' '}
             <span className="font-bold">Aletzwiz</span>
           </p>
         </footer>
