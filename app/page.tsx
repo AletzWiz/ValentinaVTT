@@ -323,16 +323,12 @@ export default function ValentinaVTTPage() {
 <section className="mt-10">
   <div className="rounded-3xl border border-pink-300/30 bg-white/50 p-2 shadow-xl backdrop-blur">
     <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
-      {/*
-        IMPORTANTÍSIMO: parent debe ser el host actual.
-        Con esto funciona en localhost, vercel.app y tu dominio propio.
-      */}
       <iframe
         title="Twitch Player"
         src={
-          typeof window !== 'undefined'
+          typeof window !== "undefined"
             ? `https://player.twitch.tv/?channel=ValentinaVTT&parent=${window.location.hostname}`
-            : 'https://player.twitch.tv/?channel=ValentinaVTT&parent=localhost'
+            : "https://player.twitch.tv/?channel=ValentinaVTT&parent=valentina-vtt.vercel.app"
         }
         allowFullScreen
         className="h-full w-full"
@@ -348,7 +344,7 @@ export default function ValentinaVTTPage() {
       </a>
     </div>
   </div>
-</section>
+</section> 
 
 
         {/* Mis redes */}
