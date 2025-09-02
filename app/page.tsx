@@ -144,7 +144,14 @@ function SideShowcase() {
    Card sponsor bloqueado (estilo videojuego)
 ========================================================= */
 function LockedSponsorCard({ size = 'md' }: { size?: 'md' | 'lg' }) {
-  const dims = size === 'lg' ? 'w-[520px] h-[220px]' : 'w-[420px] h-[180px]';
+  // Hacemos el componente responsivo:
+  // - En móvil: usa % del viewport y alturas más bajas
+  // - En >=sm: vuelve a los tamaños “fijos” originales
+  const dims =
+    size === 'lg'
+      ? 'w-[88vw] sm:w-[520px] h-[180px] sm:h-[220px] max-w-[520px]'
+      : 'w-[78vw] sm:w-[420px] h-[150px] sm:h-[180px] max-w-[420px]';
+
   return (
     <div
       className={`relative ${dims} overflow-hidden rounded-3xl ring-1 ring-white/10 shadow-[0_20px_60px_-20px_rgba(0,0,0,.5)]`}
