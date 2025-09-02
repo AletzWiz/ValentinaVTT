@@ -416,7 +416,7 @@ export default function ValentinaVTTPage() {
         </section>
 
       {/* Sponsors bloqueados */}
-<section className="mt-12 overflow-x-hidden">
+<section className="mt-12 overflow-x-hidden sm:overflow-visible">
   <div className="mb-4 flex items-center justify-between px-2 sm:px-0">
     <h2 className="text-xl font-semibold text-pink-700">Sponsors</h2>
     <div className="flex items-center gap-2">
@@ -437,24 +437,24 @@ export default function ValentinaVTTPage() {
     </div>
   </div>
 
-  {/* Anclamos TODO al centro para que sea simétrico */}
+  {/* Todo anclado al centro para simetría */}
   <div className="relative h-52 sm:h-56 lg:h-64">
     {/* Central */}
-    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] sm:w-auto max-w-[520px]">
+    <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 w-[80vw] sm:w-auto max-w-[520px]">
       <LockedSponsorCard size="lg" />
     </div>
 
-    {/* Lateral IZQ (anclado al centro, corrido hacia la izquierda) */}
-    <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-[155%] rotate-6 scale-[.62] sm:-translate-x-[120%] sm:scale-90 opacity-60">
+    {/* Lateral IZQ */}
+    <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 -translate-x-[155%] rotate-6 scale-[.62] sm:-translate-x-[120%] sm:scale-90 opacity-60">
       <LockedSponsorCard />
     </div>
 
-    {/* Lateral DER (anclado al centro, corrido hacia la derecha) */}
-    <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-y-1/2 translate-x-[155%] -rotate-6 scale-[.62] sm:translate-x-[120%] sm:scale-90 opacity-60">
+    {/* Lateral DER (nota sm:overflow-visible arriba para que no se recorte) */}
+    <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 translate-x-[155%] -rotate-6 scale-[.62] sm:translate-x-[120%] sm:scale-90 opacity-60">
       <LockedSponsorCard />
     </div>
   </div>
-</section> 
+</section>
 
 
         {/* Contacto */}
