@@ -409,41 +409,45 @@ export default function ValentinaVTTPage() {
         </section>
 
         {/* Sponsors bloqueados */}
-        <section className="mt-12">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-pink-700">Sponsors</h2>
-            <div className="flex items-center gap-2">
-              <button
-                disabled
-                title="Próximamente"
-                className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                disabled
-                title="Próximamente"
-                className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
+<section className="mt-12">
+  <div className="mb-4 flex items-center justify-between">
+    <h2 className="text-xl font-semibold text-pink-700">Sponsors</h2>
+    <div className="flex items-center gap-2">
+      <button
+        disabled
+        title="Próximamente"
+        className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+      <button
+        disabled
+        title="Próximamente"
+        className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+    </div>
+  </div>
 
-          <div className="relative h-48 sm:h-56 lg:h-64">
-            {/* laterales: ocultos en móvil */}
-            <div className="absolute left-0 top-1/2 hidden sm:block -translate-y-1/2 -translate-x-4 -rotate-6 scale-90 opacity-60">
-              <LockedSponsorCard />
-            </div>
-            <div className="absolute right-0 top-1/2 hidden sm:block -translate-y-1/2 translate-x-4 rotate-6 scale-90 opacity-60">
-              <LockedSponsorCard />
-            </div>
-            {/* central */}
-            <div className="absolute left-1/2 top-1/2 w-full max-w-[520px] -translate-x-1/2 -translate-y-1/2 px-4">
-              <LockedSponsorCard size="lg" />
-            </div>
-          </div>
-        </section>
+  {/* Alto adaptable y sin ocultar laterales en móvil */}
+  <div className="relative h-56 sm:h-56 lg:h-64">
+    {/* Lateral IZQ: visible también en móvil, más pequeña */}
+    <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 -rotate-6 scale-[.78] sm:scale-90 opacity-60">
+      <LockedSponsorCard />
+    </div>
+
+    {/* Lateral DER */}
+    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 rotate-6 scale-[.78] sm:scale-90 opacity-60">
+      <LockedSponsorCard />
+    </div>
+
+    {/* Central (un poco de padding en móvil para que no pegue a los bordes) */}
+    <div className="absolute left-1/2 top-1/2 w-[92%] sm:w-auto max-w-[520px] -translate-x-1/2 -translate-y-1/2 px-2 sm:px-0">
+      <LockedSponsorCard size="lg" />
+    </div>
+  </div>
+</section> 
 
         {/* Contacto */}
         <section id="contacto" className="mt-10 sm:mt-12">
