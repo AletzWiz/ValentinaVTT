@@ -408,9 +408,9 @@ export default function ValentinaVTTPage() {
           </div>
         </section>
 
-        {/* Sponsors bloqueados */}
-<section className="mt-12">
-  <div className="mb-4 flex items-center justify-between">
+      {/* Sponsors bloqueados */}
+<section className="mt-12 overflow-x-hidden">  {/* <- clave: evita que sobresalga en móvil */}
+  <div className="mb-4 flex items-center justify-between px-2 sm:px-0">
     <h2 className="text-xl font-semibold text-pink-700">Sponsors</h2>
     <div className="flex items-center gap-2">
       <button
@@ -430,24 +430,25 @@ export default function ValentinaVTTPage() {
     </div>
   </div>
 
-  {/* Alto adaptable y sin ocultar laterales en móvil */}
-  <div className="relative h-56 sm:h-56 lg:h-64">
-    {/* Lateral IZQ: visible también en móvil, más pequeña */}
-    <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 -rotate-6 scale-[.78] sm:scale-90 opacity-60">
+  {/* Wrapper relativo con padding lateral en móvil */}
+  <div className="relative h-52 sm:h-56 lg:h-64 px-3 sm:px-0">
+    {/* Lateral IZQ (más pequeña y más adentro en móvil) */}
+    <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-6 scale-[.68] sm:left-0 sm:-translate-x-4 sm:scale-90 opacity-60">
       <LockedSponsorCard />
     </div>
 
     {/* Lateral DER */}
-    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 rotate-6 scale-[.78] sm:scale-90 opacity-60">
+    <div className="absolute right-2 top-1/2 -translate-y-1/2 rotate-6 scale-[.68] sm:right-0 sm:translate-x-4 sm:scale-90 opacity-60">
       <LockedSponsorCard />
     </div>
 
-    {/* Central (un poco de padding en móvil para que no pegue a los bordes) */}
-    <div className="absolute left-1/2 top-1/2 w-[92%] sm:w-auto max-w-[520px] -translate-x-1/2 -translate-y-1/2 px-2 sm:px-0">
+    {/* Central: ancho relativo en móvil para que nunca toque el borde */}
+    <div className="absolute left-1/2 top-1/2 w-[86%] sm:w-auto max-w-[520px] -translate-x-1/2 -translate-y-1/2">
       <LockedSponsorCard size="lg" />
     </div>
   </div>
-</section> 
+</section>
+
 
         {/* Contacto */}
         <section id="contacto" className="mt-10 sm:mt-12">
