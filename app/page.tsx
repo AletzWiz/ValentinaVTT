@@ -440,22 +440,21 @@ export default function ValentinaVTTPage() {
   {/* Todo anclado al centro para simetría */}
   <div className="relative h-52 sm:h-56 lg:h-64">
     {/* Central */}
-    <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 w-[80vw] sm:w-auto max-w-[520px]">
+    <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 w-[78vw] sm:w-auto max-w-[520px]">
       <LockedSponsorCard size="lg" />
     </div>
 
-    {/* Lateral IZQ */}
-    <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 -translate-x-[155%] rotate-6 scale-[.62] sm:-translate-x-[120%] sm:scale-90 opacity-60">
+    {/* Lateral IZQ (más cerca en desktop) */}
+    <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 -translate-x-[135%] sm:-translate-x-[95%] lg:-translate-x-[90%] rotate-6 scale-[.58] sm:scale-95 opacity-60">
       <LockedSponsorCard />
     </div>
 
-    {/* Lateral DER (nota sm:overflow-visible arriba para que no se recorte) */}
-    <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 translate-x-[155%] -rotate-6 scale-[.62] sm:translate-x-[120%] sm:scale-90 opacity-60">
+    {/* Lateral DER (más cerca en desktop) */}
+    <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 translate-x-[135%] sm:translate-x-[95%] lg:translate-x-[90%] -rotate-6 scale-[.58] sm:scale-95 opacity-60">
       <LockedSponsorCard />
     </div>
   </div>
 </section>
-
 
         {/* Contacto */}
         <section id="contacto" className="mt-10 sm:mt-12">
