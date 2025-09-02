@@ -416,45 +416,45 @@ export default function ValentinaVTTPage() {
         </section>
 
       {/* Sponsors bloqueados */}
-<section className="mt-12 overflow-x-hidden">  {/* <- clave: evita que sobresalga en móvil */}
+<section className="mt-12 overflow-x-hidden">
   <div className="mb-4 flex items-center justify-between px-2 sm:px-0">
     <h2 className="text-xl font-semibold text-pink-700">Sponsors</h2>
     <div className="flex items-center gap-2">
       <button
         disabled
-        title="Próximamente"
         className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
+        title="Próximamente"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         disabled
-        title="Próximamente"
         className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
+        title="Próximamente"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
     </div>
   </div>
 
-  {/* Wrapper relativo con padding lateral en móvil */}
-  <div className="relative h-52 sm:h-56 lg:h-64 px-3 sm:px-0">
-    {/* Lateral IZQ (más pequeña y más adentro en móvil) */}
-    <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-6 scale-[.68] sm:left-0 sm:-translate-x-4 sm:scale-90 opacity-60">
-      <LockedSponsorCard />
-    </div>
-
-    {/* Lateral DER */}
-    <div className="absolute right-2 top-1/2 -translate-y-1/2 rotate-6 scale-[.68] sm:right-0 sm:translate-x-4 sm:scale-90 opacity-60">
-      <LockedSponsorCard />
-    </div>
-
-    {/* Central: ancho relativo en móvil para que nunca toque el borde */}
-    <div className="absolute left-1/2 top-1/2 w-[86%] sm:w-auto max-w-[520px] -translate-x-1/2 -translate-y-1/2">
+  {/* Anclamos TODO al centro para que sea simétrico */}
+  <div className="relative h-52 sm:h-56 lg:h-64">
+    {/* Central */}
+    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] sm:w-auto max-w-[520px]">
       <LockedSponsorCard size="lg" />
     </div>
+
+    {/* Lateral IZQ (anclado al centro, corrido hacia la izquierda) */}
+    <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-[155%] rotate-6 scale-[.62] sm:-translate-x-[120%] sm:scale-90 opacity-60">
+      <LockedSponsorCard />
+    </div>
+
+    {/* Lateral DER (anclado al centro, corrido hacia la derecha) */}
+    <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-y-1/2 translate-x-[155%] -rotate-6 scale-[.62] sm:translate-x-[120%] sm:scale-90 opacity-60">
+      <LockedSponsorCard />
+    </div>
   </div>
-</section>
+</section> 
 
 
         {/* Contacto */}
