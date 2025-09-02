@@ -374,7 +374,7 @@ export default function ValentinaVTTPage() {
         <section className="mt-12">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Panel
-              bandText="kynsvrTV"
+              bandText="SotanoVTT"
               bandColor="bg-[linear-gradient(180deg,#ec4899,#d946ef)]"
               icon={<MessageCircle className="h-6 w-6 text-pink-600" />}
               title="¿Te unes a mi Discord?"
