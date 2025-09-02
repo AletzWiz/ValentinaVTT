@@ -144,13 +144,11 @@ function SideShowcase() {
    Card sponsor bloqueado (estilo videojuego)
 ========================================================= */
 function LockedSponsorCard({ size = 'md' }: { size?: 'md' | 'lg' }) {
-  // Hacemos el componente responsivo:
-  // - En móvil: usa % del viewport y alturas más bajas
-  // - En >=sm: vuelve a los tamaños “fijos” originales
+  // Responsivo:
   const dims =
     size === 'lg'
-      ? 'w-[88vw] sm:w-[520px] h-[180px] sm:h-[220px] max-w-[520px]'
-      : 'w-[78vw] sm:w-[420px] h-[150px] sm:h-[180px] max-w-[420px]';
+      ? 'w-[76vw] sm:w-[520px] h-[180px] sm:h-[220px] max-w-[520px]'
+      : 'w-[70vw] sm:w-[420px] h-[150px] sm:h-[180px] max-w-[420px]';
 
   return (
     <div
@@ -325,7 +323,7 @@ export default function ValentinaVTTPage() {
             </a>
             <a
               href="https://www.youtube.com/@valentinavtt"
-              className={`${reactiveBtn.replace('shadow-lg', 'shadow-md')} w-full sm:w-auto min-h-[44px]`}
+              className={`${reactiveBtn.replace('shadow-lg', 'shadow-md')} w/full sm:w-auto min-h-[44px]`}
               aria-label="Últimos videos en YouTube"
             >
               <Youtube className="h-5 w-5 text-white" /> Últimos videos
@@ -415,46 +413,45 @@ export default function ValentinaVTTPage() {
           </div>
         </section>
 
-      {/* Sponsors bloqueados */}
-<section className="mt-12 overflow-x-hidden sm:overflow-visible">
-  <div className="mb-4 flex items-center justify-between px-2 sm:px-0">
-    <h2 className="text-xl font-semibold text-pink-700">Sponsors</h2>
-    <div className="flex items-center gap-2">
-      <button
-        disabled
-        className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
-        title="Próximamente"
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </button>
-      <button
-        disabled
-        className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
-        title="Próximamente"
-      >
-        <ChevronRight className="h-5 w-5" />
-      </button>
-    </div>
-  </div>
+        {/* Sponsors (centrado y gap como antes) */}
+        <section className="mt-12 overflow-x-hidden sm:overflow-visible">
+          <div className="mb-4 flex items-center justify-between px-2 sm:px-0">
+            <h2 className="text-xl font-semibold text-pink-700">Sponsors</h2>
+            <div className="flex items-center gap-2">
+              <button
+                disabled
+                className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
+                title="Próximamente"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                disabled
+                className="inline-flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full bg-white/70 text-pink-700 ring-1 ring-pink-200/60 shadow-sm opacity-50"
+                title="Próximamente"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
 
-  {/* Todo anclado al centro para simetría */}
-  <div className="relative h-52 sm:h-56 lg:h-64">
-    {/* Central */}
-    <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 w-[78vw] sm:w-auto max-w-[520px]">
-      <LockedSponsorCard size="lg" />
-    </div>
+          <div className="relative h-52 sm:h-56 lg:h-64">
+            {/* Central */}
+            <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 w-[76vw] sm:w-auto max-w-[520px]">
+              <LockedSponsorCard size="lg" />
+            </div>
 
-    {/* Lateral IZQ (más cerca en desktop) */}
-    <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 -translate-x-[135%] sm:-translate-x-[95%] lg:-translate-x-[90%] rotate-6 scale-[.58] sm:scale-95 opacity-60">
-      <LockedSponsorCard />
-    </div>
+            {/* Lateral IZQ (más cerca en desktop) */}
+            <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 -translate-x-[125%] sm:-translate-x-[88%] lg:-translate-x-[82%] rotate-6 scale-[.56] sm:scale-95 opacity-60">
+              <LockedSponsorCard />
+            </div>
 
-    {/* Lateral DER (más cerca en desktop) */}
-    <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 translate-x-[135%] sm:translate-x-[95%] lg:translate-x-[90%] -rotate-6 scale-[.58] sm:scale-95 opacity-60">
-      <LockedSponsorCard />
-    </div>
-  </div>
-</section>
+            {/* Lateral DER (más cerca en desktop) */}
+            <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-y-1/2 translate-x-[125%] sm:translate-x-[88%] lg:translate-x-[82%] -rotate-6 scale-[.56] sm:scale-95 opacity-60">
+              <LockedSponsorCard />
+            </div>
+          </div>
+        </section>
 
         {/* Contacto */}
         <section id="contacto" className="mt-10 sm:mt-12">
@@ -484,3 +481,4 @@ export default function ValentinaVTTPage() {
     </main>
   );
 }
+
