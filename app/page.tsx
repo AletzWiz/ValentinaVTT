@@ -324,12 +324,15 @@ export default function ValentinaVTTPage() {
           <div className="rounded-3xl border border-pink-300/30 bg-white/50 p-2 shadow-xl backdrop-blur">
             <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
               <iframe
-                title="Twitch Player"
-                // Al publicar en Vercel/dominio propio: añade parent=tu-dominio (puedes repetir parent)
-                src="https://player.twitch.tv/?channel=ValentinaVTT&parent=localhost"
-                allowFullScreen
-                className="h-full w-full"
-              />
+  title="Twitch Player"
+  src={
+    "https://player.twitch.tv/?channel=ValentinaVTT"
+    + "&parent=localhost"
+    + "&parent=valentina-vtt.vercel.app"
+  }
+  allowFullScreen
+  className="h-full w-full"
+/>
             </div>
             <div className="flex items-center justify-between px-4 py-3 text-xs text-purple-700/70">
               <span>En vivo / Último directo</span>
