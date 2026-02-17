@@ -9,11 +9,12 @@ export default function LiveStream() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
-  const isLive = false;
+  
+  // CAMBIO 1: Cambia esto a 'true' cuando estés en directo
+  const isLive = true; 
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Container mask reveal
       gsap.fromTo(
         containerRef.current,
         { clipPath: 'circle(0% at 50% 50%)' },
@@ -29,7 +30,6 @@ export default function LiveStream() {
         }
       );
 
-      // Badge pop in
       gsap.fromTo(
         badgeRef.current,
         { scale: 0 },
@@ -50,7 +50,6 @@ export default function LiveStream() {
     return () => ctx.revert();
   }, []);
 
-  // Floating hearts animation - desde el lateral derecho del contenedor
   useEffect(() => {
     const interval = setInterval(() => {
       if (!containerRef.current) return;
@@ -79,7 +78,6 @@ export default function LiveStream() {
 
   return (
     <section ref={sectionRef} className="relative py-16 px-4">
-      {/* Section Title */}
       <div className="text-center mb-8">
         <h2 className="text-3xl sm:text-4xl font-bold text-gray-700 mb-2">
           En vivo / Último directo
@@ -94,35 +92,35 @@ export default function LiveStream() {
         </a>
       </div>
 
-      {/* Stream Container */}
       <div
         ref={containerRef}
         className="relative max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-2xl"
         style={{ boxShadow: '0 20px 60px rgba(255, 183, 197, 0.4)' }}
       >
-        {/* Live Badge */}
         <div
           ref={badgeRef}
           className={`absolute top-4 left-4 z-20 px-4 py-2 rounded-full font-bold text-white flex items-center gap-2 ${
             isLive ? 'bg-red-500 animate-pulse' : 'bg-gray-500'
           }`}
         >
-          <Radio className="w-4 h-4" />
+          <span className="relative flex h-3 w-3">
+            {isLive && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>}
+            <Radio className="relative inline-flex w-4 h-4" />
+          </span>
           {isLive ? 'EN VIVO' : 'OFFLINE'}
         </div>
 
-        {/* Twitch Embed */}
         <div className="relative aspect-video bg-gray-900">
           <iframe
-            src="https://player.twitch.tv/?channel=valentinavtt&parent=localhost&autoplay=false"
+            // CAMBIO 2: Aquí agregué tus dominios reales en el parámetro parent
+            src="https://player.twitch.tv/?channel=valentinavtt&parent=valentina-vtt.vercel.app&parent=www.valentinavtt.com&autoplay=false"
             className="absolute inset-0 w-full h-full"
             allowFullScreen
             title="ValentinaVTT Twitch Stream"
           />
         </div>
 
-        {/* Status Card */}
-        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-sm glass-card p-4">
+        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-sm glass-card p-4 bg-white/80 backdrop-blur-md rounded-xl border border-white/20">
           <p className="text-sm text-gray-600">
             {isLive
               ? '¡Estoy en directo ahora! Únete al chat 💬'
