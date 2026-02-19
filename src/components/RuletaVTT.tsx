@@ -29,9 +29,25 @@ export const RuletaVTT = () => {
 
   const girarRuleta = () => {
     if (!mustSpin && participantes.length > 1) {
+      // 1. Calculamos el premio
       const nuevoPremio = Math.floor(Math.random() * participantes.length);
+      
+      // 2. Seteamos el premio para que la ruleta sepa a dónde ir
       setPrizeNumber(nuevoPremio);
-      setMustSpin(true);
+
+      // 3. ¡EL TRUCO! Esperamos 150 milisegundos antes de activar el giro. 
+      // Esto obliga al navegador a procesar la animación completa dando tensión.
+      setTimeout(() => {
+        setMustSpin(true);
+
+        // Reproducir sonido si existe
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play().catch(() => console.log("Añade un ruleta.mp3 en public/"));
+        }
+      }, 150);
+    }
+  };
       
       // Reproducir sonido si existe
       if (audioRef.current) {
