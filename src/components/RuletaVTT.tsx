@@ -89,18 +89,26 @@ export const RuletaVTT = () => {
           </button>
         </div>
 
-        {/* Ruleta Flotante */}
+       {/* Ruleta Flotante */}
         <motion.div 
           animate={{ y: [-10, 10, -10] }} 
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-          className="relative flex flex-col items-center"
+          className="relative flex flex-col items-center mt-8 md:mt-0"
         >
+          {/* El puntero indicador (flecha) que apunta al ganador */}
+          {participantes.length > 0 && (
+            <div className="absolute -top-8 z-10 text-5xl drop-shadow-lg">
+              👇
+            </div>
+          )}
+
           {participantes.length > 0 ? (
             <div className="drop-shadow-2xl scale-110">
               <Wheel
                 mustStartSpinning={mustSpin}
                 prizeNumber={prizeNumber}
                 data={participantes}
+                spinDuration={0.6}
                 outerBorderColor="#ffffff"
                 outerBorderWidth={6}
                 innerRadius={15}
