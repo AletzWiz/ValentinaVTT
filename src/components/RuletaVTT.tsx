@@ -89,37 +89,41 @@ export const RuletaVTT = () => {
           </button>
         </div>
 
-       {/* Ruleta Flotante */}
-        <motion.div 
-          animate={{ y: [-10, 10, -10] }} 
-          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-          className="relative flex flex-col items-center mt-8 md:mt-0"
-        >
-          {/* El puntero indicador (flecha) que apunta al ganador */}
-          {participantes.length > 0 && (
-            <div className="absolute -top-8 z-10 text-5xl drop-shadow-lg">
-              👇
-            </div>
-          )}
-
+      {/* Área de la Ruleta (Sin flote para evitar lag al girar) */}
+        <div className="relative flex flex-col items-center mt-12 md:mt-0">
+          
           {participantes.length > 0 ? (
-            <div className="drop-shadow-2xl scale-110">
-              <Wheel
-                mustStartSpinning={mustSpin}
-                prizeNumber={prizeNumber}
-                data={participantes}
-                spinDuration={0.6}
-                outerBorderColor="#ffffff"
-                outerBorderWidth={6}
-                innerRadius={15}
-                innerBorderColor="#ffffff"
-                radiusLineColor="#ffffff"
-                radiusLineWidth={3}
-                textColors={['#ffffff', '#666666']}
-                fontSize={16}
-                onStopSpinning={() => setMustSpin(false)}
-              />
-            </div>
+            <>
+              {/* EL PUNTERO ROJO (Triángulo CSS) */}
+              {/* Está posicionado absolutamente arriba al centro */}
+              <div className="absolute -top-8 z-20 w-0 h-0 
+                            border-l-[25px] border-l-transparent 
+                            border-r-[25px] border-r-transparent 
+                            border-t-[40px] border-t-red-500 
+                            drop-shadow-lg filter hue-rotate-15">
+              </div>
+
+              <div className="drop-shadow-2xl scale-110 relative z-10">
+                <Wheel
+                  mustStartSpinning={mustSpin}
+                  prizeNumber={prizeNumber}
+                  data={participantes}
+                  // Aumentamos un poco la duración para que sea más suave
+                  spinDuration={0.8} 
+                  outerBorderColor="#ffffff"
+                  outerBorderWidth={8}
+                  innerRadius={20}
+                  innerBorderColor="#ffffff"
+                  radiusLineColor="#ffffff"
+                  radiusLineWidth={4}
+                  textColors={['#ffffff', '#666666']}
+                  fontSize={17}
+                  // Cuando termina de girar, el premio seleccionado queda arriba justo en el puntero
+                  perpendicularText={true}
+                  onStopSpinning={() => setMustSpin(false)}
+                />
+              </div>
+            </>
           ) : (
             <div className="w-[300px] h-[300px] bg-white/50 rounded-full flex items-center justify-center border-4 border-dashed border-pink-300 text-pink-400 font-bold text-center p-4 shadow-inner">
               Añade a alguien para jugar 🌸
@@ -129,11 +133,11 @@ export const RuletaVTT = () => {
           <button
             onClick={girarRuleta}
             disabled={mustSpin || participantes.length < 2}
-            className={`mt-10 bg-gradient-to-r from-pink-400 to-rose-400 text-white px-12 py-4 rounded-full font-black text-2xl shadow-[0_10px_20px_rgba(244,114,182,0.4)] hover:scale-105 active:scale-95 transition-all ${mustSpin ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`mt-12 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-14 py-5 rounded-full font-black text-2xl shadow-[0_10px_25px_rgba(244,114,182,0.5)] hover:scale-105 active:scale-95 transition-all ${mustSpin ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             ¡GIRAR! 💖
           </button>
-        </motion.div>
+        </div>
       </div>
     </motion.section>
   );
