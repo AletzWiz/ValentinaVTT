@@ -1,5 +1,5 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
-import { RuletaVTT } from './components/RuletaVTT';
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -12,57 +12,49 @@ import Wishlist from './sections/Wishlist';
 import Sponsors from './sections/Sponsors';
 import Contact from './sections/Contact';
 import Footer from './sections/Footer';
+import { RuletaVTT } from './components/RuletaVTT';
 
 import './App.css';
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger);
-
-function App() {
+// 1. Agrupamos todo tu contenido principal en un componente "Inicio"
+const Inicio = () => {
   useEffect(() => {
-    // Smooth scroll behavior
-    ScrollTrigger.defaults({
-      toggleActions: 'play none none reverse',
-    });
-
-    // Refresh ScrollTrigger on load
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.defaults({ toggleActions: 'play none none reverse' });
     ScrollTrigger.refresh();
-
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
+    return () => { ScrollTrigger.getAll().forEach(trigger => trigger.kill()); };
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#FFF0F5]">
-      <Navbar />
-      {/* Hero Section */}
+    <>
       <Hero />
-
-      {/* Live Stream Section */}
       <LiveStream />
-      {/* Ruleta Section */}
-      <RuletaVTT />
-
-      {/* Social Grid Section */}
       <SocialGrid />
-
-      {/* Discord Section */}
       <Discord />
-
-      {/* Wishlist Section */}
       <Wishlist />
-
-      {/* Sponsors Section */}
       <Sponsors />
-
-      {/* Contact Section */}
       <Contact />
-
-      {/* Footer */}
       <Footer />
-    </main>
+    </>
+  );
+};
+
+// 2. Aquí creamos las rutas de tu página web
+export default function App() {
+  return (
+    <Router>
+      <main className="min-h-screen bg-[#FFF0F5]">
+        <Navbar />
+        
+        <Routes>
+          {/* Ruta principal: valentinavtt.com */}
+          <Route path="/" element={<Inicio />} />
+          
+          {/* Ruta separada: valentinavtt.com/ruleta */}
+          <Route path="/ruleta" element={<RuletaVTT />} />
+        </Routes>
+      </main>
+    </Router>
   );
 }
 
-export default App;
