@@ -1,3 +1,4 @@
+import { Navbar } from './components/Navbar';
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -33,6 +34,7 @@ function App() {
 
   return (
     <main className="min-h-screen bg-[#FFF0F5]">
+      <Navbar />
       {/* Hero Section */}
       <Hero />
 
