@@ -1,4 +1,5 @@
 import { Navbar } from './components/Navbar';
+import { RuletaVTT } from './components/RuletaVTT';
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -40,6 +41,8 @@ function App() {
 
       {/* Live Stream Section */}
       <LiveStream />
+      {/* Ruleta Section */}
+      <RuletaVTT />
 
       {/* Social Grid Section */}
       <SocialGrid />
