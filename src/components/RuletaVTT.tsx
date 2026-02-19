@@ -89,41 +89,30 @@ export const RuletaVTT = () => {
           </button>
         </div>
 
-      {/* Área de la Ruleta (Sin flote para evitar lag al girar) */}
+     {/* Área de la Ruleta (Optimizada al 100% para fluidez y sin puntero doble) */}
         <div className="relative flex flex-col items-center mt-12 md:mt-0">
           
           {participantes.length > 0 ? (
-            <>
-              {/* EL PUNTERO ROJO (Triángulo CSS) */}
-              {/* Está posicionado absolutamente arriba al centro */}
-              <div className="absolute -top-8 z-20 w-0 h-0 
-                            border-l-[25px] border-l-transparent 
-                            border-r-[25px] border-r-transparent 
-                            border-t-[40px] border-t-red-500 
-                            drop-shadow-lg filter hue-rotate-15">
-              </div>
-
-              <div className="drop-shadow-2xl scale-110 relative z-10">
-                <Wheel
-                  mustStartSpinning={mustSpin}
-                  prizeNumber={prizeNumber}
-                  data={participantes}
-                  // Aumentamos un poco la duración para que sea más suave
-                  spinDuration={0.8} 
-                  outerBorderColor="#ffffff"
-                  outerBorderWidth={8}
-                  innerRadius={20}
-                  innerBorderColor="#ffffff"
-                  radiusLineColor="#ffffff"
-                  radiusLineWidth={4}
-                  textColors={['#ffffff', '#666666']}
-                  fontSize={17}
-                  // Cuando termina de girar, el premio seleccionado queda arriba justo en el puntero
-                  perpendicularText={true}
-                  onStopSpinning={() => setMustSpin(false)}
-                />
-              </div>
-            </>
+            /* Eliminamos 'scale', sombras pesadas y el triángulo rojo manual. 
+               Usamos un div simple para que el giro sea suave como mantequilla */
+            <div className="relative z-10 bg-white p-1 rounded-full shadow-lg"> 
+              <Wheel
+                mustStartSpinning={mustSpin}
+                prizeNumber={prizeNumber}
+                data={participantes}
+                spinDuration={0.9} 
+                outerBorderColor="#fce7f3" 
+                outerBorderWidth={5}
+                innerRadius={20}
+                innerBorderColor="#ffffff"
+                radiusLineColor="#fce7f3"
+                radiusLineWidth={2}
+                textColors={['#ffffff', '#666666']}
+                fontSize={17}
+                perpendicularText={true}
+                onStopSpinning={() => setMustSpin(false)}
+              />
+            </div>
           ) : (
             <div className="w-[300px] h-[300px] bg-white/50 rounded-full flex items-center justify-center border-4 border-dashed border-pink-300 text-pink-400 font-bold text-center p-4 shadow-inner">
               Añade a alguien para jugar 🌸
@@ -133,7 +122,7 @@ export const RuletaVTT = () => {
           <button
             onClick={girarRuleta}
             disabled={mustSpin || participantes.length < 2}
-            className={`mt-12 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-14 py-5 rounded-full font-black text-2xl shadow-[0_10px_25px_rgba(244,114,182,0.5)] hover:scale-105 active:scale-95 transition-all ${mustSpin ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`mt-12 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-14 py-5 rounded-full font-black text-2xl shadow-lg hover:scale-105 active:scale-95 transition-all ${mustSpin ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             ¡GIRAR! 💖
           </button>
