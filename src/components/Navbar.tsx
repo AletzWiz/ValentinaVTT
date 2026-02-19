@@ -17,7 +17,7 @@ export const Navbar = () => {
         <div className="hidden md:flex gap-6 items-center font-bold text-pink-400">
           <Link to="/" className="hover:text-pink-600 transition">Inicio</Link>
           <Link to="/ruleta" className="hover:text-pink-600 transition">RuletaVTT</Link>
-          <a href to="https://discord.gg/TU_LINK_AQUI" target="_blank" rel="noreferrer" className="bg-[#5865F2] text-white px-6 py-2 rounded-full hover:bg-[#4752C4] transition shadow-lg shadow-indigo-200">
+          <a href="https://discord.gg/TU_LINK_AQUI" target="_blank" rel="noreferrer" className="bg-[#5865F2] text-white px-6 py-2 rounded-full hover:bg-[#4752C4] transition shadow-lg shadow-indigo-200">
             Discord
           </a>
         </div>
@@ -34,7 +34,7 @@ export const Navbar = () => {
           <div className="flex flex-col p-4 gap-4 text-center font-bold text-pink-400">
             <Link to="/" onClick={() => setIsOpen(false)}>Inicio</Link>
             <Link to="/ruleta" onClick={() => setIsOpen(false)}>RuletaVTT</Link>
-            <a href to="https://discord.gg/TU_LINK_AQUI" target="_blank" rel="noreferrer" className="bg-[#5865F2] text-white py-2 rounded-xl shadow-md">Unirme al Discord</a>
+            <a href="https://discord.gg/TU_LINK_AQUI" target="_blank" rel="noreferrer" className="bg-[#5865F2] text-white py-2 rounded-xl shadow-md">Unirme al Discord</a>
           </div>
         </div>
       )}
