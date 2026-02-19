@@ -100,7 +100,6 @@ export const RuletaVTT = () => {
                 mustStartSpinning={mustSpin}
                 prizeNumber={prizeNumber}
                 data={participantes}
-                spinDuration={0.9} 
                 outerBorderColor="#fce7f3" 
                 outerBorderWidth={5}
                 innerRadius={20}
