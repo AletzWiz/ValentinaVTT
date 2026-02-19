@@ -17,7 +17,7 @@ export const Navbar = () => {
         <div className="hidden md:flex gap-6 items-center font-bold text-pink-400">
           <Link to="#" className="hover:text-pink-600 transition">Inicio</a>
           <Link to="#ruleta" className="hover:text-pink-600 transition">RuletaVTT</a>
-          <Link to="https://discord.gg/TU_LINK_AQUI" target="_blank" rel="noreferrer" className="bg-[#5865F2] text-white px-6 py-2 rounded-full hover:bg-[#4752C4] transition shadow-lg shadow-indigo-200">
+          <a href to="https://discord.gg/TU_LINK_AQUI" target="_blank" rel="noreferrer" className="bg-[#5865F2] text-white px-6 py-2 rounded-full hover:bg-[#4752C4] transition shadow-lg shadow-indigo-200">
             Discord
           </a>
         </div>
