@@ -136,11 +136,10 @@ export const RuletaVTT = () => {
             disabled={mustSpin || participantes.length < 2}
             className={`mt-12 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-14 py-5 rounded-full font-black text-2xl shadow-lg hover:scale-105 active:scale-95 transition-all ${mustSpin ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            ¡GIRAR! 💖
+           ¡GIRAR! 💖
           </button>
-        </div>
         </div>
       </div>
     </motion.section>
   );
-}; 
+};
