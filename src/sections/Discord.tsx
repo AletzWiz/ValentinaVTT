@@ -126,7 +126,7 @@ export default function Discord() {
           {/* Button */}
           <Button
             className="btn-kawaii bg-white text-[#5865F2] hover:bg-gray-100 font-bold px-8 py-6 text-lg group"
-            onClick={() => window.open('https://discord.gg/kynsvrTV', '_blank')}
+            onClick={() => window.open('https://discord.gg/fTnp3CGqHr', '_blank')}
           >
             <span className="group-hover:animate-wiggle inline-block">
               Entrar al Discord
