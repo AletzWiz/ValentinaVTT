@@ -139,3 +139,8 @@ export const RuletaVTT = () => {
             ¡GIRAR! 💖
           </button>
         </div>
+        </div>
+      </div>
+    </motion.section>
+  );
+};
