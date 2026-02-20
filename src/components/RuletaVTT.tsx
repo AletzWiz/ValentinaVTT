@@ -96,13 +96,18 @@ export const RuletaVTT = () => {
           </button>
         </div>
 
-     {/* Área de la Ruleta (Optimizada al 100% para fluidez y sin puntero doble) */}
+    {/* Área de la Ruleta con Efecto de Flotación */}
         <div className="relative flex flex-col items-center mt-12 md:mt-0">
           
           {participantes.length > 0 ? (
-            /* Eliminamos 'scale', sombras pesadas y el triángulo rojo manual. 
-               Usamos un div simple para que el giro sea suave como mantequilla */
-            <div className="relative z-10 bg-white p-1 rounded-full shadow-lg"> 
+            /* Envolvemos todo en un motion.div para el efecto de flotación.
+               y: [-10, 10, -10] hace que suba y baje 10 píxeles suavemente.
+            */
+            <motion.div 
+              animate={{ y: [-10, 10, -10] }} 
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+              className="relative z-10 bg-white p-1 rounded-full shadow-xl"
+            > 
               <Wheel
                 mustStartSpinning={mustSpin}
                 prizeNumber={prizeNumber}
@@ -118,8 +123,9 @@ export const RuletaVTT = () => {
                 perpendicularText={true}
                 onStopSpinning={() => setMustSpin(false)}
               />
-            </div>
+            </motion.div>
           ) : (
+            /* Cuadro de aviso cuando no hay nombres */
             <div className="w-[300px] h-[300px] bg-white/50 rounded-full flex items-center justify-center border-4 border-dashed border-pink-300 text-pink-400 font-bold text-center p-4 shadow-inner">
               Añade a alguien para jugar 🌸
             </div>
@@ -133,7 +139,3 @@ export const RuletaVTT = () => {
             ¡GIRAR! 💖
           </button>
         </div>
-      </div>
-    </motion.section>
-  );
-};
