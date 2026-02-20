@@ -143,4 +143,4 @@ export const RuletaVTT = () => {
       </div>
     </motion.section>
   );
-};
+}; 
