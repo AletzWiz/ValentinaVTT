@@ -4,6 +4,21 @@ module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      // 1. AGREGA ESTE BLOQUE DE KEYFRAMES
+      keyframes: {
+        shine: {
+          '0%': { left: '-100%' },
+          '100%': { left: '125%' },
+        }
+      },
+      // 2. AGREGA ESTE BLOQUE DE ANIMATION
+      animation: {
+        shine: 'shine 2.5s infinite',
+      }
+    },
+  },
+  plugins: [],
+}
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
