@@ -7,28 +7,31 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. Conseguimos el pase VIP (Token) de Twitch en secreto
     const tokenReq = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`, { method: 'POST' });
     const tokenData = await tokenReq.json();
     const token = tokenData.access_token;
 
-    // 2. Buscamos el ID interno del canal de Valentina
-    const username = "valentinavtt"; // <-- CONFIRMA QUE ASÍ ESTÁ EN TWITCH
+    const username = "valentinavtt";
     const userReq = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
       headers: { 'Client-ID': clientId, 'Authorization': `Bearer ${token}` }
     });
     const userData = await userReq.json();
     const broadcasterId = userData.data[0].id;
 
-    // 3. Pedimos los 20 mejores clips a partir del 13 de mayo de 2026
-    const startDate = new Date('2026-05-13T00:00:00Z').toISOString();
-    const clipsReq = await fetch(`https://api.twitch.tv/helix/clips?broadcaster_id=${broadcasterId}&started_at=${startDate}&first=20`, {
+    // Fecha estricta: 13 de Mayo de 2026
+    const startDateString = '2026-05-13T00:00:00Z';
+    const startDate = new Date(startDateString);
+    
+    // Pedimos el top 10 a Twitch
+    const clipsReq = await fetch(`https://api.twitch.tv/helix/clips?broadcaster_id=${broadcasterId}&started_at=${startDateString}&first=10`, {
       headers: { 'Client-ID': clientId, 'Authorization': `Bearer ${token}` }
     });
     const clipsData = await clipsReq.json();
 
-    // Le mandamos los clips de forma segura a tu página web
-    res.status(200).json(clipsData.data || []);
+    // Candado extra de seguridad: Filtramos nosotros mismos para eliminar colados viejos
+    const clipsReales = (clipsData.data || []).filter(clip => new Date(clip.created_at) >= startDate);
+
+    res.status(200).json(clipsReales);
   } catch (error) {
     res.status(500).json({ error: "Error conectando con Twitch" });
   }
