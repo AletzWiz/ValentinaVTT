@@ -1,9 +1,9 @@
 [
-  { "nombre": "NelsonVTT", "dias": 102 },
-  { "nombre": "VenomVTT", "dias": 100 },
-  { "nombre": "TamalitoVTT", "dias": 57 },
-  { "nombre": "MonikaVTT", "dias": 20 },
-  { "nombre": "GalletitaVTT", "dias": 12 },
-  { "nombre": "Sin Usuario", "dias": 0 },
-  { "nombre": "Sin Usuario", "dias": 0 }
+  { "nombre": "NelsonVTT", "dias": 102, "fecha": "2026-05-13" },
+  { "nombre": "VenomVTT", "dias": 100, "fecha": "2026-05-13" },
+  { "nombre": "TamalitoVTT", "dias": 57, "fecha": "2026-05-13" },
+  { "nombre": "MonikaVTT", "dias": 20, "fecha": "2026-05-13" },
+  { "nombre": "GalletitaVTT", "dias": 12, "fecha": "2026-05-13" },
+  { "nombre": "Sin Usuario", "dias": 0, "fecha": "2026-05-13" },
+  { "nombre": "Sin Usuario", "dias": 0, "fecha": "2026-05-13" },
 ]
