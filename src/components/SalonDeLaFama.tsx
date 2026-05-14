@@ -11,7 +11,6 @@ interface TwitchClip {
   title: string;
 }
 
-// ✨ COMPONENTE DE PARTÍCULAS DORADAS ✨
 const ParticulasDoradas = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -22,10 +21,8 @@ const ParticulasDoradas = () => {
             key={i}
             className="absolute bg-yellow-300 rounded-full opacity-40 animate-pulse"
             style={{
-              width: `${size}px`,
-              height: `${size}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
+              width: `${size}px`, height: `${size}px`,
+              top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`,
               animationDuration: `${Math.random() * 3 + 2}s`,
               animationDelay: `${Math.random() * 2}s`,
               boxShadow: '0 0 10px rgba(250, 204, 21, 0.8)'
@@ -41,45 +38,34 @@ export const SalonDeLaFama = () => {
   const [clips, setClips] = useState<TwitchClip[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔴 CAMBIA ESTO A "true" SI QUIERES VER LOS CUADROS DE PRUEBA
-  const TEST_MODE = false;
-
   useEffect(() => {
     const fetchClips = async () => {
       try {
         setLoading(true);
+        // Llamamos al conector secreto que hicimos
+        const response = await fetch('/api/clips');
+        const data = await response.json();
         
-        if (TEST_MODE) {
-          // Datos de prueba para ver el diseño arreglado
-          const mockClips = Array.from({ length: 20 }, (_, i) => ({
-            id: `clip-${i}`,
-            url: "#",
-            embed_url: "",
-            creator_name: i === 0 ? "TopEditor1" : i === 1 ? "ClipMaster" : i === 2 ? "VTT_Fan" : `User_${i}`,
-            thumbnail_url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400", // Imagen real de fallback
-            view_count: 5000 - (i * 200),
-            title: `Momento épico #${i + 1}`
-          }));
-          setClips(mockClips);
+        if (Array.isArray(data)) {
+          setClips(data);
         } else {
-          // Aquí conectaremos la API real. Por ahora, lo dejamos vacío para mostrar "Esperando clip"
+          console.error("Error de la API:", data);
           setClips([]);
         }
+      } catch (error) {
+        console.error("Error buscando clips:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchClips();
-  }, [TEST_MODE]);
+  }, []);
 
-  if (loading) return <div className="text-center py-20 text-yellow-500 font-bold bg-[#1a0f14] min-h-screen flex items-center justify-center">Preparando el escenario dorado...</div>;
+  if (loading) return <div className="text-center py-20 text-yellow-500 font-bold bg-[#1a0f14] min-h-screen flex items-center justify-center">Preparando la alfombra dorada...</div>;
 
   return (
-    // Fondo más claro (Mora oscuro/Chocolate)
     <section className="min-h-screen bg-[#1a0f14] pt-24 pb-12 px-4 relative overflow-hidden">
-      
-      {/* Luces y Partículas */}
       <ParticulasDoradas />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-pink-900/10 blur-[100px] rounded-full pointer-events-none z-0"></div>
 
@@ -91,13 +77,12 @@ export const SalonDeLaFama = () => {
         <p className="text-gray-400 text-sm mt-2">13 Mayo 2026 - 13 Julio 2026</p>
       </div>
 
-      {/* Condición: Si no hay clips, mostramos la claqueta. Si hay, mostramos el carrusel */}
       {clips.length === 0 ? (
         <div className="max-w-2xl mx-auto relative z-10">
           <div className="border-4 border-dashed border-pink-900/50 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-[#24131d]/50 backdrop-blur-sm transition-all hover:border-pink-500/50 hover:shadow-[0_0_30px_rgba(219,39,119,0.1)]">
             <Clapperboard size={80} strokeWidth={1.5} className="text-pink-400/60 mb-6 drop-shadow-lg" />
             <h3 className="text-3xl font-black text-slate-200 mb-2 tracking-tight">Esperando clip</h3>
-            <p className="text-pink-400/80 font-medium">Aún no hay obras maestras en esta temporada.</p>
+            <p className="text-pink-400/80 font-medium text-center">Aún no hay obras maestras en esta temporada.</p>
           </div>
         </div>
       ) : (
@@ -117,7 +102,6 @@ export const SalonDeLaFama = () => {
                     'bg-[#1e1018] shadow-lg border border-pink-900/30'}
                 `}
               >
-                {/* Contenedor de imagen arreglado con altura fija (h-40) */}
                 <div className="relative w-full h-40 bg-black/50">
                   <img src={clip.thumbnail_url} alt={clip.title} className="w-full h-full object-cover opacity-90" onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400'; }} />
                   <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-pink-200 text-[10px] px-2 py-1 rounded-full border border-pink-500/30">
