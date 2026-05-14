@@ -22,7 +22,7 @@ interface RachaData {
   dias: number;
 }
 
-// ✨ Partículas doradas sutiles ✨
+// ✨ Partículas doradas y animaciones de fuego ✨
 const ParticulasDoradas = () => {
   return (
     <>
@@ -43,9 +43,27 @@ const ParticulasDoradas = () => {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-12px); }
         }
+        /* ANIMACIONES DE FUEGO PARA LAS RACHAS */
+        @keyframes flameIntense {
+          0%, 100% { transform: scale(1) rotate(-5deg); opacity: 1; filter: drop-shadow(0 0 8px rgba(250,204,21,0.8)); }
+          50% { transform: scale(1.25) rotate(5deg); opacity: 0.9; filter: drop-shadow(0 0 15px rgba(250,204,21,1)); }
+        }
+        @keyframes flameMedium {
+          0%, 100% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 0 5px rgba(251,146,60,0.5)); }
+          50% { transform: scale(1.15); opacity: 0.7; filter: drop-shadow(0 0 10px rgba(251,146,60,0.8)); }
+        }
+        @keyframes flameSubtle {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.08); opacity: 0.6; filter: drop-shadow(0 0 5px rgba(248,113,113,0.5)); }
+        }
+
         .animate-fade-in { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-float-title { animation: floatTitle 5s ease-in-out infinite; }
         .animate-float-podium { animation: floatPodium 5s ease-in-out infinite; }
+        
+        .animate-flame-1 { animation: flameIntense 0.6s ease-in-out infinite; }
+        .animate-flame-2 { animation: flameMedium 1.2s ease-in-out infinite; }
+        .animate-flame-3 { animation: flameSubtle 1.8s ease-in-out infinite; }
       `}</style>
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         {[...Array(25)].map((_, i) => {
@@ -84,6 +102,13 @@ const EmojisFondo = () => (
   </div>
 );
 
+// Componente reutilizable para los títulos de sección (Estilo Pastilla/Badge)
+const TituloSeccion = ({ texto }: { texto: string }) => (
+  <h2 className="text-xl md:text-2xl font-bold text-yellow-400 tracking-widest mb-2 mt-6 font-sans bg-[#4a0414]/60 backdrop-blur-md inline-block px-8 py-3 rounded-full border-2 border-yellow-500/50 shadow-[0_0_20px_rgba(250,204,21,0.2)] uppercase">
+    {texto}
+  </h2>
+);
+
 export const SalonDeLaFama = () => {
   const [clips, setClips] = useState<TwitchClip[]>([]);
   const [rachas, setRachas] = useState<RachaData[]>([]);
@@ -107,11 +132,11 @@ export const SalonDeLaFama = () => {
           setMeta(clipsData.meta);
         }
 
-        // 2. Buscamos tu archivo manual de rachas
+        // 2. Buscamos tu archivo manual de rachas (Ahora lee los primeros 10)
         const rachasResponse = await fetch('/rachas.json');
         if (rachasResponse.ok) {
           const rachasData = await rachasResponse.json();
-          setRachas(rachasData.slice(0, 7));
+          setRachas(rachasData.slice(0, 10));
         }
 
       } catch (error) {
@@ -149,8 +174,8 @@ export const SalonDeLaFama = () => {
 
       <div className="relative z-10 animate-fade-in w-full flex flex-col items-center">
         
-        <div className="max-w-6xl mx-auto text-center mb-6">
-          {/* TÍTULO PRINCIPAL: Más pequeño y centrado */}
+        <div className="max-w-6xl mx-auto text-center mb-4">
+          {/* TÍTULO PRINCIPAL */}
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_0_15px_rgba(250,204,21,0.7)] mb-4 tracking-[0.15em] uppercase animate-float-title text-center">
             SALON DE LA FAMA
           </h1>
@@ -188,13 +213,10 @@ export const SalonDeLaFama = () => {
         {/* ======================================= */}
         {currentSection === 0 && (
           <div className="w-full flex flex-col items-center animate-fade-in">
-            {/* Título de sección: Minúsculas y color blanco/gris claro */}
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-2 mt-6 font-sans">
-              Clips más populares
-            </h2>
+            <TituloSeccion texto="Clips más populares" />
 
             {clips.length === 0 ? (
-              <div className="max-w-2xl mx-auto mt-4">
+              <div className="max-w-2xl mx-auto mt-8">
                 <div className="border-2 border-dashed border-yellow-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                   <Clapperboard size={80} strokeWidth={1.5} className="text-yellow-400/80 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)] animate-pulse" />
                   <h3 className="text-2xl md:text-3xl font-sans font-bold text-white mb-2 tracking-tight">Esperando clip</h3>
@@ -202,16 +224,12 @@ export const SalonDeLaFama = () => {
                 </div>
               </div>
             ) : (
-              // pt-20 y pb-24 para evitar por completo el clipping al hacer hover/flotar
-              <div className="max-w-7xl mx-auto overflow-x-auto pt-20 pb-24 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
+              <div className="max-w-7xl mx-auto overflow-x-auto pt-12 pb-20 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
                 {clips.map((clip, index) => {
                   const isGold = index === 0;
                   const isSilver = index === 1;
                   const isBronze = index === 2;
-
-                  const hdThumbnail = clip.thumbnail_url
-                    .replace('%{width}', '640')
-                    .replace('%{height}', '360'); 
+                  const hdThumbnail = clip.thumbnail_url.replace('%{width}', '640').replace('%{height}', '360'); 
 
                   return (
                     <div 
@@ -229,7 +247,6 @@ export const SalonDeLaFama = () => {
                         <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-pink-200 text-[10px] px-2 py-1 rounded-full border border-pink-500/30 tracking-wider">
                           {clip.view_count.toLocaleString()} vistas
                         </div>
-                        
                         <div className={`absolute -top-3 -right-2 w-12 h-12 flex items-center justify-center rounded-full font-black text-xl shadow-[0_0_15px_rgba(0,0,0,0.8)]
                           ${isGold ? 'bg-gradient-to-br from-yellow-200 to-yellow-600 text-black border-2 border-yellow-100' : 
                             isSilver ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black border-2 border-slate-100' : 
@@ -239,7 +256,6 @@ export const SalonDeLaFama = () => {
                           {index + 1}
                         </div>
                       </div>
-
                       <div className="p-5">
                         <p className="text-[10px] uppercase tracking-widest text-pink-500 font-bold mb-1">Creador VIP</p>
                         <h3 className={`text-xl font-black truncate drop-shadow-md
@@ -250,11 +266,8 @@ export const SalonDeLaFama = () => {
                           {clip.creator_name}
                         </h3>
                         <p className="text-xs text-pink-200/60 truncate mt-2 font-medium">{clip.title}</p>
-                        
                         <a 
-                          href={clip.url} 
-                          target="_blank" 
-                          rel="noreferrer"
+                          href={clip.url} target="_blank" rel="noreferrer"
                           className="mt-5 block text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-300 bg-black/40 text-yellow-400 border border-yellow-600/50 hover:bg-yellow-500 hover:text-black hover:shadow-[0_0_20px_rgba(250,204,21,0.5)] tracking-widest"
                         >
                           VER JOYA EN TWITCH
@@ -272,74 +285,79 @@ export const SalonDeLaFama = () => {
         {/* ===== SECCIÓN 1: MEJORES RACHAS ======= */}
         {/* ======================================= */}
         {currentSection === 1 && (
-          <div className="w-full flex flex-col items-center animate-fade-in">
-            {/* Título de sección: Minúsculas y color blanco/gris claro */}
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-2 mt-6 font-sans">
-              Mejores rachas
-            </h2>
+          <div className="w-full flex flex-col items-center animate-fade-in px-4">
+            <TituloSeccion texto="Mejores rachas" />
 
             {rachas.length === 0 ? (
-              <div className="max-w-2xl mx-auto mt-4">
+              <div className="max-w-2xl mx-auto mt-8">
                 <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                   <Flame size={80} strokeWidth={1.5} className="text-pink-400 mb-6 drop-shadow-[0_0_15px_rgba(244,114,182,0.6)] animate-pulse" />
                   <h3 className="text-2xl md:text-3xl font-sans font-bold text-white text-center tracking-wide">Buscando las leyendas...</h3>
                 </div>
               </div>
             ) : (
-              // pt-20 y pb-24 para evitar por completo el clipping al hacer hover/flotar
-              <div className="max-w-7xl mx-auto overflow-x-auto pt-20 pb-24 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
-                {rachas.map((racha, index) => {
-                  const isGold = index === 0;
-                  const isSilver = index === 1;
-                  const isBronze = index === 2;
+              /* TABLA DE CLASIFICACIÓN (LEADERBOARD) */
+              <div className="max-w-4xl mx-auto w-full mt-8 bg-[#11050a]/80 backdrop-blur-xl border border-yellow-600/30 rounded-[2rem] shadow-[0_0_40px_rgba(0,0,0,0.6)] p-4 md:p-8 relative overflow-hidden">
+                
+                {/* Resplandor decorativo interno */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-red-600/10 blur-[50px] pointer-events-none"></div>
 
-                  const avatarUrl = `https://ui-avatars.com/api/?name=${racha.nombre}&background=db2777&color=fff&size=128&bold=true`;
+                <div className="flex flex-col gap-3 md:gap-4 relative z-10">
+                  {rachas.map((racha, index) => {
+                    const isGold = index === 0;
+                    const isSilver = index === 1;
+                    const isBronze = index === 2;
+                    const avatarUrl = `https://ui-avatars.com/api/?name=${racha.nombre}&background=db2777&color=fff&size=128&bold=true`;
 
-                  return (
-                    <div 
-                      key={index}
-                      style={{ animationDelay: `${index * 0.3}s` }} 
-                      className={`snap-center shrink-0 w-64 rounded-3xl overflow-hidden bg-[#11050a] animate-float-podium border border-pink-900/50 transition-all duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)]
-                        ${isGold ? 'ring-2 ring-yellow-400 shadow-[0_0_40px_rgba(250,204,21,0.4)]' : 
-                          isSilver ? 'ring-2 ring-slate-300 shadow-[0_0_30px_rgba(148,163,184,0.3)]' :
-                          isBronze ? 'ring-2 ring-amber-600 shadow-[0_0_20px_rgba(180,83,9,0.3)]' : 
-                          'shadow-2xl'}
-                      `}
-                    >
-                      <div className="relative w-full h-36 bg-gradient-to-b from-pink-900 via-pink-950 to-black flex items-center justify-center">
-                        <Flame size={120} className="absolute opacity-20 text-yellow-500 animate-pulse" />
-                        
-                        <img src={avatarUrl} alt={racha.nombre} className={`w-20 h-20 rounded-full z-10 border-4 shadow-xl 
-                          ${isGold ? 'border-yellow-400' : isSilver ? 'border-slate-300' : isBronze ? 'border-amber-600' : 'border-pink-800'}`} 
-                        />
-                        
-                        <div className={`absolute -top-3 -right-2 w-12 h-12 flex items-center justify-center rounded-full font-black text-xl shadow-[0_0_15px_rgba(0,0,0,0.8)] z-20
-                          ${isGold ? 'bg-gradient-to-br from-yellow-200 to-yellow-600 text-black border-2 border-yellow-100' : 
-                            isSilver ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black border-2 border-slate-100' : 
-                            isBronze ? 'bg-gradient-to-br from-amber-500 to-amber-700 text-white border-2 border-amber-300' : 
-                            'bg-[#1a0812] text-pink-300 border-2 border-pink-800'}
-                        `}>
-                          {index + 1}
+                    // Lógica del fuego
+                    let flameClass = "text-gray-500 opacity-50"; // Por defecto (Top 4+)
+                    if (isGold) flameClass = "text-yellow-400 animate-flame-1";
+                    else if (isSilver) flameClass = "text-orange-400 animate-flame-2";
+                    else if (isBronze) flameClass = "text-red-400 animate-flame-3";
+
+                    return (
+                      <div 
+                        key={index}
+                        className={`flex items-center justify-between p-3 md:p-4 rounded-2xl transition-all duration-300 hover:bg-white/10 border hover:scale-[1.02]
+                          ${isGold ? 'border-yellow-500/60 bg-yellow-900/20 shadow-[0_0_15px_rgba(250,204,21,0.15)]' : 
+                            isSilver ? 'border-slate-400/50 bg-slate-900/30' : 
+                            isBronze ? 'border-amber-700/50 bg-amber-900/20' : 
+                            'border-pink-900/30 bg-black/40'}
+                        `}
+                      >
+                        {/* Lado Izquierdo: Rango, Avatar y Nombre */}
+                        <div className="flex items-center gap-3 md:gap-5">
+                          <div className={`w-8 h-8 md:w-10 md:h-10 flex shrink-0 items-center justify-center rounded-full font-black text-sm md:text-lg shadow-md
+                            ${isGold ? 'bg-gradient-to-br from-yellow-200 to-yellow-600 text-black' : 
+                              isSilver ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black' : 
+                              isBronze ? 'bg-gradient-to-br from-amber-500 to-amber-700 text-white' : 
+                              'bg-[#1a0812] text-pink-400 border border-pink-900'}
+                          `}>
+                            {index + 1}
+                          </div>
+                          
+                          <img src={avatarUrl} alt={racha.nombre} className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 hidden sm:block
+                            ${isGold ? 'border-yellow-400' : isSilver ? 'border-slate-300' : isBronze ? 'border-amber-600' : 'border-pink-800'}`} 
+                          />
+                          
+                          <span className={`font-black text-base md:text-xl truncate max-w-[120px] sm:max-w-[200px] md:max-w-xs
+                            ${isGold ? 'text-yellow-400 drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]' : 
+                              isSilver ? 'text-slate-200' : 
+                              isBronze ? 'text-amber-500' : 'text-pink-100'}
+                          `}>
+                            {racha.nombre}
+                          </span>
+                        </div>
+
+                        {/* Lado Derecho: Fuego y Días */}
+                        <div className="flex items-center gap-1 md:gap-2 bg-black/60 px-3 md:px-5 py-2 rounded-xl border border-pink-900/50 shrink-0">
+                          <Flame className={flameClass} size={20} />
+                          <span className="font-bold text-sm md:text-lg text-white tracking-wider">{racha.dias} <span className="text-xs md:text-sm text-gray-400">DÍAS</span></span>
                         </div>
                       </div>
-
-                      <div className="p-6 text-center">
-                        <h3 className={`text-xl font-black truncate drop-shadow-md mb-2
-                          ${isGold ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500' : 
-                            isSilver ? 'text-slate-200' : 
-                            isBronze ? 'text-amber-500' : 'text-pink-100'}
-                        `}>
-                          {racha.nombre}
-                        </h3>
-                        
-                        <div className="inline-flex items-center justify-center gap-2 bg-black/50 border border-pink-800/60 rounded-xl px-4 py-2 w-full mt-2">
-                          <Flame className="text-orange-500" size={20} />
-                          <span className="text-xl font-bold text-white tracking-widest">{racha.dias} DÍAS</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
@@ -350,11 +368,9 @@ export const SalonDeLaFama = () => {
         {/* ======================================= */}
         {currentSection === 2 && (
           <div className="w-full flex flex-col items-center justify-center min-h-[400px] animate-fade-in">
-            {/* Título de sección: Minúsculas y color blanco/gris claro */}
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-8 mt-6 font-sans">
-              Próximamente
-            </h2>
-            <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+            <TituloSeccion texto="Próximamente" />
+            
+            <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)] mt-8">
               <span className="text-6xl mb-4 animate-bounce">🚧</span>
               <h3 className="text-xl md:text-2xl font-sans font-bold text-white text-center tracking-wide">Nuevas categorías en construcción...</h3>
             </div>
