@@ -90,7 +90,7 @@ export const SalonDeLaFama = () => {
   const [meta, setMeta] = useState<SeasonMeta | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // 0 = Clips Populares, 1 = Mejores Rachas
+  // 0 = Clips Populares, 1 = Mejores Rachas, 2 = Próximamente
   const [currentSection, setCurrentSection] = useState(0); 
 
   useEffect(() => {
@@ -111,7 +111,6 @@ export const SalonDeLaFama = () => {
         const rachasResponse = await fetch('/rachas.json');
         if (rachasResponse.ok) {
           const rachasData = await rachasResponse.json();
-          // Solo tomamos los primeros 7 como pediste
           setRachas(rachasData.slice(0, 7));
         }
 
@@ -126,8 +125,8 @@ export const SalonDeLaFama = () => {
   }, []);
 
   const changeSection = (direction: 'right' | 'left') => {
-    if (direction === 'right') setCurrentSection(prev => (prev === 0 ? 1 : 0));
-    if (direction === 'left') setCurrentSection(prev => (prev === 1 ? 0 : 1));
+    if (direction === 'right') setCurrentSection(prev => (prev < 2 ? prev + 1 : prev));
+    if (direction === 'left') setCurrentSection(prev => (prev > 0 ? prev - 1 : prev));
   };
 
   const formatearFecha = (isoString: string) => {
@@ -141,7 +140,7 @@ export const SalonDeLaFama = () => {
   return (
     <section className="min-h-screen bg-[#ffccd5] pt-28 pb-12 px-4 relative overflow-hidden flex flex-col justify-center">
       
-      {/* Sombra negra en los bordes MUCHO más sutil */}
+      {/* Sombra negra en los bordes */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_70%,_rgba(0,0,0,0.6)_100%)] pointer-events-none z-0"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none z-0"></div>
 
@@ -151,11 +150,12 @@ export const SalonDeLaFama = () => {
       <div className="relative z-10 animate-fade-in w-full flex flex-col items-center">
         
         <div className="max-w-6xl mx-auto text-center mb-6">
-          <h1 className="text-5xl md:text-7xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_0_15px_rgba(250,204,21,0.7)] mb-4 tracking-[0.15em] uppercase animate-float-title">
+          {/* TÍTULO PRINCIPAL: Más pequeño y centrado */}
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_0_15px_rgba(250,204,21,0.7)] mb-4 tracking-[0.15em] uppercase animate-float-title text-center">
             SALON DE LA FAMA
           </h1>
           
-          <p className="text-pink-100 font-medium italic tracking-wide text-base md:text-lg bg-black/40 backdrop-blur-sm inline-block px-5 py-1.5 rounded-full border border-pink-500/30 shadow-lg mt-2">
+          <p className="text-pink-100 font-medium italic tracking-wide text-sm md:text-base bg-black/40 backdrop-blur-sm inline-block px-5 py-1.5 rounded-full border border-pink-500/30 shadow-lg mt-2">
             "Temporada {meta?.temporada || 1}: Piloto"
           </p>
           <p className="text-pink-200 text-xs mt-3 font-bold opacity-90 tracking-widest">
@@ -174,7 +174,7 @@ export const SalonDeLaFama = () => {
         )}
 
         {/* ➡️ Flecha Derecha */}
-        {currentSection < 1 && (
+        {currentSection < 2 && (
           <button 
             onClick={() => changeSection('right')}
             className="absolute right-2 md:right-12 top-1/2 -translate-y-1/2 z-50 p-2 md:p-3 bg-black/60 rounded-full text-yellow-400 border-2 border-yellow-500/50 shadow-[0_0_15px_rgba(250,204,21,0.4)] transition-all hover:bg-yellow-500 hover:text-black hover:scale-110 hover:shadow-[0_0_25px_rgba(250,204,21,0.8)] backdrop-blur-md"
@@ -188,20 +188,22 @@ export const SalonDeLaFama = () => {
         {/* ======================================= */}
         {currentSection === 0 && (
           <div className="w-full flex flex-col items-center animate-fade-in">
-            <h2 className="text-3xl font-black text-black tracking-widest mb-4 mt-6 uppercase font-sans">
-              CLIPS MAS POPULARES
+            {/* Título de sección: Minúsculas y color blanco/gris claro */}
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-2 mt-6 font-sans">
+              Clips más populares
             </h2>
 
             {clips.length === 0 ? (
               <div className="max-w-2xl mx-auto mt-4">
                 <div className="border-2 border-dashed border-yellow-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                   <Clapperboard size={80} strokeWidth={1.5} className="text-yellow-400/80 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)] animate-pulse" />
-                  <h3 className="text-3xl font-sans font-black text-white mb-2 tracking-tight">Esperando clip</h3>
+                  <h3 className="text-2xl md:text-3xl font-sans font-bold text-white mb-2 tracking-tight">Esperando clip</h3>
                   <p className="text-pink-200 font-medium text-center">Aún no hay obras maestras en la Temporada {meta?.temporada || 1}.</p>
                 </div>
               </div>
             ) : (
-              <div className="max-w-7xl mx-auto overflow-x-auto pt-12 pb-16 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
+              // pt-20 y pb-24 para evitar por completo el clipping al hacer hover/flotar
+              <div className="max-w-7xl mx-auto overflow-x-auto pt-20 pb-24 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
                 {clips.map((clip, index) => {
                   const isGold = index === 0;
                   const isSilver = index === 1;
@@ -271,25 +273,26 @@ export const SalonDeLaFama = () => {
         {/* ======================================= */}
         {currentSection === 1 && (
           <div className="w-full flex flex-col items-center animate-fade-in">
-            <h2 className="text-3xl font-black text-black tracking-widest mb-4 mt-6 uppercase font-sans">
-              MEJORES RACHAS
+            {/* Título de sección: Minúsculas y color blanco/gris claro */}
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-2 mt-6 font-sans">
+              Mejores rachas
             </h2>
 
             {rachas.length === 0 ? (
               <div className="max-w-2xl mx-auto mt-4">
                 <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                   <Flame size={80} strokeWidth={1.5} className="text-pink-400 mb-6 drop-shadow-[0_0_15px_rgba(244,114,182,0.6)] animate-pulse" />
-                  <h3 className="text-3xl font-sans font-black text-white text-center tracking-wide">Buscando las leyendas...</h3>
+                  <h3 className="text-2xl md:text-3xl font-sans font-bold text-white text-center tracking-wide">Buscando las leyendas...</h3>
                 </div>
               </div>
             ) : (
-              <div className="max-w-7xl mx-auto overflow-x-auto pt-12 pb-16 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
+              // pt-20 y pb-24 para evitar por completo el clipping al hacer hover/flotar
+              <div className="max-w-7xl mx-auto overflow-x-auto pt-20 pb-24 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
                 {rachas.map((racha, index) => {
                   const isGold = index === 0;
                   const isSilver = index === 1;
                   const isBronze = index === 2;
 
-                  // Genera un avatar automáticamente basado en su nombre y un fondo rosa!
                   const avatarUrl = `https://ui-avatars.com/api/?name=${racha.nombre}&background=db2777&color=fff&size=128&bold=true`;
 
                   return (
@@ -303,7 +306,6 @@ export const SalonDeLaFama = () => {
                           'shadow-2xl'}
                       `}
                     >
-                      {/* Fondo de fuego y avatar para la racha */}
                       <div className="relative w-full h-36 bg-gradient-to-b from-pink-900 via-pink-950 to-black flex items-center justify-center">
                         <Flame size={120} className="absolute opacity-20 text-yellow-500 animate-pulse" />
                         
@@ -340,6 +342,22 @@ export const SalonDeLaFama = () => {
                 })}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ======================================= */}
+        {/* ===== SECCIÓN 2: PRÓXIMAMENTE ========= */}
+        {/* ======================================= */}
+        {currentSection === 2 && (
+          <div className="w-full flex flex-col items-center justify-center min-h-[400px] animate-fade-in">
+            {/* Título de sección: Minúsculas y color blanco/gris claro */}
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-8 mt-6 font-sans">
+              Próximamente
+            </h2>
+            <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+              <span className="text-6xl mb-4 animate-bounce">🚧</span>
+              <h3 className="text-xl md:text-2xl font-sans font-bold text-white text-center tracking-wide">Nuevas categorías en construcción...</h3>
+            </div>
           </div>
         )}
 
