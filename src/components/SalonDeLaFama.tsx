@@ -30,11 +30,18 @@ const ParticulasDoradas = () => {
           from { opacity: 0; transform: translateY(50px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        /* Animación para el título principal */
+        @keyframes floatTitle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        /* Animación para los podios */
         @keyframes floatPodium {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-12px); }
         }
         .animate-fade-in { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-float-title { animation: floatTitle 5s ease-in-out infinite; }
         .animate-float-podium { animation: floatPodium 5s ease-in-out infinite; }
       `}</style>
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -64,7 +71,7 @@ const ParticulasDoradas = () => {
 
 // 🎬 Emojis Kawaii de fondo (Sutiles) 🎬
 const EmojisFondo = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-[0.15] text-5xl select-none filter blur-[1px]">
+  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-[0.12] text-5xl select-none filter blur-[1px]">
     <span className="absolute top-[15%] left-[10%] -rotate-12">🎬</span>
     <span className="absolute top-[60%] left-[8%] rotate-12">✨</span>
     <span className="absolute top-[25%] right-[12%] rotate-45">💖</span>
@@ -119,14 +126,14 @@ export const SalonDeLaFama = () => {
   if (loading) return <div className="text-center py-20 text-yellow-500 font-bold bg-[#1a0f14] min-h-screen flex items-center justify-center">Preparando la alfombra dorada...</div>;
 
   return (
-    // 🎨 FONDO ROSA KAWAII CON VIÑETA NEGRA SUAVIZADA 🎨
+    // 🎨 FONDO ROSA KAWAII CON VIÑETA NEGRA REDUCIDA (Predomina el rosa) 🎨
     <section className="min-h-screen bg-[#ffccd5] pt-28 pb-12 px-4 relative overflow-hidden flex flex-col justify-center">
       
-      {/* Sombra negra en los bordes MUCHO más sutil (el centro rosa es más grande) */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_45%,_rgba(0,0,0,0.75)_100%)] pointer-events-none z-0"></div>
+      {/* Sombra negra en los bordes MUCHO más sutil (el centro rosa es mucho más grande) */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_70%,_rgba(0,0,0,0.6)_100%)] pointer-events-none z-0"></div>
       
       {/* Sombra extra arriba y abajo muy ligera */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none z-0"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none z-0"></div>
 
       <ParticulasDoradas />
       <EmojisFondo />
@@ -134,8 +141,8 @@ export const SalonDeLaFama = () => {
       <div className="relative z-10 animate-fade-in w-full flex flex-col items-center">
         
         <div className="max-w-6xl mx-auto text-center mb-6">
-          {/* Título renovado: Fuente elegante (serif) y espaciado premium */}
-          <h1 className="text-5xl md:text-7xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)] mb-4 tracking-[0.15em] uppercase">
+          {/* Título Principal Flotante Dorada */}
+          <h1 className="text-5xl md:text-7xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_0_15px_rgba(250,204,21,0.7)] mb-4 tracking-[0.15em] uppercase animate-float-title">
             SALON DE LA FAMA
           </h1>
           
@@ -171,8 +178,8 @@ export const SalonDeLaFama = () => {
         {currentSection === 0 && (
           <div className="w-full flex flex-col items-center animate-fade-in">
             
-            {/* Subtítulo elegante con serifa también */}
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-yellow-400 tracking-[0.2em] mb-4 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)] mt-6">
+            {/* Título de categoría: Negro, Simple, Bold (fuente Sans) */}
+            <h2 className="text-3xl font-black text-black tracking-widest mb-4 mt-6 uppercase font-sans">
               CLIPS MAS POPULARES
             </h2>
 
@@ -180,12 +187,12 @@ export const SalonDeLaFama = () => {
               <div className="max-w-2xl mx-auto mt-4">
                 <div className="border-2 border-dashed border-yellow-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                   <Clapperboard size={80} strokeWidth={1.5} className="text-yellow-400/80 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)] animate-pulse" />
-                  <h3 className="text-3xl font-serif font-bold text-white mb-2 tracking-tight">Esperando clip</h3>
+                  <h3 className="text-3xl font-sans font-black text-white mb-2 tracking-tight">Esperando clip</h3>
                   <p className="text-pink-200 font-medium text-center">Aún no hay obras maestras en la Temporada {meta?.temporada || 1}.</p>
                 </div>
               </div>
             ) : (
-              // SOLUCIÓN AL CLIPPING: pt-12 y pb-16 dan espacio suficiente arriba y abajo para que las sombras y el hover no se rebanen
+              // SOLUCIÓN AL CLIPPING: pt-12 y pb-16 dan espacio suficiente arriba y abajo
               <div className="max-w-7xl mx-auto overflow-x-auto pt-12 pb-16 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
                 {clips.map((clip, index) => {
                   const isGold = index === 0;
@@ -197,7 +204,6 @@ export const SalonDeLaFama = () => {
                     .replace('%{height}', '360'); 
 
                   return (
-                    // La animación de flotar se aplica aquí. El hover aumenta la escala.
                     <div 
                       key={clip.id}
                       style={{ animationDelay: `${index * 0.3}s` }} 
@@ -255,12 +261,12 @@ export const SalonDeLaFama = () => {
         {/* --- SECCIÓN 1: FUTURA SECCIÓN --- */}
         {currentSection === 1 && (
           <div className="w-full flex flex-col items-center justify-center min-h-[400px] animate-fade-in">
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-yellow-400 tracking-[0.2em] mb-8 drop-shadow-[0_0_10px_rgba(250,204,21,0.6)] mt-6">
+            <h2 className="text-3xl font-black text-black tracking-widest mb-8 mt-6 uppercase font-sans">
               PROXIMAMENTE
             </h2>
             <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
               <span className="text-6xl mb-4 animate-bounce">🚧</span>
-              <h3 className="text-2xl font-serif font-bold text-white text-center tracking-wide">Nuevas categorías en construcción...</h3>
+              <h3 className="text-2xl font-sans font-black text-white text-center tracking-wide">Nuevas categorías en construcción...</h3>
             </div>
           </div>
         )}
