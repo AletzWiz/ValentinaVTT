@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Clapperboard, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Clapperboard, ChevronRight, ChevronLeft, Flame } from 'lucide-react';
 
 interface TwitchClip {
   id: string;
@@ -17,6 +17,11 @@ interface SeasonMeta {
   fechaFin: string;
 }
 
+interface RachaData {
+  nombre: string;
+  dias: number;
+}
+
 // ✨ Partículas doradas sutiles ✨
 const ParticulasDoradas = () => {
   return (
@@ -30,12 +35,10 @@ const ParticulasDoradas = () => {
           from { opacity: 0; transform: translateY(50px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        /* Animación para el título principal */
         @keyframes floatTitle {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-6px); }
         }
-        /* Animación para los podios */
         @keyframes floatPodium {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-12px); }
@@ -73,7 +76,7 @@ const ParticulasDoradas = () => {
 const EmojisFondo = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-[0.12] text-5xl select-none filter blur-[1px]">
     <span className="absolute top-[15%] left-[10%] -rotate-12">🎬</span>
-    <span className="absolute top-[60%] left-[8%] rotate-12">✨</span>
+    <span className="absolute top-[60%] left-[8%] rotate-12">🔥</span>
     <span className="absolute top-[25%] right-[12%] rotate-45">💖</span>
     <span className="absolute bottom-[20%] right-[10%] -rotate-12">🎬</span>
     <span className="absolute top-[10%] right-[25%] rotate-12">🎀</span>
@@ -83,33 +86,43 @@ const EmojisFondo = () => (
 
 export const SalonDeLaFama = () => {
   const [clips, setClips] = useState<TwitchClip[]>([]);
+  const [rachas, setRachas] = useState<RachaData[]>([]);
   const [meta, setMeta] = useState<SeasonMeta | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // 0 = Clips Populares, 1 = Futura Sección
+  // 0 = Clips Populares, 1 = Mejores Rachas
   const [currentSection, setCurrentSection] = useState(0); 
 
   useEffect(() => {
-    const fetchClips = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/clips');
-        const data = await response.json();
         
-        if (data.clips && Array.isArray(data.clips)) {
-          setClips(data.clips);
-          setMeta(data.meta);
-        } else {
-          setClips([]);
+        // 1. Buscamos los clips
+        const clipsResponse = await fetch('/api/clips');
+        const clipsData = await clipsResponse.json();
+        
+        if (clipsData.clips && Array.isArray(clipsData.clips)) {
+          setClips(clipsData.clips);
+          setMeta(clipsData.meta);
         }
+
+        // 2. Buscamos tu archivo manual de rachas
+        const rachasResponse = await fetch('/rachas.json');
+        if (rachasResponse.ok) {
+          const rachasData = await rachasResponse.json();
+          // Solo tomamos los primeros 7 como pediste
+          setRachas(rachasData.slice(0, 7));
+        }
+
       } catch (error) {
-        setClips([]);
+        console.error("Error cargando los datos:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchClips();
+    fetchData();
   }, []);
 
   const changeSection = (direction: 'right' | 'left') => {
@@ -126,13 +139,10 @@ export const SalonDeLaFama = () => {
   if (loading) return <div className="text-center py-20 text-yellow-500 font-bold bg-[#1a0f14] min-h-screen flex items-center justify-center">Preparando la alfombra dorada...</div>;
 
   return (
-    // 🎨 FONDO ROSA KAWAII CON VIÑETA NEGRA REDUCIDA (Predomina el rosa) 🎨
     <section className="min-h-screen bg-[#ffccd5] pt-28 pb-12 px-4 relative overflow-hidden flex flex-col justify-center">
       
-      {/* Sombra negra en los bordes MUCHO más sutil (el centro rosa es mucho más grande) */}
+      {/* Sombra negra en los bordes MUCHO más sutil */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_70%,_rgba(0,0,0,0.6)_100%)] pointer-events-none z-0"></div>
-      
-      {/* Sombra extra arriba y abajo muy ligera */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none z-0"></div>
 
       <ParticulasDoradas />
@@ -141,7 +151,6 @@ export const SalonDeLaFama = () => {
       <div className="relative z-10 animate-fade-in w-full flex flex-col items-center">
         
         <div className="max-w-6xl mx-auto text-center mb-6">
-          {/* Título Principal Flotante Dorada */}
           <h1 className="text-5xl md:text-7xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_0_15px_rgba(250,204,21,0.7)] mb-4 tracking-[0.15em] uppercase animate-float-title">
             SALON DE LA FAMA
           </h1>
@@ -174,11 +183,11 @@ export const SalonDeLaFama = () => {
           </button>
         )}
 
-        {/* --- SECCIÓN 0: CLIPS MAS POPULARES --- */}
+        {/* ======================================= */}
+        {/* === SECCIÓN 0: CLIPS MAS POPULARES ==== */}
+        {/* ======================================= */}
         {currentSection === 0 && (
           <div className="w-full flex flex-col items-center animate-fade-in">
-            
-            {/* Título de categoría: Negro, Simple, Bold (fuente Sans) */}
             <h2 className="text-3xl font-black text-black tracking-widest mb-4 mt-6 uppercase font-sans">
               CLIPS MAS POPULARES
             </h2>
@@ -192,7 +201,6 @@ export const SalonDeLaFama = () => {
                 </div>
               </div>
             ) : (
-              // SOLUCIÓN AL CLIPPING: pt-12 y pb-16 dan espacio suficiente arriba y abajo
               <div className="max-w-7xl mx-auto overflow-x-auto pt-12 pb-16 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
                 {clips.map((clip, index) => {
                   const isGold = index === 0;
@@ -258,16 +266,80 @@ export const SalonDeLaFama = () => {
           </div>
         )}
 
-        {/* --- SECCIÓN 1: FUTURA SECCIÓN --- */}
+        {/* ======================================= */}
+        {/* ===== SECCIÓN 1: MEJORES RACHAS ======= */}
+        {/* ======================================= */}
         {currentSection === 1 && (
-          <div className="w-full flex flex-col items-center justify-center min-h-[400px] animate-fade-in">
-            <h2 className="text-3xl font-black text-black tracking-widest mb-8 mt-6 uppercase font-sans">
-              PROXIMAMENTE
+          <div className="w-full flex flex-col items-center animate-fade-in">
+            <h2 className="text-3xl font-black text-black tracking-widest mb-4 mt-6 uppercase font-sans">
+              MEJORES RACHAS
             </h2>
-            <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-              <span className="text-6xl mb-4 animate-bounce">🚧</span>
-              <h3 className="text-2xl font-sans font-black text-white text-center tracking-wide">Nuevas categorías en construcción...</h3>
-            </div>
+
+            {rachas.length === 0 ? (
+              <div className="max-w-2xl mx-auto mt-4">
+                <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                  <Flame size={80} strokeWidth={1.5} className="text-pink-400 mb-6 drop-shadow-[0_0_15px_rgba(244,114,182,0.6)] animate-pulse" />
+                  <h3 className="text-3xl font-sans font-black text-white text-center tracking-wide">Buscando las leyendas...</h3>
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-7xl mx-auto overflow-x-auto pt-12 pb-16 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
+                {rachas.map((racha, index) => {
+                  const isGold = index === 0;
+                  const isSilver = index === 1;
+                  const isBronze = index === 2;
+
+                  // Genera un avatar automáticamente basado en su nombre y un fondo rosa!
+                  const avatarUrl = `https://ui-avatars.com/api/?name=${racha.nombre}&background=db2777&color=fff&size=128&bold=true`;
+
+                  return (
+                    <div 
+                      key={index}
+                      style={{ animationDelay: `${index * 0.3}s` }} 
+                      className={`snap-center shrink-0 w-64 rounded-3xl overflow-hidden bg-[#11050a] animate-float-podium border border-pink-900/50 transition-all duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)]
+                        ${isGold ? 'ring-2 ring-yellow-400 shadow-[0_0_40px_rgba(250,204,21,0.4)]' : 
+                          isSilver ? 'ring-2 ring-slate-300 shadow-[0_0_30px_rgba(148,163,184,0.3)]' :
+                          isBronze ? 'ring-2 ring-amber-600 shadow-[0_0_20px_rgba(180,83,9,0.3)]' : 
+                          'shadow-2xl'}
+                      `}
+                    >
+                      {/* Fondo de fuego y avatar para la racha */}
+                      <div className="relative w-full h-36 bg-gradient-to-b from-pink-900 via-pink-950 to-black flex items-center justify-center">
+                        <Flame size={120} className="absolute opacity-20 text-yellow-500 animate-pulse" />
+                        
+                        <img src={avatarUrl} alt={racha.nombre} className={`w-20 h-20 rounded-full z-10 border-4 shadow-xl 
+                          ${isGold ? 'border-yellow-400' : isSilver ? 'border-slate-300' : isBronze ? 'border-amber-600' : 'border-pink-800'}`} 
+                        />
+                        
+                        <div className={`absolute -top-3 -right-2 w-12 h-12 flex items-center justify-center rounded-full font-black text-xl shadow-[0_0_15px_rgba(0,0,0,0.8)] z-20
+                          ${isGold ? 'bg-gradient-to-br from-yellow-200 to-yellow-600 text-black border-2 border-yellow-100' : 
+                            isSilver ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black border-2 border-slate-100' : 
+                            isBronze ? 'bg-gradient-to-br from-amber-500 to-amber-700 text-white border-2 border-amber-300' : 
+                            'bg-[#1a0812] text-pink-300 border-2 border-pink-800'}
+                        `}>
+                          {index + 1}
+                        </div>
+                      </div>
+
+                      <div className="p-6 text-center">
+                        <h3 className={`text-xl font-black truncate drop-shadow-md mb-2
+                          ${isGold ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500' : 
+                            isSilver ? 'text-slate-200' : 
+                            isBronze ? 'text-amber-500' : 'text-pink-100'}
+                        `}>
+                          {racha.nombre}
+                        </h3>
+                        
+                        <div className="inline-flex items-center justify-center gap-2 bg-black/50 border border-pink-800/60 rounded-xl px-4 py-2 w-full mt-2">
+                          <Flame className="text-orange-500" size={20} />
+                          <span className="text-xl font-bold text-white tracking-widest">{racha.dias} DÍAS</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
