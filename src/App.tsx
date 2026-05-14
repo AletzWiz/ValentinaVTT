@@ -14,6 +14,9 @@ import Contact from './sections/Contact';
 import Footer from './sections/Footer';
 import { RuletaVTT } from './components/RuletaVTT';
 
+// 🌟 Aquí importamos tu nuevo componente brillante
+import { SalonDeLaFama } from './components/SalonDeLaFama';
+
 import './App.css';
 
 // 1. Agrupamos todo tu contenido principal en un componente "Inicio"
@@ -52,9 +55,11 @@ export default function App() {
           
           {/* Ruta separada: valentinavtt.com/ruleta */}
           <Route path="/ruleta" element={<RuletaVTT />} />
+
+          {/* 🌟 NUEVA RUTA: valentinavtt.com/salon-de-la-fama */}
+          <Route path="/salon-de-la-fama" element={<SalonDeLaFama />} />
         </Routes>
       </main>
     </Router>
   );
 }
-
