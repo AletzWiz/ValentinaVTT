@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Clapperboard, ChevronRight, ChevronLeft, Flame, Smartphone, Play } from 'lucide-react';
+import { Clapperboard, ChevronRight, ChevronLeft, Flame } from 'lucide-react';
 
 interface TwitchClip {
   id: string;
@@ -21,12 +21,6 @@ interface RachaData {
   nombre: string;
   dias: number;
   fecha?: string;
-}
-
-interface TiktokData {
-  creador: string;
-  vistas: number;
-  url: string;
 }
 
 // ✨ Partículas doradas sutiles ✨
@@ -109,14 +103,20 @@ const EmojisFondo = () => (
   </div>
 );
 
+// 📛 COMPONENTE DE TÍTULO TIPO "PASTILLA" ROJA/DORADA 📛
+const TituloSeccion = ({ texto }: { texto: string }) => (
+  <h2 className="text-xl md:text-2xl font-bold text-yellow-400 tracking-widest mb-4 mt-6 font-sans bg-[#4a0414]/80 backdrop-blur-md inline-block px-8 py-3 rounded-full border-2 border-yellow-500/60 shadow-[0_0_20px_rgba(250,204,21,0.25)] uppercase">
+    {texto}
+  </h2>
+);
+
 export const SalonDeLaFama = () => {
   const [clips, setClips] = useState<TwitchClip[]>([]);
   const [rachas, setRachas] = useState<RachaData[]>([]);
-  const [tiktoks, setTiktoks] = useState<TiktokData[]>([]);
   const [meta, setMeta] = useState<SeasonMeta | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // 0 = Clips Populares, 1 = Mejores Rachas, 2 = TikToks, 3 = Próximamente
+  // 0 = Clips Populares, 1 = Mejores Rachas, 2 = Próximamente
   const [currentSection, setCurrentSection] = useState(0); 
 
   useEffect(() => {
@@ -125,7 +125,7 @@ export const SalonDeLaFama = () => {
         setLoading(true);
         
         // 1. Buscamos los clips
-        const clipsResponse = await fetch('/api/clips');
+        const clipsResponse = await fetch('/api/clips?v=' + new Date().getTime());
         const clipsData = await clipsResponse.json();
         
         if (clipsData.clips && Array.isArray(clipsData.clips)) {
@@ -133,41 +133,24 @@ export const SalonDeLaFama = () => {
           setMeta(clipsData.meta);
         }
 
-        // 2. Buscamos archivo manual de rachas con CÁLCULO AUTOMÁTICO
-        const rachasResponse = await fetch('/rachas.json');
+        // 2. Buscamos archivo manual de rachas (CON TRUCO ANTI-CACHÉ)
+        const rachasResponse = await fetch('/rachas.json?v=' + new Date().getTime());
         if (rachasResponse.ok) {
           const rachasData: RachaData[] = await rachasResponse.json();
           
-          // Magia del tiempo: Calculamos los días en piloto automático
           const rachasCalculadas = rachasData.map((r) => {
             let diasCalculados = r.dias;
-            
-            // Solo sumamos si los días base no son 0 y existe una fecha
             if (r.dias > 0 && r.fecha) {
               const hoy = new Date().getTime();
               const base = new Date(`${r.fecha}T00:00:00`).getTime();
-              
-              // Cuántos días exactos han pasado
               const diffDias = Math.floor((hoy - base) / (1000 * 60 * 60 * 24));
-              
-              if (diffDias > 0) {
-                diasCalculados += diffDias;
-              }
+              if (diffDias > 0) diasCalculados += diffDias;
             }
             return { ...r, dias: diasCalculados };
           });
 
-          // Ordenamos para que el que tenga más días siempre quede arriba
           rachasCalculadas.sort((a, b) => b.dias - a.dias);
-
           setRachas(rachasCalculadas.slice(0, 10));
-        }
-
-        // 3. Buscamos archivo manual de TikToks
-        const tiktokResponse = await fetch('/tiktok.json');
-        if (tiktokResponse.ok) {
-          const tiktokData = await tiktokResponse.json();
-          setTiktoks(tiktokData.slice(0, 10));
         }
 
       } catch (error) {
@@ -181,7 +164,7 @@ export const SalonDeLaFama = () => {
   }, []);
 
   const changeSection = (direction: 'right' | 'left') => {
-    if (direction === 'right') setCurrentSection(prev => (prev < 3 ? prev + 1 : prev));
+    if (direction === 'right') setCurrentSection(prev => (prev < 2 ? prev + 1 : prev));
     if (direction === 'left') setCurrentSection(prev => (prev > 0 ? prev - 1 : prev));
   };
 
@@ -229,7 +212,7 @@ export const SalonDeLaFama = () => {
         )}
 
         {/* ➡️ Flecha Derecha */}
-        {currentSection < 3 && (
+        {currentSection < 2 && (
           <button 
             onClick={() => changeSection('right')}
             className="absolute right-2 md:right-12 top-1/2 -translate-y-1/2 z-50 p-2 md:p-3 bg-black/60 rounded-full text-yellow-400 border-2 border-yellow-500/50 shadow-[0_0_15px_rgba(250,204,21,0.4)] transition-all hover:bg-yellow-500 hover:text-black hover:scale-110 hover:shadow-[0_0_25px_rgba(250,204,21,0.8)] backdrop-blur-md"
@@ -243,9 +226,7 @@ export const SalonDeLaFama = () => {
         {/* ======================================= */}
         {currentSection === 0 && (
           <div className="w-full flex flex-col items-center animate-fade-in">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-2 mt-6 font-sans">
-              Clips más populares
-            </h2>
+            <TituloSeccion texto="Clips más populares" />
 
             {clips.length === 0 ? (
               <div className="max-w-2xl mx-auto mt-4">
@@ -256,15 +237,13 @@ export const SalonDeLaFama = () => {
                 </div>
               </div>
             ) : (
-              <div className="max-w-7xl mx-auto overflow-x-auto pt-20 pb-24 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
+              <div className="max-w-7xl mx-auto overflow-x-auto pt-12 pb-24 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
                 {clips.map((clip, index) => {
                   const isGold = index === 0;
                   const isSilver = index === 1;
                   const isBronze = index === 2;
 
-                  const hdThumbnail = clip.thumbnail_url
-                    .replace('%{width}', '640')
-                    .replace('%{height}', '360'); 
+                  const hdThumbnail = clip.thumbnail_url.replace('%{width}', '640').replace('%{height}', '360'); 
 
                   return (
                     <div 
@@ -326,9 +305,7 @@ export const SalonDeLaFama = () => {
         {/* ======================================= */}
         {currentSection === 1 && (
           <div className="w-full flex flex-col items-center animate-fade-in px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-2 mt-6 font-sans">
-              Mejores rachas
-            </h2>
+            <TituloSeccion texto="Mejores rachas" />
 
             {rachas.length === 0 ? (
               <div className="max-w-2xl mx-auto mt-8">
@@ -407,94 +384,13 @@ export const SalonDeLaFama = () => {
         )}
 
         {/* ======================================= */}
-        {/* ===== SECCIÓN 2: MEJORES TIKTOKS ====== */}
+        {/* ===== SECCIÓN 2: PRÓXIMAMENTE ========= */}
         {/* ======================================= */}
         {currentSection === 2 && (
-          <div className="w-full flex flex-col items-center animate-fade-in">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-2 mt-6 font-sans">
-              Mejores TikToks
-            </h2>
-
-            {tiktoks.length === 0 ? (
-              <div className="max-w-2xl mx-auto mt-4">
-                <div className="border-2 border-dashed border-cyan-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-                  <Smartphone size={80} strokeWidth={1.5} className="text-cyan-400 mb-6 drop-shadow-[0_0_15px_rgba(37,244,238,0.6)] animate-pulse" />
-                  <h3 className="text-2xl md:text-3xl font-sans font-bold text-white text-center tracking-wide">Esperando TikToks...</h3>
-                </div>
-              </div>
-            ) : (
-              <div className="max-w-7xl mx-auto overflow-x-auto pt-20 pb-24 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
-                {tiktoks.map((tiktok, index) => {
-                  const isGold = index === 0;
-                  const isSilver = index === 1;
-                  const isBronze = index === 2;
-                  const avatarUrl = `https://ui-avatars.com/api/?name=${tiktok.creador}&background=25F4EE&color=fff&size=200&bold=true`;
-
-                  return (
-                    <div 
-                      key={index}
-                      style={{ animationDelay: `${index * 0.3}s` }} 
-                      className={`snap-center shrink-0 w-60 aspect-[9/16] rounded-[2.5rem] overflow-hidden bg-black animate-float-podium border-2 transition-all duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)] relative
-                        ${isGold ? 'border-yellow-400 shadow-[0_0_40px_rgba(250,204,21,0.5)]' : 
-                          isSilver ? 'border-cyan-400 shadow-[0_0_30px_rgba(37,244,238,0.4)]' :
-                          isBronze ? 'border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.4)]' : 
-                          'border-gray-800 shadow-2xl'}
-                      `}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-black opacity-80 z-0"></div>
-                      
-                      <div className="relative z-10 w-full h-full flex flex-col items-center justify-between p-6">
-                        <div className={`w-14 h-14 flex items-center justify-center rounded-full font-black text-2xl shadow-[0_0_15px_rgba(0,0,0,0.8)] mt-2
-                          ${isGold ? 'bg-gradient-to-br from-yellow-200 to-yellow-600 text-black border-2 border-yellow-100' : 
-                            isSilver ? 'bg-gradient-to-br from-cyan-200 to-cyan-500 text-black border-2 border-cyan-100' : 
-                            isBronze ? 'bg-gradient-to-br from-rose-400 to-rose-700 text-white border-2 border-rose-300' : 
-                            'bg-gray-800 text-gray-300 border-2 border-gray-600'}
-                        `}>
-                          #{index + 1}
-                        </div>
-
-                        <div className="flex flex-col items-center my-auto">
-                          <div className={`relative p-1 rounded-full bg-gradient-to-tr ${isGold ? 'from-yellow-400 to-yellow-600' : 'from-cyan-400 to-rose-500'}`}>
-                            <img src={avatarUrl} alt={tiktok.creador} className="w-24 h-24 rounded-full border-4 border-black" />
-                          </div>
-                          <h3 className="text-xl font-black text-white mt-4 drop-shadow-md tracking-wider">
-                            @{tiktok.creador}
-                          </h3>
-                        </div>
-
-                        <div className="w-full flex flex-col items-center gap-4">
-                          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                            <Play size={16} fill="white" className="text-white" />
-                            <span className="font-bold text-white">{tiktok.vistas.toLocaleString()}</span>
-                          </div>
-                          <a 
-                            href={tiktok.url} target="_blank" rel="noreferrer"
-                            className={`w-full text-center py-3 rounded-2xl text-sm font-black transition-all duration-300 text-white tracking-widest uppercase shadow-lg
-                              ${isGold ? 'bg-yellow-600 hover:bg-yellow-500 hover:shadow-[0_0_20px_rgba(250,204,21,0.6)]' : 
-                                'bg-gradient-to-r from-cyan-600 to-rose-600 hover:from-cyan-500 hover:to-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.5)]'}
-                            `}
-                          >
-                            Ver en TikTok
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ======================================= */}
-        {/* ===== SECCIÓN 3: PRÓXIMAMENTE ========= */}
-        {/* ======================================= */}
-        {currentSection === 3 && (
           <div className="w-full flex flex-col items-center justify-center min-h-[400px] animate-fade-in">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-100 tracking-wide mb-8 mt-6 font-sans">
-              Próximamente
-            </h2>
-            <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+            <TituloSeccion texto="Próximamente" />
+            
+            <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)] mt-8">
               <span className="text-6xl mb-4 animate-bounce">🚧</span>
               <h3 className="text-xl md:text-2xl font-sans font-bold text-white text-center tracking-wide">Nuevas categorías en construcción...</h3>
             </div>
