@@ -219,12 +219,12 @@ export const SalonDeLaFama = () => {
       {/* ========================================================= */}
       {showRachasSec ? (
         <div className="relative z-20 max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-amber-400/15 border border-amber-300/40 text-amber-300 text-xs font-black tracking-widest uppercase mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/15 border border-amber-300/40 text-amber-300 text-xs font-black tracking-widest uppercase mb-4">
             <Crown className="w-4 h-4 text-amber-300" /> SALÓN DE RECONOCIMIENTO TWITCH
           </div>
 
           <h2
-            className="text-4xl sm:text-5xl font-black uppercase tracking-widest mb-3"
+            className="text-3xl sm:text-5xl font-black uppercase tracking-widest mb-3"
             style={{
               background: 'linear-gradient(135deg, #FFF0F5, #FDE68A, #FF85A1)',
               WebkitBackgroundClip: 'text',
@@ -234,11 +234,11 @@ export const SalonDeLaFama = () => {
           >
             🔥 Top 5 Leyendas de Racha
           </h2>
-          <p className="text-pink-200/80 text-sm font-semibold max-w-md mx-auto mb-12">
+          <p className="text-pink-200/80 text-xs sm:text-sm font-semibold max-w-md mx-auto mb-10">
             Un tributo especial a los espectadores más fieles que mantienen encendida la llama de la comunidad VTT.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             {topRachas.map((user) => {
               const isTop1 = user.posicion === 1;
               const isTop2 = user.posicion === 2;
@@ -303,13 +303,13 @@ export const SalonDeLaFama = () => {
       ) : (
         <>
           {/* ── HEADER PRINCIPAL DE LA GALA ── */}
-          <div className="relative z-20 text-center max-w-4xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-gradient-to-r from-amber-400/15 via-pink-500/15 to-amber-400/15 border border-amber-300/40 text-amber-300 text-xs font-black tracking-widest uppercase mb-4 shadow-[0_0_20px_rgba(253,230,138,0.2)]">
-              <Trophy className="w-4 h-4 text-amber-300" /> GALA DE LA COMUNIDAD VTT
+          <div className="relative z-20 text-center max-w-4xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400/15 via-pink-500/15 to-amber-400/15 border border-amber-300/40 text-amber-300 text-[11px] sm:text-xs font-black tracking-widest uppercase mb-3 shadow-[0_0_20px_rgba(253,230,138,0.2)]">
+              <Trophy className="w-3.5 h-3.5 text-amber-300" /> GALA DE LA COMUNIDAD VTT
             </div>
 
             <h1
-              className="text-4xl sm:text-6xl md:text-7xl font-black tracking-widest uppercase mb-3 drop-shadow-[0_4px_30px_rgba(255,133,161,0.5)]"
+              className="text-3xl sm:text-5xl md:text-7xl font-black tracking-widest uppercase mb-2 drop-shadow-[0_4px_30px_rgba(255,133,161,0.5)]"
               style={{
                 background: 'linear-gradient(135deg, #FFF0F5 0%, #FFB3C6 35%, #FDE68A 70%, #FF85A1 100%)',
                 WebkitBackgroundClip: 'text',
@@ -320,7 +320,7 @@ export const SalonDeLaFama = () => {
               SALÓN DE LA FAMA
             </h1>
 
-            <p className="text-pink-200/90 font-extrabold text-sm md:text-base tracking-wider max-w-md mx-auto">
+            <p className="text-pink-200/90 font-extrabold text-xs sm:text-sm tracking-wider max-w-xs sm:max-w-md mx-auto">
               Recorre la alfombra roja y vota hasta 3 veces por tus favoritos en cada categoría 🏆
             </p>
           </div>
@@ -329,7 +329,7 @@ export const SalonDeLaFama = () => {
           <div className="relative max-w-5xl mx-auto z-10">
 
             {/* ── ALFOMBRA ROJA PERSPECTIVA ── */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-24 sm:w-36 md:w-44 pointer-events-none z-0 overflow-hidden flex flex-col items-center">
+            <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-16 sm:w-28 md:w-44 pointer-events-none z-0 overflow-hidden flex flex-col items-center">
               <motion.div
                 initial={{ scaleY: 0 }}
                 animate={{ scaleY: 1 }}
@@ -337,19 +337,19 @@ export const SalonDeLaFama = () => {
                 className="w-full h-full origin-top relative shadow-[0_0_50px_rgba(239,68,68,0.4)]"
                 style={{
                   background: 'linear-gradient(90deg, #991b1b 0%, #dc2626 30%, #ef4444 50%, #dc2626 70%, #991b1b 100%)',
-                  borderLeft: '4px solid #fde047',
-                  borderRight: '4px solid #fde047',
+                  borderLeft: '3px solid #fde047',
+                  borderRight: '3px solid #fde047',
                 }}
               >
                 <div className="absolute inset-0 opacity-25" style={{
                   backgroundImage: 'radial-gradient(circle, #fde047 1px, transparent 1px)',
-                  backgroundSize: '24px 48px',
+                  backgroundSize: '20px 40px',
                 }} />
               </motion.div>
             </div>
 
             {/* ── TARJETAS ZIG-ZAG ── */}
-            <div className="relative z-10 space-y-16 py-8">
+            <div className="relative z-10 space-y-12 sm:space-y-16 py-6">
               {categorias.map((cat) => {
                 const esIzquierda = cat.lado === 'left';
                 const votosCat = misVotos[cat.id] || [];
@@ -358,13 +358,13 @@ export const SalonDeLaFama = () => {
                 return (
                   <motion.div
                     key={cat.id}
-                    initial={{ opacity: 0, x: esIzquierda ? -80 : 80, y: 40 }}
+                    initial={{ opacity: 0, x: esIzquierda ? -50 : 50, y: 30 }}
                     whileInView={{ opacity: 1, x: 0, y: 0 }}
-                    viewport={{ once: true, margin: '-100px' }}
-                    transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-                    className={`flex w-full ${esIzquierda ? 'justify-start pr-8 md:pr-0' : 'justify-end pl-8 md:pl-0'}`}
+                    viewport={{ once: true, margin: '-50px' }}
+                    transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                    className={`flex w-full ${esIzquierda ? 'justify-start md:justify-start' : 'justify-end md:justify-end'}`}
                   >
-                    <div className="w-full md:w-[45%] relative group">
+                    <div className="w-[88%] sm:w-[80%] md:w-[45%] mx-auto md:mx-0 relative group">
 
                       <div
                         className={`hidden md:block absolute top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-amber-300 to-pink-400 opacity-60 z-0 ${
@@ -374,7 +374,7 @@ export const SalonDeLaFama = () => {
 
                       {/* Tarjeta Flotante */}
                       <div
-                        className="relative rounded-3xl p-6 sm:p-7 overflow-hidden transition-all duration-500 hover:scale-[1.03] shadow-2xl"
+                        className="relative rounded-3xl p-5 sm:p-7 overflow-hidden transition-all duration-500 hover:scale-[1.02] shadow-2xl"
                         style={{
                           background: 'linear-gradient(145deg, rgba(65,18,40,0.92) 0%, rgba(28,8,18,0.96) 100%)',
                           border: '2px solid rgba(253,230,138,0.35)',
@@ -384,28 +384,28 @@ export const SalonDeLaFama = () => {
                         <CornerBrackets color="border-amber-300/70" />
 
                         {/* Card Header */}
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500/25 to-amber-400/25 border border-amber-300/40 flex items-center justify-center text-2xl shadow-lg">
+                        <div className="flex items-center justify-between gap-2 mb-3">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-pink-500/25 to-amber-400/25 border border-amber-300/40 flex items-center justify-center text-xl sm:text-2xl shadow-lg shrink-0">
                             {cat.emoji}
                           </div>
 
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border ${
+                          <span className={`px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-black tracking-widest uppercase border truncate ${
                             tieneVotos
                               ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
                               : 'bg-amber-400/15 text-amber-300 border-amber-300/40'
                           }`}>
-                            {votosCat.length > 0 ? `✓ Votos: ${votosCat.length}/3` : '✨ 3 Votos Disponibles'}
+                            {votosCat.length > 0 ? `✓ Votos: ${votosCat.length}/3` : '✨ 3 Votos'}
                           </span>
                         </div>
 
                         {/* Title & Desc */}
-                        <h3 className="text-2xl font-black text-white mb-1 tracking-wide group-hover:text-amber-300 transition-colors">
+                        <h3 className="text-xl sm:text-2xl font-black text-white mb-0.5 tracking-wide group-hover:text-amber-300 transition-colors">
                           {cat.titulo}
                         </h3>
-                        <p className="text-xs font-bold text-amber-300/80 mb-2 uppercase tracking-wider">
+                        <p className="text-[11px] sm:text-xs font-bold text-amber-300/80 mb-2 uppercase tracking-wider">
                           {cat.subtitulo}
                         </p>
-                        <p className="text-xs text-pink-200/70 mb-6 font-semibold leading-relaxed">
+                        <p className="text-xs text-pink-200/70 mb-5 font-semibold leading-relaxed">
                           {cat.descripcion}
                         </p>
 
