@@ -1,46 +1,60 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Gift, Heart, Sparkles } from 'lucide-react';
+import { Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const floatingDecos = [
+  { emoji: '💝', top: '-16px', right: '-16px', delay: '0s',   size: '2rem' },
+  { emoji: '🎀', top: '20%',   left: '-20px',  delay: '0.5s', size: '1.8rem' },
+  { emoji: '✨', bottom: '-12px', left: '20%', delay: '0.9s', size: '1.6rem' },
+  { emoji: '💖', top: '60%',   right: '-18px',  delay: '1.2s', size: '1.7rem' },
+  { emoji: '🌸', bottom: '-14px', right: '15%', delay: '0.3s', size: '1.5rem' },
+];
+
 export default function Wishlist() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const giftRef = useRef<HTMLDivElement>(null);
+  const cardRef    = useRef<HTMLDivElement>(null);
+  const giftRef    = useRef<HTMLDivElement>(null);
+  const titleRef   = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Card unfold animation
-      gsap.fromTo(
-        cardRef.current,
-        { rotateX: 90, opacity: 0, transformOrigin: 'top center' },
+      gsap.fromTo(titleRef.current,
+        { y: 30, opacity: 0 },
         {
-          rotateX: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none reverse',
-          },
+          y: 0, opacity: 1, duration: 0.6, ease: 'back.out(2)',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 85%', toggleActions: 'play none none reverse' },
         }
       );
 
-      // Gift bounce on hover setup
+      gsap.fromTo(cardRef.current,
+        { rotateY: -25, opacity: 0, scale: 0.9 },
+        {
+          rotateY: 0, opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
+        }
+      );
+
+      // Gift icon pulse on scroll enter
+      gsap.fromTo(giftRef.current,
+        { scale: 0, rotation: -20 },
+        {
+          scale: 1, rotation: 0, duration: 0.6, delay: 0.4, ease: 'elastic.out(1, 0.5)',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
+        }
+      );
+
+      // Gift hover
       const gift = giftRef.current;
       if (gift) {
         gift.addEventListener('mouseenter', () => {
-          gsap.to(gift, {
-            y: -10,
-            duration: 0.3,
-            yoyo: true,
-            repeat: 1,
-            ease: 'power2.out',
-          });
+          gsap.to(gift, { y: -12, rotation: 10, duration: 0.3, ease: 'power2.out' });
+        });
+        gift.addEventListener('mouseleave', () => {
+          gsap.to(gift, { y: 0, rotation: 0, duration: 0.4, ease: 'elastic.out(1, 0.5)' });
         });
       }
     }, sectionRef);
@@ -49,77 +63,104 @@ export default function Wishlist() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-16 px-4">
-      <div
-        ref={cardRef}
-        className="max-w-xl mx-auto relative"
-        style={{ perspective: '1000px' }}
-      >
-        {/* Gift Card */}
+    <section ref={sectionRef} className="relative py-20 px-4">
+      {/* Header */}
+      <div ref={titleRef} className="text-center mb-12">
+        <h2 className="section-title">
+          Mi <span className="text-gradient">Wishlist</span> 🎀
+        </h2>
+        <p className="section-subtitle">¿Quieres regalarme algo? ¡Aquí está mi lista! 💝</p>
+      </div>
+
+      <div className="max-w-md mx-auto relative" style={{ perspective: '1200px' }}>
+        {/* Floating decorations */}
+        {floatingDecos.map((d, i) => (
+          <span
+            key={i}
+            className="absolute select-none pointer-events-none"
+            style={{
+              top: d.top,
+              right: (d as Record<string, string>).right,
+              left: (d as Record<string, string>).left,
+              bottom: (d as Record<string, string>).bottom,
+              fontSize: d.size,
+              animationDelay: d.delay,
+              animation: `float 3.5s ease-in-out ${d.delay} infinite`,
+              filter: 'drop-shadow(0 2px 6px rgba(255,133,161,0.4))',
+              zIndex: 20,
+            }}
+          >
+            {d.emoji}
+          </span>
+        ))}
+
+        {/* Main card */}
         <div
-          className="relative bg-white rounded-3xl p-8 sm:p-12 text-center overflow-hidden"
+          ref={cardRef}
+          className="relative rounded-3xl overflow-hidden"
           style={{
-            boxShadow: '0 20px 60px rgba(255, 183, 197, 0.4)',
-            borderTop: '8px solid #FFB7C5',
+            background: 'linear-gradient(160deg, #fff 0%, #FFF0F5 60%, #F3E8FF 100%)',
+            boxShadow: '0 25px 70px rgba(255,133,161,0.3), inset 0 1px 0 rgba(255,255,255,0.9)',
+            border: '2px solid rgba(255,133,161,0.2)',
           }}
         >
-          {/* Ribbon decoration - más sutiles y solo en las esquinas */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-24 bg-gradient-to-b from-pink-200 to-transparent opacity-20 rounded-b-full" />
-          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-24 h-3 bg-gradient-to-r from-pink-200 to-transparent opacity-20 rounded-r-full" />
-          <div className="absolute top-1/2 right-0 -translate-y-1/2 w-24 h-3 bg-gradient-to-l from-pink-200 to-transparent opacity-20 rounded-l-full" />
-
-          {/* Sparkles */}
-          <Sparkles className="absolute top-4 right-4 w-6 h-6 text-yellow-400 animate-pulse" />
-          <Sparkles className="absolute bottom-4 left-4 w-5 h-5 text-pink-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
-
-          {/* Gift Icon */}
+          {/* Top ribbon */}
           <div
-            ref={giftRef}
-            className="relative z-10 w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-300 to-pink-400 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-pink-300/50"
-          >
-            <Gift className="w-12 h-12 text-white" />
-            <Heart className="absolute -top-2 -right-2 w-6 h-6 text-red-400 fill-red-400 animate-bounce" />
+            className="h-2 w-full"
+            style={{ background: 'linear-gradient(90deg, #FF85A1, #C084FC, #7DD3FC, #FF85A1)', backgroundSize: '200% 100%', animation: 'gradient-shift 3s linear infinite' }}
+          />
+
+          <div className="px-8 py-10 text-center">
+            {/* Gift icon */}
+            <div
+              ref={giftRef}
+              className="relative w-24 h-24 mx-auto mb-7 rounded-2xl flex items-center justify-center cursor-pointer shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, #FF85A1, #C084FC)',
+                boxShadow: '0 10px 30px rgba(255,133,161,0.5)',
+              }}
+            >
+              <Gift className="w-12 h-12 text-white" />
+              <div
+                className="absolute -top-3 -right-3 w-7 h-7 rounded-full flex items-center justify-center text-white text-sm font-bold shadow"
+                style={{ background: 'linear-gradient(135deg, #FF5C8A, #FF85A1)', animation: 'heart-beat 1.5s ease-in-out infinite' }}
+              >
+                💖
+              </div>
+            </div>
+
+            <h3 className="text-2xl sm:text-3xl font-black mb-3" style={{ color: '#3D1A2B' }}>
+              ¡Hazme feliz! 🥺
+            </h3>
+
+            <p className="text-base mb-1" style={{ color: '#7B5064' }}>
+              Si me quieres regalar algo, puedes ver mi
+            </p>
+            <p className="text-2xl font-black mb-1" style={{
+              background: 'linear-gradient(135deg, #FF85A1, #A78BFA)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              Wishlist
+            </p>
+            <p className="text-base mb-6" style={{ color: '#7B5064' }}>
+              aquí, bb 💝
+            </p>
+
+            <p className="text-sm mb-8 font-semibold" style={{ color: '#A78BFA' }}>
+              ¡Gracias por tu apoyo! ✨ Todo lo agradezco muchísimo
+            </p>
+
+            <Button
+              className="btn-kawaii text-white font-extrabold text-base px-10 py-6 w-full"
+              style={{ background: 'linear-gradient(135deg, #FF85A1, #C084FC)' }}
+              onClick={() => window.open('https://throne.com/valentinavtt', '_blank')}
+            >
+              <Gift className="w-5 h-5 mr-2" />
+              Abrir mi Wishlist 🎀
+            </Button>
           </div>
-
-          {/* Title */}
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-700 mb-4">
-            Wishlist
-          </h2>
-
-          {/* Description */}
-          <p className="text-lg text-gray-600 mb-2">
-            Si me quieres regalar algo, puedes ver mi
-          </p>
-          <p className="text-xl font-bold text-pink-500 mb-2">
-            Wishlist
-          </p>
-          <p className="text-lg text-gray-600 mb-6">
-            aquí, bb <span className="inline-block animate-pulse">💝</span>
-          </p>
-
-          <p className="text-base text-gray-500 mb-8">
-            ¡Gracias por tu apoyo! ✨
-          </p>
-
-          {/* Button */}
-          <Button
-            className="btn-kawaii bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white font-bold px-8 py-6 text-lg"
-            onClick={() => window.open('https://throne.com/valentinavtt', '_blank')}
-          >
-            <Gift className="w-5 h-5 mr-2" />
-            Abrir mi Wishlist
-          </Button>
-        </div>
-
-        {/* Floating hearts around card */}
-        <div className="absolute -top-4 -right-4 text-2xl animate-float" style={{ animationDelay: '0.3s' }}>
-          💕
-        </div>
-        <div className="absolute -bottom-4 -left-4 text-2xl animate-float" style={{ animationDelay: '0.6s' }}>
-          💖
-        </div>
-        <div className="absolute top-1/2 -right-8 text-xl animate-float" style={{ animationDelay: '0.9s' }}>
-          💗
         </div>
       </div>
     </section>

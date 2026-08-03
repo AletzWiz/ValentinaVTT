@@ -1,409 +1,387 @@
 import { useEffect, useState } from 'react';
-import { Clapperboard, ChevronRight, ChevronLeft, Flame } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Trophy, Flame, Check, Sparkles, X, Heart, Star } from 'lucide-react';
 
-interface TwitchClip {
+interface CategoriaGala {
   id: string;
-  url: string;
-  creator_name: string;
-  thumbnail_url: string;
-  view_count: number;
-  title: string;
+  emoji: string;
+  titulo: string;
+  subtitulo: string;
+  descripcion: string;
+  lado: 'left' | 'right';
+  nominados: { id: string; nombre: string; detalle: string; votos: number }[];
 }
 
-interface SeasonMeta {
-  temporada: number;
-  diasRestantes: number;
-  fechaInicio: string;
-  fechaFin: string;
-}
-
-interface RachaData {
-  nombre: string;
-  dias: number;
-  fecha?: string;
-}
-
-// ✨ Partículas doradas sutiles ✨
-const ParticulasDoradas = () => {
-  return (
-    <>
-      <style>{`
-        @keyframes floatMagic {
-          0%, 100% { transform: translateY(0) translateX(0); opacity: 0.5; }
-          50% { transform: translateY(-20px) translateX(10px); opacity: 0.8; }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(50px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes floatTitle {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
-        }
-        @keyframes floatPodium {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
-        }
-        /* ANIMACIONES DE FUEGO PARA LAS RACHAS */
-        @keyframes flameIntense {
-          0%, 100% { transform: scale(1) rotate(-5deg); opacity: 1; filter: drop-shadow(0 0 8px rgba(250,204,21,0.8)); }
-          50% { transform: scale(1.25) rotate(5deg); opacity: 0.9; filter: drop-shadow(0 0 15px rgba(250,204,21,1)); }
-        }
-        @keyframes flameMedium {
-          0%, 100% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 0 5px rgba(251,146,60,0.5)); }
-          50% { transform: scale(1.15); opacity: 0.7; filter: drop-shadow(0 0 10px rgba(251,146,60,0.8)); }
-        }
-        @keyframes flameSubtle {
-          0%, 100% { transform: scale(1); opacity: 0.8; }
-          50% { transform: scale(1.08); opacity: 0.6; filter: drop-shadow(0 0 5px rgba(248,113,113,0.5)); }
-        }
-
-        .animate-fade-in { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-float-title { animation: floatTitle 5s ease-in-out infinite; }
-        .animate-float-podium { animation: floatPodium 5s ease-in-out infinite; }
-        
-        .animate-flame-1 { animation: flameIntense 0.6s ease-in-out infinite; }
-        .animate-flame-2 { animation: flameMedium 1.2s ease-in-out infinite; }
-        .animate-flame-3 { animation: flameSubtle 1.8s ease-in-out infinite; }
-      `}</style>
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {[...Array(25)].map((_, i) => {
-          const size = Math.random() * 4 + 2;
-          return (
-            <div
-              key={i}
-              className="absolute bg-yellow-300 rounded-full"
-              style={{
-                width: `${size}px`, height: `${size}px`,
-                top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`,
-                animationName: 'floatMagic',
-                animationDuration: `${Math.random() * 6 + 4}s`,
-                animationIterationCount: 'infinite',
-                animationTimingFunction: 'ease-in-out',
-                animationDelay: `${Math.random() * -3}s`,
-                boxShadow: '0 0 10px rgba(250, 204, 21, 0.6)'
-              }}
-            />
-          );
-        })}
-      </div>
-    </>
-  );
-};
-
-// 🎬 Emojis Kawaii de fondo (Sutiles) 🎬
-const EmojisFondo = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-[0.12] text-5xl select-none filter blur-[1px]">
-    <span className="absolute top-[15%] left-[10%] -rotate-12">🎬</span>
-    <span className="absolute top-[60%] left-[8%] rotate-12">🔥</span>
-    <span className="absolute top-[25%] right-[12%] rotate-45">💖</span>
-    <span className="absolute bottom-[20%] right-[10%] -rotate-12">🎬</span>
-    <span className="absolute top-[10%] right-[25%] rotate-12">🎀</span>
-    <span className="absolute bottom-[30%] left-[20%] -rotate-45">🍿</span>
-  </div>
-);
-
-// 📛 COMPONENTE DE TÍTULO TIPO "PASTILLA" ROJA/DORADA 📛
-const TituloSeccion = ({ texto }: { texto: string }) => (
-  <h2 className="text-xl md:text-2xl font-bold text-yellow-400 tracking-widest mb-4 mt-6 font-sans bg-[#4a0414]/80 backdrop-blur-md inline-block px-8 py-3 rounded-full border-2 border-yellow-500/60 shadow-[0_0_20px_rgba(250,204,21,0.25)] uppercase">
-    {texto}
-  </h2>
-);
+const CATEGORIAS_GALA: CategoriaGala[] = [
+  {
+    id: 'clip-oro',
+    emoji: '🎬',
+    titulo: 'El Clip de Oro',
+    subtitulo: 'El momento más épico del stream',
+    descripcion: 'El clip que rompió la comunidad y sacó las mejores risas.',
+    lado: 'left',
+    nominados: [
+      { id: 'c1', nombre: 'Reacción Épica al Jumpscare', detalle: 'Clip por Juan_VT', votos: 142 },
+      { id: 'c2', nombre: 'Victoria Impensable en Final', detalle: 'Clip por MariaGamer', votos: 98 },
+      { id: 'c3', nombre: 'Risa Contagiosa en Directo', detalle: 'Clip por AlexVTT', votos: 210 },
+    ],
+  },
+  {
+    id: 'mvp-comunidad',
+    emoji: '🛡️',
+    titulo: 'MVP de la Comunidad',
+    subtitulo: 'El miembro más valioso y activo',
+    descripcion: 'Quien siempre está apoyando en el chat, eventos y Discord.',
+    lado: 'right',
+    nominados: [
+      { id: 'm1', nombre: 'Aletzwiz', detalle: 'Creador de la Web & Mod activo', votos: 340 },
+      { id: 'm2', nombre: 'Soto_VTT', detalle: 'Líder de Eventos en Discord', votos: 215 },
+      { id: 'm3', nombre: 'PinkyStar', detalle: 'Sub #1 y apoyo incondicional', votos: 189 },
+    ],
+  },
+  {
+    id: 'mod-trabajador',
+    emoji: '🛡️',
+    titulo: 'El Mod más trabajador',
+    subtitulo: 'El guardián del chat',
+    descripcion: 'El moderador que siempre mantiene la paz y la buena onda.',
+    lado: 'left',
+    nominados: [
+      { id: 'mo1', nombre: 'ValenMod_Zero', detalle: '120h de moderación en directo', votos: 180 },
+      { id: 'mo2', nombre: 'KawaiiGuard', detalle: 'Organizador del chat & comandos', votos: 245 },
+      { id: 'mo3', nombre: 'ShieldPink', detalle: 'Protector en sorteos y eventos', votos: 130 },
+    ],
+  },
+  {
+    id: 'peor-manqueada',
+    emoji: '💀',
+    titulo: 'Peor Manqueada / Susto',
+    subtitulo: 'El momento F en el chat',
+    descripcion: 'Aquella jugada que salió tan mal que dio la vuelta y fue legendaria.',
+    lado: 'right',
+    nominados: [
+      { id: 'pm1', nombre: 'Caída al vacío en Minecraft', detalle: 'Perdió todo el diamante', votos: 310 },
+      { id: 'pm2', nombre: 'Susto por el gato en directo', detalle: 'Grito de terror nivel 10', votos: 275 },
+      { id: 'pm3', nombre: 'Granada a los propios compañeros', detalle: 'Eliminación en equipo accidental', votos: 190 },
+    ],
+  },
+  {
+    id: 'frase-celebre',
+    emoji: '💬',
+    titulo: 'Frase Célebre',
+    subtitulo: 'La frase icónica de la temporada',
+    descripcion: 'Esa frase espontánea que se convirtió en sticker y emote de la comunidad.',
+    lado: 'left',
+    nominados: [
+      { id: 'fc1', nombre: '¡Eso no era un bug, era una característica! 🌸', detalle: 'En directo de terror', votos: 285 },
+      { id: 'fc2', nombre: '¡Última partida y me voy a dormir! (Fueron 4h más)', detalle: 'Directo nocturno', votos: 420 },
+      { id: 'fc3', nombre: '¡El chat me distrajo, lo juro!', detalle: 'Luego de fallar un salto fácil', votos: 310 },
+    ],
+  },
+  {
+    id: 'art-temporada',
+    emoji: '🎨',
+    titulo: 'Art de la Temporada',
+    subtitulo: 'La mejor obra de arte o dibujo de un fan',
+    descripcion: 'El fanart que más enamoró a Valentina y a toda la comunidad VTT.',
+    lado: 'right',
+    nominados: [
+      { id: 'art1', nombre: 'Valentina Chibi en la Playa', detalle: 'Arte digital por SakuraArts', votos: 350 },
+      { id: 'art2', nombre: 'Retrato Valentina Anime Gold', detalle: 'Ilustración por NekoDraws', votos: 290 },
+      { id: 'art3', nombre: 'Stickers Emotes para Twitch', detalle: 'Set de emotes por PixelVT', votos: 240 },
+    ],
+  },
+];
 
 export const SalonDeLaFama = () => {
-  const [clips, setClips] = useState<TwitchClip[]>([]);
-  const [rachas, setRachas] = useState<RachaData[]>([]);
-  const [meta, setMeta] = useState<SeasonMeta | null>(null);
-  const [loading, setLoading] = useState(true);
-  
-  // 0 = Clips Populares, 1 = Mejores Rachas, 2 = Próximamente
-  const [currentSection, setCurrentSection] = useState(0); 
+  const [votosLocal, setVotosLocal] = useState<Record<string, string>>({});
+  const [modalCat, setModalCat]     = useState<CategoriaGala | null>(null);
 
+  // Cargar votos guardados
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        
-        // 1. Buscamos los clips
-        const clipsResponse = await fetch('/api/clips?v=' + new Date().getTime());
-        const clipsData = await clipsResponse.json();
-        
-        if (clipsData.clips && Array.isArray(clipsData.clips)) {
-          setClips(clipsData.clips);
-          setMeta(clipsData.meta);
-        }
-
-        // 2. Buscamos archivo manual de rachas (CON TRUCO ANTI-CACHÉ)
-        const rachasResponse = await fetch('/rachas.json?v=' + new Date().getTime());
-        if (rachasResponse.ok) {
-          const rachasData: RachaData[] = await rachasResponse.json();
-          
-          const rachasCalculadas = rachasData.map((r) => {
-            let diasCalculados = r.dias;
-            if (r.dias > 0 && r.fecha) {
-              const hoy = new Date().getTime();
-              const base = new Date(`${r.fecha}T00:00:00`).getTime();
-              const diffDias = Math.floor((hoy - base) / (1000 * 60 * 60 * 24));
-              if (diffDias > 0) diasCalculados += diffDias;
-            }
-            return { ...r, dias: diasCalculados };
-          });
-
-          rachasCalculadas.sort((a, b) => b.dias - a.dias);
-          setRachas(rachasCalculadas.slice(0, 10));
-        }
-
-      } catch (error) {
-        console.error("Error cargando los datos:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    try {
+      const saved = localStorage.getItem('vtt_votos');
+      if (saved) setVotosLocal(JSON.parse(saved));
+    } catch {}
   }, []);
 
-  const changeSection = (direction: 'right' | 'left') => {
-    if (direction === 'right') setCurrentSection(prev => (prev < 2 ? prev + 1 : prev));
-    if (direction === 'left') setCurrentSection(prev => (prev > 0 ? prev - 1 : prev));
+  const votar = (catId: string, nominadoId: string) => {
+    const nuevosVotos = { ...votosLocal, [catId]: nominadoId };
+    setVotosLocal(nuevosVotos);
+    try {
+      localStorage.setItem('vtt_votos', JSON.stringify(nuevosVotos));
+    } catch {}
   };
-
-  const formatearFecha = (isoString: string) => {
-    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const date = new Date(isoString);
-    return `${date.getUTCDate()} ${meses[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
-  };
-
-  if (loading) return <div className="text-center py-20 text-yellow-500 font-bold bg-[#1a0f14] min-h-screen flex items-center justify-center">Preparando la alfombra dorada...</div>;
 
   return (
-    <section className="min-h-screen bg-[#ffccd5] pt-28 pb-12 px-4 relative overflow-hidden flex flex-col justify-center">
-      
-      {/* Sombra negra en los bordes */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_70%,_rgba(0,0,0,0.6)_100%)] pointer-events-none z-0"></div>
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none z-0"></div>
+    <section className="min-h-screen text-white pt-24 pb-32 px-4 relative overflow-hidden bg-[#180612]">
 
-      <ParticulasDoradas />
-      <EmojisFondo />
+      {/* ── Fondo de Luces y Brillos Gala ── */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#4a152e] via-[#1b0613] to-[#0c0208] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-to-b from-pink-500/20 via-amber-400/10 to-transparent blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 animate-fade-in w-full flex flex-col items-center">
-        
-        <div className="max-w-6xl mx-auto text-center mb-6">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-100 via-yellow-300 to-yellow-600 drop-shadow-[0_0_15px_rgba(250,204,21,0.7)] mb-4 tracking-[0.15em] uppercase animate-float-title text-center">
-            SALON DE LA FAMA
-          </h1>
-          
-          <p className="text-pink-100 font-medium italic tracking-wide text-sm md:text-base bg-black/40 backdrop-blur-sm inline-block px-5 py-1.5 rounded-full border border-pink-500/30 shadow-lg mt-2">
-            "Temporada {meta?.temporada || 1}: Piloto"
-          </p>
-          <p className="text-pink-200 text-xs mt-3 font-bold opacity-90 tracking-widest">
-            {meta ? `${formatearFecha(meta.fechaInicio)} - ${formatearFecha(meta.fechaFin)}` : 'Calculando temporada...'}
-          </p>
+      {/* ── HEADER PRINCIPAL ── */}
+      <div className="relative z-20 text-center max-w-4xl mx-auto mb-16">
+        <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-gradient-to-r from-amber-400/15 via-pink-500/15 to-amber-400/15 border border-amber-300/40 text-amber-300 text-xs font-black tracking-widest uppercase mb-4 shadow-[0_0_20px_rgba(253,230,138,0.2)]">
+          <Trophy className="w-4 h-4 text-amber-300" /> GALA DE LA COMUNIDAD VTT
         </div>
 
-        {/* ⬅️ Flecha Izquierda */}
-        {currentSection > 0 && (
-          <button 
-            onClick={() => changeSection('left')}
-            className="absolute left-2 md:left-12 top-1/2 -translate-y-1/2 z-50 p-2 md:p-3 bg-black/60 rounded-full text-yellow-400 border-2 border-yellow-500/50 shadow-[0_0_15px_rgba(250,204,21,0.4)] transition-all hover:bg-yellow-500 hover:text-black hover:scale-110 hover:shadow-[0_0_25px_rgba(250,204,21,0.8)] backdrop-blur-md"
+        <h1
+          className="text-4xl sm:text-6xl md:text-7xl font-black tracking-widest uppercase mb-3 drop-shadow-[0_4px_30px_rgba(255,133,161,0.5)]"
+          style={{
+            background: 'linear-gradient(135deg, #FFF0F5 0%, #FFB3C6 35%, #FDE68A 70%, #FF85A1 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          SALÓN DE LA FAMA
+        </h1>
+
+        <p className="text-pink-200/90 font-extrabold text-sm md:text-base tracking-wider max-w-md mx-auto">
+          Recorre la alfombra roja y vota por tus favoritos en cada categoría 🏆
+        </p>
+      </div>
+
+      {/* ── PASEO DE LA ALFOMBRA ROJA (RED CARPET CORRIDOR) ── */}
+      <div className="relative max-w-5xl mx-auto z-10">
+
+        {/* ── ALFOMBRA ROJA PERSPECTIVA PERMANENTE EN EL CENTRO ── */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-24 sm:w-36 md:w-44 pointer-events-none z-0 overflow-hidden flex flex-col items-center">
+          {/* Desenrolle de la alfombra con Framer Motion */}
+          <motion.div
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            transition={{ duration: 1.8, ease: 'easeOut' }}
+            className="w-full h-full origin-top relative shadow-[0_0_50px_rgba(239,68,68,0.4)]"
+            style={{
+              background: 'linear-gradient(90deg, #991b1b 0%, #dc2626 30%, #ef4444 50%, #dc2626 70%, #991b1b 100%)',
+              borderLeft: '4px solid #fde047',
+              borderRight: '4px solid #fde047',
+            }}
           >
-            <ChevronLeft size={36} strokeWidth={2.5} />
-          </button>
-        )}
+            {/* Destellos dorados en la alfombra */}
+            <div className="absolute inset-0 opacity-25" style={{
+              backgroundImage: 'radial-gradient(circle, #fde047 1px, transparent 1px)',
+              backgroundSize: '24px 48px',
+            }} />
+          </motion.div>
+        </div>
 
-        {/* ➡️ Flecha Derecha */}
-        {currentSection < 2 && (
-          <button 
-            onClick={() => changeSection('right')}
-            className="absolute right-2 md:right-12 top-1/2 -translate-y-1/2 z-50 p-2 md:p-3 bg-black/60 rounded-full text-yellow-400 border-2 border-yellow-500/50 shadow-[0_0_15px_rgba(250,204,21,0.4)] transition-all hover:bg-yellow-500 hover:text-black hover:scale-110 hover:shadow-[0_0_25px_rgba(250,204,21,0.8)] backdrop-blur-md"
-          >
-            <ChevronRight size={36} strokeWidth={2.5} />
-          </button>
-        )}
+        {/* ── TARJETAS ZIG-ZAG A LO LARGO DE LA ALFOMBRA ── */}
+        <div className="relative z-10 space-y-16 py-8">
+          {CATEGORIAS_GALA.map((cat, idx) => {
+            const esIzquierda = cat.lado === 'left';
+            const votoId = votosLocal[cat.id];
+            const yaVoto = !!votoId;
 
-        {/* ======================================= */}
-        {/* === SECCIÓN 0: CLIPS MAS POPULARES ==== */}
-        {/* ======================================= */}
-        {currentSection === 0 && (
-          <div className="w-full flex flex-col items-center animate-fade-in">
-            <TituloSeccion texto="Clips más populares" />
+            return (
+              <motion.div
+                key={cat.id}
+                initial={{ opacity: 0, x: esIzquierda ? -80 : 80, y: 40 }}
+                whileInView={{ opacity: 1, x: 0, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
+                className={`flex w-full ${esIzquierda ? 'justify-start pr-8 md:pr-0' : 'justify-end pl-8 md:pl-0'}`}
+              >
+                <div className="w-full md:w-[45%] relative group">
 
-            {clips.length === 0 ? (
-              <div className="max-w-2xl mx-auto mt-4">
-                <div className="border-2 border-dashed border-yellow-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-                  <Clapperboard size={80} strokeWidth={1.5} className="text-yellow-400/80 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)] animate-pulse" />
-                  <h3 className="text-2xl md:text-3xl font-sans font-bold text-white mb-2 tracking-tight">Esperando clip</h3>
-                  <p className="text-pink-200 font-medium text-center">Aún no hay obras maestras en la Temporada {meta?.temporada || 1}.</p>
-                </div>
-              </div>
-            ) : (
-              <div className="max-w-7xl mx-auto overflow-x-auto pt-12 pb-24 flex gap-8 snap-x no-scrollbar px-6 w-full justify-start xl:justify-center">
-                {clips.map((clip, index) => {
-                  const isGold = index === 0;
-                  const isSilver = index === 1;
-                  const isBronze = index === 2;
+                  {/* Conector desde la tarjeta hacia la alfombra central */}
+                  <div
+                    className={`hidden md:block absolute top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-amber-300 to-pink-400 opacity-60 z-0 ${
+                      esIzquierda ? '-right-16 w-16' : '-left-16 w-16'
+                    }`}
+                  />
 
-                  const hdThumbnail = clip.thumbnail_url.replace('%{width}', '640').replace('%{height}', '360'); 
+                  {/* Tarjeta Flotante de Gala */}
+                  <div
+                    className="relative rounded-3xl p-6 sm:p-7 overflow-hidden transition-all duration-500 hover:scale-[1.03] shadow-2xl"
+                    style={{
+                      background: 'linear-gradient(145deg, rgba(65,18,40,0.92) 0%, rgba(28,8,18,0.96) 100%)',
+                      border: '2px solid rgba(253,230,138,0.35)',
+                      boxShadow: '0 20px 50px rgba(0,0,0,0.6), 0 0 25px rgba(255,133,161,0.15)',
+                    }}
+                  >
+                    {/* Esquinas doradas */}
+                    <div className="absolute top-2.5 left-2.5 w-3 h-3 border-t-2 border-l-2 border-amber-300/70" />
+                    <div className="absolute top-2.5 right-2.5 w-3 h-3 border-t-2 border-r-2 border-amber-300/70" />
+                    <div className="absolute bottom-2.5 left-2.5 w-3 h-3 border-b-2 border-l-2 border-amber-300/70" />
+                    <div className="absolute bottom-2.5 right-2.5 w-3 h-3 border-b-2 border-r-2 border-amber-300/70" />
 
-                  return (
-                    <div 
-                      key={clip.id}
-                      style={{ animationDelay: `${index * 0.3}s` }} 
-                      className={`snap-center shrink-0 w-72 rounded-3xl overflow-hidden bg-[#11050a] animate-float-podium border border-pink-900/50 transition-all duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.8)]
-                        ${isGold ? 'ring-2 ring-yellow-400 shadow-[0_0_40px_rgba(250,204,21,0.4)]' : 
-                          isSilver ? 'ring-2 ring-slate-300 shadow-[0_0_30px_rgba(148,163,184,0.3)]' :
-                          isBronze ? 'ring-2 ring-amber-600 shadow-[0_0_20px_rgba(180,83,9,0.3)]' : 
-                          'shadow-2xl'}
-                      `}
-                    >
-                      <div className="relative w-full aspect-video bg-black">
-                        <img src={hdThumbnail} alt={clip.title} className="w-full h-full object-cover opacity-90" onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=640'; }} />
-                        <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-pink-200 text-[10px] px-2 py-1 rounded-full border border-pink-500/30 tracking-wider">
-                          {clip.view_count.toLocaleString()} vistas
-                        </div>
-                        
-                        <div className={`absolute -top-3 -right-2 w-12 h-12 flex items-center justify-center rounded-full font-black text-xl shadow-[0_0_15px_rgba(0,0,0,0.8)]
-                          ${isGold ? 'bg-gradient-to-br from-yellow-200 to-yellow-600 text-black border-2 border-yellow-100' : 
-                            isSilver ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black border-2 border-slate-100' : 
-                            isBronze ? 'bg-gradient-to-br from-amber-500 to-amber-700 text-white border-2 border-amber-300' : 
-                            'bg-[#1a0812] text-pink-300 border-2 border-pink-800'}
-                        `}>
-                          {index + 1}
-                        </div>
+                    {/* Encabezado de la Tarjeta */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500/25 to-amber-400/25 border border-amber-300/40 flex items-center justify-center text-2xl shadow-lg">
+                        {cat.emoji}
                       </div>
 
-                      <div className="p-5">
-                        <p className="text-[10px] uppercase tracking-widest text-pink-500 font-bold mb-1">Creador VIP</p>
-                        <h3 className={`text-xl font-black truncate drop-shadow-md
-                          ${isGold ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500' : 
-                            isSilver ? 'text-slate-200' : 
-                            isBronze ? 'text-amber-500' : 'text-pink-100'}
-                        `}>
-                          {clip.creator_name}
-                        </h3>
-                        <p className="text-xs text-pink-200/60 truncate mt-2 font-medium">{clip.title}</p>
-                        
-                        <a 
-                          href={clip.url} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="mt-5 block text-center py-2.5 rounded-xl text-xs font-bold transition-all duration-300 bg-black/40 text-yellow-400 border border-yellow-600/50 hover:bg-yellow-500 hover:text-black hover:shadow-[0_0_20px_rgba(250,204,21,0.5)] tracking-widest"
-                        >
-                          VER JOYA EN TWITCH
-                        </a>
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border ${
+                        yaVoto
+                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
+                          : 'bg-amber-400/15 text-amber-300 border-amber-300/40'
+                      }`}>
+                        {yaVoto ? '✓ VOTO REGISTRADO' : '✨ VOTACIÓN ABIERTA'}
+                      </span>
+                    </div>
+
+                    {/* Título & Subtítulo */}
+                    <h3 className="text-2xl font-black text-white mb-1 tracking-wide group-hover:text-amber-300 transition-colors">
+                      {cat.titulo}
+                    </h3>
+                    <p className="text-xs font-bold text-amber-300/80 mb-2 uppercase tracking-wider">
+                      {cat.subtitulo}
+                    </p>
+                    <p className="text-xs text-pink-200/70 mb-6 font-semibold leading-relaxed">
+                      {cat.descripcion}
+                    </p>
+
+                    {/* Botón para Abrir Votaciones */}
+                    <button
+                      onClick={() => setModalCat(cat)}
+                      className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-extrabold text-xs tracking-widest uppercase transition-all duration-300 bg-gradient-to-r from-amber-300 via-pink-400 to-amber-400 text-black shadow-lg hover:scale-105 hover:shadow-[0_0_25px_rgba(253,230,138,0.6)]"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      {yaVoto ? 'Ver Nominados & Cambiar Voto' : 'Votar por esta Categoría'}
+                    </button>
+                  </div>
+
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* ── PUERTAS CERRADAS DEL SALÓN AL FINAL DE LA ALFOMBRA ── */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 50 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: 'easeOut' }}
+          className="relative mt-20 pt-10 text-center"
+        >
+          {/* Estructura de las Grandes Puertas Doradas Cerradas */}
+          <div className="relative max-w-md mx-auto rounded-3xl p-8 bg-gradient-to-b from-[#3a1024] to-[#16050e] border-2 border-amber-300/60 shadow-[0_0_60px_rgba(253,230,138,0.25)] overflow-hidden">
+            {/* Brillo de las Puertas */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-400/10 via-transparent to-transparent pointer-events-none" />
+
+            {/* Ilustración visual de puertas cerradas de gala */}
+            <div className="relative w-48 h-56 mx-auto mb-6 flex rounded-2xl overflow-hidden border-2 border-amber-300/50 shadow-2xl bg-[#0f0409]">
+              {/* Puerta Izquierda */}
+              <div className="w-1/2 h-full bg-gradient-to-r from-[#4a152e] to-[#2b0c1b] border-r border-amber-300/60 flex flex-col justify-center items-end pr-2">
+                <div className="w-3 h-3 rounded-full bg-amber-300 shadow-[0_0_10px_#fde047]" />
+              </div>
+              {/* Puerta Derecha */}
+              <div className="w-1/2 h-full bg-gradient-to-l from-[#4a152e] to-[#2b0c1b] border-l border-amber-300/60 flex flex-col justify-center items-start pl-2">
+                <div className="w-3 h-3 rounded-full bg-amber-300 shadow-[0_0_10px_#fde047]" />
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-black text-amber-300 tracking-wider uppercase mb-2">
+              Puertas de la Gran Gala
+            </h3>
+            <p className="text-xs font-semibold text-pink-200/80 mb-4">
+              Las puertas se abrirán oficialmente al finalizar el periodo de votaciones.
+            </p>
+            <div className="inline-block px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-300/50 text-amber-300 text-xs font-black tracking-widest uppercase">
+              ✨ Próxima Gran Gala: 30 Días
+            </div>
+          </div>
+        </motion.div>
+
+      </div>
+
+      {/* ── MODAL INTERACTIVO DE VOTACIÓN ── */}
+      <AnimatePresence>
+        {modalCat && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setModalCat(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.85, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-lg rounded-3xl p-6 sm:p-8 overflow-hidden text-white shadow-2xl z-10"
+              style={{
+                background: 'linear-gradient(160deg, #3d1226 0%, #1a0611 100%)',
+                border: '2px solid rgba(253,230,138,0.5)',
+                boxShadow: '0 25px 80px rgba(0,0,0,0.9), 0 0 40px rgba(255,133,161,0.25)',
+              }}
+            >
+              {/* Botón Cerrar */}
+              <button
+                onClick={() => setModalCat(null)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <X className="w-5 h-5 text-amber-300" />
+              </button>
+
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-3xl">{modalCat.emoji}</span>
+                <div>
+                  <h3 className="text-2xl font-black text-white">{modalCat.titulo}</h3>
+                  <p className="text-xs font-bold text-amber-300 uppercase tracking-wider">{modalCat.subtitulo}</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-pink-200/70 mb-6 font-semibold">
+                Selecciona tu candidato preferido para registrar tu voto en esta categoría:
+              </p>
+
+              {/* Lista de Nominados */}
+              <div className="space-y-3 mb-6">
+                {modalCat.nominados.map((nom) => {
+                  const selec = votosLocal[modalCat.id] === nom.id;
+
+                  return (
+                    <div
+                      key={nom.id}
+                      onClick={() => votar(modalCat.id, nom.id)}
+                      className={`p-4 rounded-2xl border cursor-pointer transition-all duration-300 flex items-center justify-between ${
+                        selec
+                          ? 'bg-gradient-to-r from-amber-400/25 to-pink-500/25 border-amber-300 shadow-[0_0_20px_rgba(253,230,138,0.3)] scale-[1.02]'
+                          : 'bg-white/5 border-pink-500/20 hover:border-amber-300/40 hover:bg-white/10'
+                      }`}
+                    >
+                      <div>
+                        <div className="font-extrabold text-sm text-white flex items-center gap-2">
+                          {nom.nombre}
+                          {selec && <Check className="w-4 h-4 text-emerald-400" />}
+                        </div>
+                        <div className="text-xs text-pink-200/60 font-semibold">{nom.detalle}</div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className="text-xs font-black text-amber-300 block">
+                          {nom.votos + (selec ? 1 : 0)} VOTOS
+                        </span>
+                        <span className="text-[10px] text-pink-200/50 font-bold">
+                          {selec ? '¡Tu Voto!' : 'Hacer clic para votar'}
+                        </span>
                       </div>
                     </div>
                   );
                 })}
               </div>
-            )}
+
+              <button
+                onClick={() => setModalCat(null)}
+                className="w-full py-3.5 rounded-2xl font-black text-xs tracking-widest uppercase bg-gradient-to-r from-amber-300 to-pink-400 text-black shadow-lg hover:scale-105 transition-all"
+              >
+                Confirmar & Cerrar
+              </button>
+            </motion.div>
           </div>
         )}
+      </AnimatePresence>
 
-        {/* ======================================= */}
-        {/* ===== SECCIÓN 1: MEJORES RACHAS ======= */}
-        {/* ======================================= */}
-        {currentSection === 1 && (
-          <div className="w-full flex flex-col items-center animate-fade-in px-4">
-            <TituloSeccion texto="Mejores rachas" />
-
-            {rachas.length === 0 ? (
-              <div className="max-w-2xl mx-auto mt-8">
-                <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-                  <Flame size={80} strokeWidth={1.5} className="text-pink-400 mb-6 drop-shadow-[0_0_15px_rgba(244,114,182,0.6)] animate-pulse" />
-                  <h3 className="text-2xl md:text-3xl font-sans font-bold text-white text-center tracking-wide">Buscando las leyendas...</h3>
-                </div>
-              </div>
-            ) : (
-              <div className="max-w-4xl mx-auto w-full mt-8 bg-[#11050a]/80 backdrop-blur-xl border border-yellow-600/30 rounded-[2rem] shadow-[0_0_40px_rgba(0,0,0,0.6)] p-4 md:p-8 relative overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-red-600/10 blur-[50px] pointer-events-none"></div>
-
-                <div className="flex flex-col gap-3 md:gap-4 relative z-10">
-                  {rachas.map((racha, index) => {
-                    const isGold = index === 0;
-                    const isSilver = index === 1;
-                    const isBronze = index === 2;
-                    const avatarUrl = racha.dias > 0 
-                      ? `https://ui-avatars.com/api/?name=${racha.nombre}&background=db2777&color=fff&size=128&bold=true`
-                      : `https://ui-avatars.com/api/?name=Usuario&background=1f2937&color=fff&size=128`;
-
-                    let flameClass = "text-gray-500 opacity-50"; 
-                    if (racha.dias > 0) {
-                      if (isGold) flameClass = "text-yellow-400 animate-flame-1";
-                      else if (isSilver) flameClass = "text-orange-400 animate-flame-2";
-                      else if (isBronze) flameClass = "text-red-400 animate-flame-3";
-                    }
-
-                    return (
-                      <div 
-                        key={index}
-                        className={`flex items-center justify-between p-3 md:p-4 rounded-2xl transition-all duration-300 hover:bg-white/10 border hover:scale-[1.02]
-                          ${isGold && racha.dias > 0 ? 'border-yellow-500/60 bg-yellow-900/20 shadow-[0_0_15px_rgba(250,204,21,0.15)]' : 
-                            isSilver && racha.dias > 0 ? 'border-slate-400/50 bg-slate-900/30' : 
-                            isBronze && racha.dias > 0 ? 'border-amber-700/50 bg-amber-900/20' : 
-                            'border-pink-900/30 bg-black/40'}
-                        `}
-                      >
-                        <div className="flex items-center gap-3 md:gap-5">
-                          <div className={`w-8 h-8 md:w-10 md:h-10 flex shrink-0 items-center justify-center rounded-full font-black text-sm md:text-lg shadow-md
-                            ${isGold && racha.dias > 0 ? 'bg-gradient-to-br from-yellow-200 to-yellow-600 text-black' : 
-                              isSilver && racha.dias > 0 ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-black' : 
-                              isBronze && racha.dias > 0 ? 'bg-gradient-to-br from-amber-500 to-amber-700 text-white' : 
-                              'bg-[#1a0812] text-pink-400 border border-pink-900'}
-                          `}>
-                            {index + 1}
-                          </div>
-                          
-                          <img src={avatarUrl} alt={racha.nombre} className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 hidden sm:block
-                            ${isGold && racha.dias > 0 ? 'border-yellow-400' : isSilver && racha.dias > 0 ? 'border-slate-300' : isBronze && racha.dias > 0 ? 'border-amber-600' : 'border-gray-800'}`} 
-                          />
-                          
-                          <span className={`font-black text-base md:text-xl truncate max-w-[120px] sm:max-w-[200px] md:max-w-xs
-                            ${racha.dias === 0 ? 'text-gray-500' :
-                              isGold ? 'text-yellow-400 drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]' : 
-                              isSilver ? 'text-slate-200' : 
-                              isBronze ? 'text-amber-500' : 'text-pink-100'}
-                          `}>
-                            {racha.nombre}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-1 md:gap-2 bg-black/60 px-3 md:px-5 py-2 rounded-xl border border-pink-900/50 shrink-0">
-                          <Flame className={flameClass} size={20} />
-                          <span className={`font-bold text-sm md:text-lg tracking-wider ${racha.dias > 0 ? 'text-white' : 'text-gray-500'}`}>
-                            {racha.dias} <span className="text-xs md:text-sm text-gray-500">DÍAS</span>
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ======================================= */}
-        {/* ===== SECCIÓN 2: PRÓXIMAMENTE ========= */}
-        {/* ======================================= */}
-        {currentSection === 2 && (
-          <div className="w-full flex flex-col items-center justify-center min-h-[400px] animate-fade-in">
-            <TituloSeccion texto="Próximamente" />
-            
-            <div className="border-2 border-dashed border-pink-500/40 rounded-[3rem] p-16 flex flex-col items-center justify-center bg-black/40 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.5)] mt-8">
-              <span className="text-6xl mb-4 animate-bounce">🚧</span>
-              <h3 className="text-xl md:text-2xl font-sans font-bold text-white text-center tracking-wide">Nuevas categorías en construcción...</h3>
-            </div>
-          </div>
-        )}
-
-        <div className="max-w-4xl mx-auto mt-2 border-t border-dashed border-pink-500/30 pt-6 text-center w-full px-4">
-          <p className="text-pink-200/80 text-xs md:text-sm font-medium tracking-widest">
-            Próxima Gala de Premiación en: <span className="font-bold text-yellow-400">{meta ? `${meta.diasRestantes} días` : '...'}</span>
-          </p>
-        </div>
-        
-      </div>
     </section>
   );
 };

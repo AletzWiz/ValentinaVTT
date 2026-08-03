@@ -1,48 +1,25 @@
 /* App-specific styles */
 
-/* Smooth scrolling for the entire page */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #FFF0F5;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #FFB7C5, #D8BFD8);
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #FF69B4, #D8BFD8);
-}
-
-/* Selection color */
+/* Selection & Focus */
 ::selection {
-  background: rgba(255, 183, 197, 0.5);
-  color: #4A4A4A;
+  background: rgba(255, 133, 161, 0.3);
+  color: #3D1A2B;
 }
-
-/* Focus styles */
 *:focus-visible {
-  outline: 2px solid #FFB7C5;
-  outline-offset: 2px;
+  outline: 2px solid #FF85A1;
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Gradient body background */
+body {
+  background:
+    radial-gradient(ellipse at 10% 20%, rgba(255, 182, 193, 0.22) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 70%, rgba(201, 177, 255, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(125, 211, 252, 0.12) 0%, transparent 55%),
+    #FFF0F5;
+  background-attachment: fixed;
 }
