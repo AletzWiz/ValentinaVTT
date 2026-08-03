@@ -1,0 +1,211 @@
+{
+  "temporada": 1,
+  "diasRestantesGala": 30,
+  "maxVotosPorCategoria": 3,
+  "categorias": [
+    {
+      "id": "clip-oro",
+      "emoji": "🎬",
+      "titulo": "El Clip de Oro",
+      "subtitulo": "El momento más épico del stream",
+      "descripcion": "El clip que rompió la comunidad y sacó las mejores risas.",
+      "lado": "left",
+      "nominados": [
+        {
+          "id": "c1",
+          "nombre": "Reacción Épica al Jumpscare",
+          "creador": "Juan_VT",
+          "detalle": "Momento de susto supremo en directo",
+          "clipUrl": "https://www.twitch.tv/valentinavtt/clip/SillyEnthusiasticPartridgeHotSpicy-12345",
+          "votos": 142
+        },
+        {
+          "id": "c2",
+          "nombre": "Victoria Impensable en Final",
+          "creador": "MariaGamer",
+          "detalle": "Remontada 1v4 épica",
+          "clipUrl": "https://www.twitch.tv/valentinavtt/clip/EpicWinValentinaVTT",
+          "votos": 98
+        },
+        {
+          "id": "c3",
+          "nombre": "Risa Contagiosa en Directo",
+          "creador": "AlexVTT",
+          "detalle": "No podíamos parar de reír",
+          "clipUrl": "",
+          "votos": 210
+        }
+      ]
+    },
+    {
+      "id": "mvp-comunidad",
+      "emoji": "🛡️",
+      "titulo": "MVP de la Comunidad",
+      "subtitulo": "El miembro más valioso y activo",
+      "descripcion": "Quien siempre está apoyando en el chat, eventos y Discord.",
+      "lado": "right",
+      "nominados": [
+        {
+          "id": "m1",
+          "nombre": "Aletzwiz",
+          "creador": "@Aletzwiz",
+          "detalle": "Creador de la Web & Mod activo",
+          "clipUrl": "",
+          "votos": 340
+        },
+        {
+          "id": "m2",
+          "nombre": "Soto_VTT",
+          "creador": "@Soto_VTT",
+          "detalle": "Líder de Eventos en Discord",
+          "clipUrl": "",
+          "votos": 215
+        },
+        {
+          "id": "m3",
+          "nombre": "PinkyStar",
+          "creador": "@PinkyStar",
+          "detalle": "Sub #1 y apoyo incondicional",
+          "clipUrl": "",
+          "votos": 189
+        }
+      ]
+    },
+    {
+      "id": "mod-trabajador",
+      "emoji": "🛡️",
+      "titulo": "El Mod más trabajador",
+      "subtitulo": "El guardián del chat",
+      "descripcion": "El moderador que siempre mantiene la paz y la buena onda.",
+      "lado": "left",
+      "nominados": [
+        {
+          "id": "mo1",
+          "nombre": "KawaiiGuard",
+          "creador": "@KawaiiGuard",
+          "detalle": "Organizador del chat & comandos",
+          "clipUrl": "",
+          "votos": 245
+        },
+        {
+          "id": "mo2",
+          "nombre": "ValenMod_Zero",
+          "creador": "@ValenMod_Zero",
+          "detalle": "120h de moderación en directo",
+          "clipUrl": "",
+          "votos": 180
+        },
+        {
+          "id": "mo3",
+          "nombre": "ShieldPink",
+          "creador": "@ShieldPink",
+          "detalle": "Protector en sorteos y eventos",
+          "clipUrl": "",
+          "votos": 130
+        }
+      ]
+    },
+    {
+      "id": "peor-manqueada",
+      "emoji": "💀",
+      "titulo": "Peor Manqueada / Susto",
+      "subtitulo": "El momento F en el chat",
+      "descripcion": "Aquella jugada que salió tan mal que dio la vuelta y fue legendaria.",
+      "lado": "right",
+      "nominados": [
+        {
+          "id": "pm1",
+          "nombre": "Caída al vacío en Minecraft",
+          "creador": "ValentinaVTT",
+          "detalle": "Perdió todo el diamante en la lava",
+          "clipUrl": "https://www.twitch.tv/valentinavtt/clip/MinecraftFailValentina",
+          "votos": 310
+        },
+        {
+          "id": "pm2",
+          "nombre": "Susto por el gato en directo",
+          "creador": "ValentinaVTT",
+          "detalle": "Grito de terror nivel 10",
+          "clipUrl": "",
+          "votos": 275
+        },
+        {
+          "id": "pm3",
+          "nombre": "Granada a los propios compañeros",
+          "creador": "GamerGuest",
+          "detalle": "Eliminación en equipo accidental",
+          "clipUrl": "",
+          "votos": 190
+        }
+      ]
+    },
+    {
+      "id": "frase-celebre",
+      "emoji": "💬",
+      "titulo": "Frase Célebre",
+      "subtitulo": "La frase icónica de la temporada",
+      "descripcion": "Esa frase espontánea que se convirtió en sticker y emote de la comunidad.",
+      "lado": "left",
+      "nominados": [
+        {
+          "id": "fc1",
+          "nombre": "¡Eso no era un bug, era una característica! 🌸",
+          "creador": "ValentinaVTT",
+          "detalle": "Dicho en directo de terror",
+          "clipUrl": "",
+          "votos": 285
+        },
+        {
+          "id": "fc2",
+          "nombre": "¡Última partida y me voy a dormir! (Fueron 4h más)",
+          "creador": "ValentinaVTT",
+          "detalle": "Directo nocturno de fin de semana",
+          "clipUrl": "",
+          "votos": 420
+        },
+        {
+          "id": "fc3",
+          "nombre": "¡El chat me distrajo, lo juro!",
+          "creador": "ValentinaVTT",
+          "detalle": "Luego de fallar un salto fácil",
+          "clipUrl": "",
+          "votos": 310
+        }
+      ]
+    },
+    {
+      "id": "art-temporada",
+      "emoji": "🎨",
+      "titulo": "Art de la Temporada",
+      "subtitulo": "La mejor obra de arte o dibujo de un fan",
+      "descripcion": "El fanart que más enamoró a Valentina y a toda la comunidad VTT.",
+      "lado": "right",
+      "nominados": [
+        {
+          "id": "art1",
+          "nombre": "Valentina Chibi en la Playa",
+          "creador": "SakuraArts",
+          "detalle": "Arte digital full HD",
+          "clipUrl": "",
+          "votos": 350
+        },
+        {
+          "id": "art2",
+          "nombre": "Retrato Valentina Anime Gold",
+          "creador": "NekoDraws",
+          "detalle": "Ilustración con fondo de luces",
+          "clipUrl": "",
+          "votos": 290
+        },
+        {
+          "id": "art3",
+          "nombre": "Stickers Emotes para Twitch",
+          "creador": "PixelVT",
+          "detalle": "Set de 6 emotes personalizados",
+          "clipUrl": "",
+          "votos": 240
+        }
+      ]
+    }
+  ]
+}

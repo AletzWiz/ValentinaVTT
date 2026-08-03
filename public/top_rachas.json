@@ -1,0 +1,42 @@
+[
+  {
+    "posicion": 1,
+    "nombre": "NelsonVTT",
+    "dias": 102,
+    "rango": "👑 Rey del Stream",
+    "avatar": "https://ui-avatars.com/api/?name=NelsonVTT&background=FF85A1&color=fff&size=128&bold=true",
+    "frase": "¡102 días seguidos sin faltar a ningún directo!"
+  },
+  {
+    "posicion": 2,
+    "nombre": "VenomVTT",
+    "dias": 100,
+    "rango": "🔥 Racha de Leyenda",
+    "avatar": "https://ui-avatars.com/api/?name=VenomVTT&background=C084FC&color=fff&size=128&bold=true",
+    "frase": "¡Llegó a los 100 días imparable!"
+  },
+  {
+    "posicion": 3,
+    "nombre": "TamalitoVTT",
+    "dias": 57,
+    "rango": "⭐ Espectador Épico",
+    "avatar": "https://ui-avatars.com/api/?name=TamalitoVTT&background=7DD3FC&color=fff&size=128&bold=true",
+    "frase": "¡Fiel en cada transmisión y chat!"
+  },
+  {
+    "posicion": 4,
+    "nombre": "MonikaVTT",
+    "dias": 20,
+    "rango": "🌸 Fan Destacado",
+    "avatar": "https://ui-avatars.com/api/?name=MonikaVTT&background=86EFAC&color=fff&size=128&bold=true",
+    "frase": "¡Presente en todas las noches de juego!"
+  },
+  {
+    "posicion": 5,
+    "nombre": "GalletitaVTT",
+    "dias": 12,
+    "rango": "✨ Promesa del Chat",
+    "avatar": "https://ui-avatars.com/api/?name=GalletitaVTT&background=FDE68A&color=333&size=128&bold=true",
+    "frase": "¡Creciendo día a día en la comunidad!"
+  }
+]
