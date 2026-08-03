@@ -2,6 +2,7 @@
   "temporada": 1,
   "diasRestantesGala": 30,
   "maxVotosPorCategoria": 3,
+  "votacionesAbiertas": false,
   "categorias": [
     {
       "id": "clip-oro",

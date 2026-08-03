@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Flame, Check, Sparkles, X, Heart, ExternalLink, Play, Crown, Award, LogIn, LogOut, ShieldCheck } from 'lucide-react';
+import { Trophy, Flame, Check, Sparkles, X, Play, Crown, Award, LogIn, LogOut, ShieldCheck, Lock, AlertTriangle, MessageSquareHeart } from 'lucide-react';
 
 interface Nominado {
   id: string;
@@ -54,17 +54,19 @@ function getTwitchClipSlug(url?: string): string | null {
 }
 
 export const SalonDeLaFama = () => {
-  const [categorias, setCategorias]   = useState<CategoriaGala[]>([]);
-  const [topRachas, setTopRachas]     = useState<TopRachaUser[]>([]);
-  const [temporada, setTemporada]     = useState(1);
-  const [diasRestantes, setDias]     = useState(30);
-  const [loading, setLoading]         = useState(true);
+  const [categorias, setCategorias]       = useState<CategoriaGala[]>([]);
+  const [topRachas, setTopRachas]         = useState<TopRachaUser[]>([]);
+  const [temporada, setTemporada]         = useState(1);
+  const [diasRestantes, setDias]         = useState(30);
+  const [votacionesAbiertas, setAbiertas] = useState(false);
+  const [loading, setLoading]             = useState(true);
 
   // Votaciones: mapa de catId -> Array de nId elegidos (máx 3)
-  const [misVotos, setMisVotos]       = useState<Record<string, string[]>>({});
-  const [modalCat, setModalCat]       = useState<CategoriaGala | null>(null);
-  const [discordUser, setDiscordUser] = useState<DiscordUser | null>(null);
+  const [misVotos, setMisVotos]           = useState<Record<string, string[]>>({});
+  const [modalCat, setModalCat]           = useState<CategoriaGala | null>(null);
+  const [discordUser, setDiscordUser]     = useState<DiscordUser | null>(null);
   const [showRachasSec, setShowRachasSec] = useState(false);
+  const [showAuthWarning, setShowAuthWarning] = useState(false);
 
   // Cargar configuración editable desde JSON
   useEffect(() => {
@@ -79,6 +81,7 @@ export const SalonDeLaFama = () => {
           setCategorias(dataGala.categorias || []);
           setTemporada(dataGala.temporada || 1);
           setDias(dataGala.diasRestantesGala || 30);
+          setAbiertas(dataGala.votacionesAbiertas ?? false);
         }
 
         // 2. Cargar top_rachas.json
@@ -107,7 +110,6 @@ export const SalonDeLaFama = () => {
 
   // Simular conexión segura con Discord OAuth2
   const conectarDiscord = () => {
-    // Generar sesión segura simulada de Discord
     const userSimulado: DiscordUser = {
       id: 'discord_' + Math.floor(Math.random() * 899999 + 100000),
       username: 'ViewerVTT_' + Math.floor(Math.random() * 90 + 10),
@@ -115,6 +117,7 @@ export const SalonDeLaFama = () => {
     };
     setDiscordUser(userSimulado);
     localStorage.setItem('vtt_discord_user', JSON.stringify(userSimulado));
+    setShowAuthWarning(false);
   };
 
   const desconectarDiscord = () => {
@@ -122,16 +125,28 @@ export const SalonDeLaFama = () => {
     localStorage.removeItem('vtt_discord_user');
   };
 
+  // Intentar abrir modal de votación (requiere Discord obligatoriamente)
+  const abrirModalVotacion = (cat: CategoriaGala) => {
+    if (!discordUser) {
+      setShowAuthWarning(true);
+      return;
+    }
+    setModalCat(cat);
+  };
+
   // Votar o desvotar (hasta 3 votos por categoría)
   const toggleVoto = (catId: string, nomId: string) => {
+    if (!discordUser) {
+      setShowAuthWarning(true);
+      return;
+    }
+
     const votosActuales = misVotos[catId] || [];
     let nuevosVotosCat: string[];
 
     if (votosActuales.includes(nomId)) {
-      // Remover voto
       nuevosVotosCat = votosActuales.filter(id => id !== nomId);
     } else {
-      // Agregar voto si aún no llega a 3
       if (votosActuales.length >= 3) return;
       nuevosVotosCat = [...votosActuales, nomId];
     }
@@ -192,7 +207,7 @@ export const SalonDeLaFama = () => {
             <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span className="text-xs font-extrabold text-emerald-300">
-                {discordUser.username} (Autenticado)
+                {discordUser.username} (Conectado)
               </span>
               <button
                 onClick={desconectarDiscord}
@@ -205,7 +220,7 @@ export const SalonDeLaFama = () => {
           ) : (
             <button
               onClick={conectarDiscord}
-              className="btn-kawaii bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-extrabold px-4 py-2 flex items-center gap-2"
+              className="btn-kawaii bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-extrabold px-4 py-2 flex items-center gap-2 shadow-lg"
             >
               <LogIn className="w-4 h-4" />
               Conectar Discord para Votar
@@ -238,7 +253,7 @@ export const SalonDeLaFama = () => {
             Un tributo especial a los espectadores más fieles que mantienen encendida la llama de la comunidad VTT.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-12">
             {topRachas.map((user) => {
               const isTop1 = user.posicion === 1;
               const isTop2 = user.posicion === 2;
@@ -259,7 +274,6 @@ export const SalonDeLaFama = () => {
                 >
                   <CornerBrackets color={isTop1 ? 'border-amber-300' : 'border-pink-500/30'} />
 
-                  {/* Rank Badge */}
                   <div
                     className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-sm mb-3 shadow-md ${
                       isTop1
@@ -274,20 +288,17 @@ export const SalonDeLaFama = () => {
                     #{user.posicion}
                   </div>
 
-                  {/* Avatar */}
                   <img
                     src={user.avatar}
                     alt={user.nombre}
                     className="w-16 h-16 rounded-full border-2 border-amber-300/50 mb-3 object-cover shadow-lg"
                   />
 
-                  {/* Name & Range */}
                   <h3 className="font-black text-base text-white truncate w-full mb-0.5">{user.nombre}</h3>
                   <span className="text-[10px] font-black tracking-widest text-amber-300 uppercase mb-2">
                     {user.rango}
                   </span>
 
-                  {/* Days */}
                   <div className="px-3 py-1 rounded-full bg-black/60 border border-amber-300/30 text-xs font-black text-white flex items-center gap-1 mb-3">
                     <Flame className="w-3.5 h-3.5 text-amber-300" /> {user.dias} Días
                   </div>
@@ -298,6 +309,14 @@ export const SalonDeLaFama = () => {
                 </div>
               );
             })}
+          </div>
+
+          {/* ── NOTA DE RECONOCIMIENTO DE RACHAS EN EL PIE ── */}
+          <div className="max-w-2xl mx-auto rounded-3xl p-6 bg-gradient-to-r from-pink-900/40 via-amber-400/10 to-pink-900/40 border border-amber-300/40 text-center shadow-xl">
+            <MessageSquareHeart className="w-8 h-8 text-amber-300 mx-auto mb-3 animate-pulse" />
+            <p className="text-xs sm:text-sm font-extrabold text-pink-100 leading-relaxed">
+              "¿Tienes una racha más alta? Envía tus rachas por Discord con captura de prueba para saber que es cierto que tienes una racha más alta y te pondremos en la página. Recuerda que ValentinaVTT da recompensas a la racha más alta de vez en cuando 💖"
+            </p>
           </div>
         </div>
       ) : (
@@ -324,6 +343,51 @@ export const SalonDeLaFama = () => {
               Recorre la alfombra roja y vota hasta 3 veces por tus favoritos en cada categoría 🏆
             </p>
           </div>
+
+          {/* ========================================================= */}
+          {/* CARTELÓN DE CONSTRUCCIÓN AMARILLO CON NEGRO (VOTACIONES CERRADAS) */}
+          {/* ========================================================= */}
+          {!votacionesAbiertas && (
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative z-30 max-w-2xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(250,204,21,0.3)] border-4 border-yellow-400 bg-black text-yellow-300"
+            >
+              {/* Franja Diagonal de Peligro / Construcción (Amarillo y Negro) */}
+              <div
+                className="h-10 w-full"
+                style={{
+                  background: 'repeating-linear-gradient(-45deg, #facc15, #facc15 20px, #000 20px, #000 40px)',
+                }}
+              />
+
+              <div className="p-6 sm:p-10 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-yellow-400 text-black flex items-center justify-center font-black shadow-lg animate-bounce">
+                  <AlertTriangle className="w-9 h-9 stroke-[2.5]" />
+                </div>
+
+                <div className="inline-block px-4 py-1 rounded-full bg-yellow-400 text-black font-black text-xs tracking-widest uppercase mb-3">
+                  🚧 ZONA DE VOTACIÓN EN CONSTRUCCIÓN 🚧
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3 tracking-wide">
+                  Aún no se puede votar, espera a que se abran las votaciones oficialmente
+                </h2>
+
+                <p className="text-xs sm:text-sm text-yellow-200/80 font-bold max-w-md mx-auto leading-relaxed">
+                  Las votaciones abrirán en el momento oficial fijado por ValentinaVTT. Prepara tus favoritos para la gran gala 🌸
+                </p>
+              </div>
+
+              {/* Franja Diagonal Inferior */}
+              <div
+                className="h-10 w-full"
+                style={{
+                  background: 'repeating-linear-gradient(-45deg, #facc15, #facc15 20px, #000 20px, #000 40px)',
+                }}
+              />
+            </motion.div>
+          )}
 
           {/* ── PASEO DE LA ALFOMBRA ROJA ── */}
           <div className="relative max-w-5xl mx-auto z-10">
@@ -394,7 +458,11 @@ export const SalonDeLaFama = () => {
                               ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
                               : 'bg-amber-400/15 text-amber-300 border-amber-300/40'
                           }`}>
-                            {votosCat.length > 0 ? `✓ Votos: ${votosCat.length}/3` : '✨ 3 Votos'}
+                            {!votacionesAbiertas
+                              ? '🔒 VOTACIONES CERRADAS'
+                              : votosCat.length > 0
+                              ? `✓ Votos: ${votosCat.length}/3`
+                              : '✨ 3 Votos'}
                           </span>
                         </div>
 
@@ -410,11 +478,27 @@ export const SalonDeLaFama = () => {
                         </p>
 
                         <button
-                          onClick={() => setModalCat(cat)}
-                          className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-extrabold text-xs tracking-widest uppercase transition-all duration-300 bg-gradient-to-r from-amber-300 via-pink-400 to-amber-400 text-black shadow-lg hover:scale-105 hover:shadow-[0_0_25px_rgba(253,230,138,0.6)]"
+                          onClick={() => {
+                            if (!votacionesAbiertas) return;
+                            abrirModalVotacion(cat);
+                          }}
+                          disabled={!votacionesAbiertas}
+                          className={`w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-extrabold text-xs tracking-widest uppercase transition-all duration-300 ${
+                            !votacionesAbiertas
+                              ? 'bg-gray-700/60 text-gray-400 border border-gray-600/40 cursor-not-allowed'
+                              : 'bg-gradient-to-r from-amber-300 via-pink-400 to-amber-400 text-black shadow-lg hover:scale-105 hover:shadow-[0_0_25px_rgba(253,230,138,0.6)]'
+                          }`}
                         >
-                          <Sparkles className="w-4 h-4" />
-                          {tieneVotos ? `Votar / Modificar (${votosCat.length}/3)` : 'Votar / Ver Nominados'}
+                          {!votacionesAbiertas ? (
+                            <>
+                              <Lock className="w-4 h-4" /> Votaciones Cerradas
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4" />
+                              {tieneVotos ? `Votar / Modificar (${votosCat.length}/3)` : 'Votar / Ver Nominados'}
+                            </>
+                          )}
                         </button>
                       </div>
 
@@ -458,9 +542,53 @@ export const SalonDeLaFama = () => {
         </>
       )}
 
-      {/* ── MODAL INTERACTIVO DE VOTACIÓN CON 3 VOTOS & REPRODUCTOR DE CLIPS ── */}
+      {/* ── MODAL AVISO AUTENTICACIÓN DISCORD OBLIGATORIA ── */}
       <AnimatePresence>
-        {modalCat && (
+        {showAuthWarning && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowAuthWarning(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.85 }}
+              className="relative max-w-md w-full rounded-3xl p-6 text-center bg-[#2b0a19] border-2 border-amber-300 text-white z-10 shadow-2xl"
+            >
+              <button
+                onClick={() => setShowAuthWarning(false)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"
+              >
+                <X className="w-4 h-4 text-amber-300" />
+              </button>
+
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#5865F2] flex items-center justify-center shadow-lg">
+                <Lock className="w-7 h-7 text-white" />
+              </div>
+
+              <h3 className="text-xl font-black text-amber-300 mb-2">Conexión Obligatoria con Discord</h3>
+              <p className="text-xs text-pink-200/80 font-bold mb-6 leading-relaxed">
+                Para garantizar votaciones limpias y únicas, es obligatorio conectar tu cuenta de Discord antes de abrir las nominaciones y votar.
+              </p>
+
+              <button
+                onClick={conectarDiscord}
+                className="w-full py-3.5 rounded-2xl bg-[#5865F2] hover:bg-[#4752C4] font-black text-xs tracking-widest uppercase text-white shadow-lg flex items-center justify-center gap-2"
+              >
+                <LogIn className="w-4 h-4" /> Conectar Discord Ahora
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL INTERACTIVO DE VOTACIÓN ── */}
+      <AnimatePresence>
+        {modalCat && votacionesAbiertas && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
@@ -551,7 +679,7 @@ export const SalonDeLaFama = () => {
                         </button>
                       </div>
 
-                      {/* Vista Previa de Clip de Twitch Embed si existe clipUrl */}
+                      {/* Vista Previa de Clip de Twitch Embed */}
                       {nom.clipUrl && (
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <div className="flex items-center justify-between mb-2">
