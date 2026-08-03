@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Wheel } from 'react-custom-roulette';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, X, Shuffle, Sparkles, Trophy } from 'lucide-react';
+import { Plus, Trash2, X, Shuffle, Trophy } from 'lucide-react';
 
 // ── Paleta kawaii vibrante para los segmentos ──
 const SEGMENT_COLORS = [

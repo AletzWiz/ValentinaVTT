@@ -10,7 +10,6 @@ export default function Discord() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRef    = useRef<HTMLDivElement>(null);
   const logoRef    = useRef<HTMLDivElement>(null);
-  const starsRef   = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {

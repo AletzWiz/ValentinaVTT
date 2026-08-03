@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const floatingDecos = [
+const floatingDecos: any[] = [
   { emoji: '💝', top: '-16px', right: '-16px', delay: '0s',   size: '2rem' },
   { emoji: '🎀', top: '20%',   left: '-20px',  delay: '0.5s', size: '1.8rem' },
   { emoji: '✨', bottom: '-12px', left: '20%', delay: '0.9s', size: '1.6rem' },

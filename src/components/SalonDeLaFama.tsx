@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Flame, Check, Sparkles, X, Play, Crown, Award, LogIn, LogOut, ShieldCheck, Lock, AlertTriangle, MessageSquareHeart } from 'lucide-react';
+import { Trophy, Flame, Check, Sparkles, X, Play, Crown, LogIn, LogOut, ShieldCheck, Lock, AlertTriangle, MessageSquareHeart, ExternalLink } from 'lucide-react';
 
 interface Nominado {
   id: string;
@@ -324,7 +324,7 @@ export const SalonDeLaFama = () => {
           {/* ── HEADER PRINCIPAL DE LA GALA ── */}
           <div className="relative z-20 text-center max-w-4xl mx-auto mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400/15 via-pink-500/15 to-amber-400/15 border border-amber-300/40 text-amber-300 text-[11px] sm:text-xs font-black tracking-widest uppercase mb-3 shadow-[0_0_20px_rgba(253,230,138,0.2)]">
-              <Trophy className="w-3.5 h-3.5 text-amber-300" /> GALA DE LA COMUNIDAD VTT
+              <Trophy className="w-3.5 h-3.5 text-amber-300" /> GALA VTT (TEMPORADA {temporada})
             </div>
 
             <h1
