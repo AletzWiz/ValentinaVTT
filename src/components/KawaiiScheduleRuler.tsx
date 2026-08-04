@@ -4,9 +4,8 @@ import { Calendar, Radio, Sparkles, ExternalLink, ChevronLeft, ChevronRight, X, 
 
 interface DiaHorarioConfig {
   id: string;
-  diaIndex: number; // 0 para Lunes, 1 para Martes... 6 para Domingo
+  diaIndex: number; // 0: Lunes, 1: Martes... 6: Domingo
   diaNombre: string;
-  estado: 'offline' | 'en_vivo' | 'stream_hoy';
   horaMexico: string;
   tituloStream: string;
   vodUrl?: string;
@@ -16,12 +15,15 @@ interface DiaHorarioConfig {
 interface DiaCalculado extends DiaHorarioConfig {
   fechaTexto: string;
   esHoy: boolean;
+  esPasado: boolean;
+  esFuturo: boolean;
+  tieneStream: boolean;
 }
 
 // Convertir hora de México (CDMX UTC-6) a la hora local del usuario
 function formatearHoraUnicaLocal(horaMexicoStr: string): string {
   try {
-    if (!horaMexicoStr || horaMexicoStr.toLowerCase() === 'offline') return '';
+    if (!horaMexicoStr || horaMexicoStr.trim() === '') return '';
     const parts = horaMexicoStr.split(':');
     const hh = parseInt(parts[0] || '20', 10);
     const mm = parseInt(parts[1] || '00', 10);
@@ -39,37 +41,46 @@ function formatearHoraUnicaLocal(horaMexicoStr: string): string {
   }
 }
 
-// Calcular las fechas exactas de la semana actual (Lunes a Domingo)
+// Calcular las fechas exactas de la semana actual y determinar estados automáticamente
 function obtenerDiasSemanaActual(diasConfig: DiaHorarioConfig[]): { dias: DiaCalculado[]; rangoSemana: string } {
   const ahora = new Date();
   const diaSemanaActual = ahora.getDay(); // 0 = Domingo, 1 = Lunes, ... 6 = Sábado
-  // Ajustar para que Lunes sea 0 y Domingo sea 6
   const indexLunesActual = (diaSemanaActual === 0 ? 6 : diaSemanaActual - 1);
 
-  // Encontrar la fecha del Lunes de esta semana
+  // Fecha del Lunes de la semana actual
   const fechaLunes = new Date(ahora);
   fechaLunes.setDate(ahora.getDate() - indexLunesActual);
+  fechaLunes.setHours(0, 0, 0, 0);
+
+  const hoyCeroHoras = new Date(ahora);
+  hoyCeroHoras.setHours(0, 0, 0, 0);
 
   const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
   const diasResultado: DiaCalculado[] = (diasConfig || []).map((configDia) => {
     const fechaDia = new Date(fechaLunes);
     fechaDia.setDate(fechaLunes.getDate() + configDia.diaIndex);
+    fechaDia.setHours(0, 0, 0, 0);
 
     const diaNum = String(fechaDia.getDate()).padStart(2, '0');
     const mesNom = meses[fechaDia.getMonth()];
     const fechaTexto = `${diaNum} ${mesNom}`;
 
-    const esHoy = (
-      ahora.getDate() === fechaDia.getDate() &&
-      ahora.getMonth() === fechaDia.getMonth() &&
-      ahora.getFullYear() === fechaDia.getFullYear()
-    );
+    const esHoy = fechaDia.getTime() === hoyCeroHoras.getTime();
+    const esPasado = fechaDia.getTime() < hoyCeroHoras.getTime();
+    const esFuturo = fechaDia.getTime() > hoyCeroHoras.getTime();
+
+    const tieneHora = Boolean(configDia.horaMexico && configDia.horaMexico.trim() !== '');
+    const esDescanso = configDia.tituloStream.toLowerCase().includes('descanso');
+    const tieneStream = tieneHora && !esDescanso;
 
     return {
       ...configDia,
       fechaTexto,
       esHoy,
+      esPasado,
+      esFuturo,
+      tieneStream,
     };
   });
 
@@ -92,12 +103,12 @@ export const KawaiiScheduleRuler = () => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      if (mobile) setOpenRuler(false); // Cerrado por defecto en teléfono
+      if (mobile) setOpenRuler(false);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // 1. Cargar horario_semanal.json
+    // Cargar horario_semanal.json
     fetch('/horario_semanal.json?v=' + Date.now())
       .then(res => res.json())
       .then(data => {
@@ -107,7 +118,7 @@ export const KawaiiScheduleRuler = () => {
       })
       .catch(err => console.error("Error al cargar horario_semanal.json:", err));
 
-    // 2. Detección automática en tiempo real si ValentinaVTT está En Vivo en Twitch
+    // Detección automática en tiempo real si ValentinaVTT está En Vivo en Twitch
     const comprobarDirectoEnVivo = async () => {
       try {
         const res = await fetch('https://decapi.me/twitch/uptime/valentinavtt');
@@ -123,7 +134,7 @@ export const KawaiiScheduleRuler = () => {
     };
 
     comprobarDirectoEnVivo();
-    const intervalLive = setInterval(comprobarDirectoEnVivo, 60000); // Comprobar cada minuto
+    const intervalLive = setInterval(comprobarDirectoEnVivo, 60000);
 
     return () => {
       window.removeEventListener('resize', checkMobile);
@@ -171,15 +182,14 @@ export const KawaiiScheduleRuler = () => {
               isMobile ? 'w-full max-w-xs' : 'w-80'
             }`}
           >
-            {/* TIRA DE LA REGLA VERTICAL CON PALITOS / MARCAS LATERALES DE 0 A ABAJO */}
+            {/* TIRA DE LA REGLA VERTICAL CON PALITOS LATERALES */}
             <div
               className="relative w-full h-full flex flex-col shadow-[10px_0_30px_rgba(255,133,161,0.25)] border-r-4 border-pink-300/60 overflow-hidden backdrop-blur-xl"
               style={{
                 background: 'linear-gradient(180deg, rgba(255,240,247,0.98) 0%, rgba(245,238,255,0.98) 50%, rgba(234,244,255,0.98) 100%)',
               }}
             >
-
-              {/* Marcas de palitos de regla a lo largo de todo el borde izquierdo */}
+              {/* Palitos de regla vertical */}
               <div className="absolute top-0 bottom-0 left-0 w-3 flex flex-col justify-between pointer-events-none opacity-40 z-10 py-2">
                 {Array.from({ length: 45 }).map((_, i) => (
                   <div
@@ -209,29 +219,25 @@ export const KawaiiScheduleRuler = () => {
                 </button>
               </div>
 
-              {/* LISTA DE DÍAS (DESPLAZABLE VERTICALMENTE CON PALITOS Y TARJETAS) */}
+              {/* LISTA DE DÍAS (AUTOMÁTICA) */}
               <div className="flex-1 overflow-y-auto p-4 pl-6 space-y-3 relative z-20">
                 {diasCalculados.map((d) => {
-                  // Si el sistema detecta que está En Vivo real HOY, forzamos el estado a en_vivo
                   const realmenteEnVivo = isRealTimeLive && d.esHoy;
-                  const estadoFinal = realmenteEnVivo ? 'en_vivo' : d.estado;
-
-                  const isEnVivo = estadoFinal === 'en_vivo';
-                  const isStreamHoy = estadoFinal === 'stream_hoy';
-                  const isOffline = estadoFinal === 'offline';
                   const horaLocal = formatearHoraUnicaLocal(d.horaMexico);
 
                   return (
                     <div
                       key={d.id}
                       className={`relative p-3.5 rounded-2xl border transition-all duration-300 ${
-                        isEnVivo
+                        realmenteEnVivo
                           ? 'bg-gradient-to-r from-red-500/20 via-pink-400/25 to-amber-300/25 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)] animate-pulse'
-                          : d.esHoy
-                          ? 'bg-white border-pink-400 shadow-md ring-2 ring-pink-300/50'
-                          : isStreamHoy
-                          ? 'bg-white/80 border-purple-300/70 shadow-sm hover:border-pink-400'
-                          : 'bg-gray-100/70 border-gray-200 opacity-60'
+                          : d.esHoy && d.tieneStream
+                          ? 'bg-white border-pink-500 shadow-md ring-2 ring-pink-300/60'
+                          : d.esFuturo && d.tieneStream
+                          ? 'bg-gradient-to-r from-purple-50/90 to-pink-50/90 border-purple-300 shadow-sm hover:border-pink-400'
+                          : d.esPasado && d.vodUrl
+                          ? 'bg-white/90 border-pink-300 shadow-sm'
+                          : 'bg-gray-100/60 border-gray-200 opacity-60'
                       }`}
                     >
                       {/* Cabecera del día */}
@@ -247,8 +253,8 @@ export const KawaiiScheduleRuler = () => {
                           </span>
                         </div>
 
-                        {/* BADGES ÚNICOS */}
-                        {isEnVivo ? (
+                        {/* BADGES AUTOMÁTICOS SEGÚN LA FECHA DE HOY */}
+                        {realmenteEnVivo ? (
                           <a
                             href="https://www.twitch.tv/valentinavtt"
                             target="_blank"
@@ -257,9 +263,17 @@ export const KawaiiScheduleRuler = () => {
                           >
                             <Radio className="w-3 h-3 text-white animate-spin" /> EN VIVO AHORA
                           </a>
-                        ) : isStreamHoy ? (
-                          <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 text-white font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center gap-1">
+                        ) : d.esHoy && d.tieneStream ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center gap-1">
                             <Sparkles className="w-2.5 h-2.5" /> STREAM HOY
+                          </span>
+                        ) : d.esFuturo && d.tieneStream ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-purple-100 border border-purple-300 text-purple-700 font-black text-[9px] uppercase tracking-wider shadow-sm flex items-center gap-1">
+                            <Calendar className="w-2.5 h-2.5 text-purple-500" /> PROGRAMADO
+                          </span>
+                        ) : d.esPasado && d.vodUrl ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-pink-100 border border-pink-300 text-pink-700 font-black text-[9px] uppercase tracking-wider shadow-sm flex items-center gap-1">
+                            <Play className="w-2.5 h-2.5 text-pink-500" /> VOD DISPONIBLE
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 rounded-full bg-gray-300 text-gray-600 font-extrabold text-[9px] uppercase tracking-wider">
@@ -274,7 +288,7 @@ export const KawaiiScheduleRuler = () => {
                       </div>
 
                       {/* HORA ÚNICA ADAPTADA A ZONA HORARIA LOCAL */}
-                      {!isOffline && horaLocal && (
+                      {d.tieneStream && horaLocal && (
                         <div className="text-[10px] font-black text-purple-600 flex items-center gap-1">
                           <Clock className="w-3 h-3 text-pink-500" />
                           <span>Horario: {horaLocal}</span>
@@ -287,7 +301,7 @@ export const KawaiiScheduleRuler = () => {
                           <a
                             href={d.vodUrl}
                             target="_blank"
-                            rel="noopener noreferrer"
+                            rel="noreferrer"
                             className="group block relative rounded-xl overflow-hidden border border-purple-300 shadow-sm"
                           >
                             {d.vodThumbnail ? (
