@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Flame, Check, Sparkles, X, Play, Crown, LogIn, LogOut, Lock, AlertTriangle, MessageSquareHeart, ExternalLink, Settings } from 'lucide-react';
+import { Trophy, Check, Sparkles, X, Play, LogIn, LogOut, Lock, AlertTriangle, ExternalLink, Settings } from 'lucide-react';
 
 interface Nominado {
   id: string;
@@ -19,15 +19,6 @@ interface CategoriaGala {
   descripcion: string;
   lado: 'left' | 'right';
   nominados: Nominado[];
-}
-
-interface TopRachaUser {
-  posicion: number;
-  nombre: string;
-  dias: number;
-  rango: string;
-  avatar: string;
-  frase: string;
 }
 
 interface DiscordUser {
@@ -55,7 +46,6 @@ function getTwitchClipSlug(url?: string): string | null {
 
 export const SalonDeLaFama = () => {
   const [categorias, setCategorias]       = useState<CategoriaGala[]>([]);
-  const [topRachas, setTopRachas]         = useState<TopRachaUser[]>([]);
   const [temporada, setTemporada]         = useState(1);
   const [diasRestantes, setDias]         = useState(30);
   const [votacionesAbiertas, setAbiertas] = useState(false);
@@ -66,7 +56,6 @@ export const SalonDeLaFama = () => {
   const [votosServer, setVotosServer]     = useState<Record<string, number>>({});
   const [modalCat, setModalCat]           = useState<CategoriaGala | null>(null);
   const [discordUser, setDiscordUser]     = useState<DiscordUser | null>(null);
-  const [showRachasSec, setShowRachasSec] = useState(false);
   const [showAuthWarning, setShowAuthWarning] = useState(false);
   const [showSetupModal, setShowSetupModal]   = useState(false);
   const [errorMsg, setErrorMsg]           = useState<string | null>(null);
@@ -119,12 +108,6 @@ export const SalonDeLaFama = () => {
           setClientId(dataGala.discordClientId || '');
         }
 
-        const resRachas = await fetch('/top_rachas.json?v=' + Date.now());
-        if (resRachas.ok) {
-          const dataRachas = await resRachas.json();
-          setTopRachas(dataRachas || []);
-        }
-
         try {
           const resVotes = await fetch('/api/votes?v=' + Date.now());
           if (resVotes.ok) {
@@ -149,12 +132,11 @@ export const SalonDeLaFama = () => {
     loadConfig();
   }, []);
 
-  // Iniciar flujo de autorización de Discord usando el origen actual exacto
+  // Iniciar flujo de autorización de Discord usando la URL exacta del navegador
   const conectarDiscord = () => {
     const cid = discordClientId ? discordClientId.trim() : '';
 
     if (cid && cid !== "") {
-      // Usar exactamente la URL del navegador actual (ej: https://www.valentinavtt.com/salon-de-la-fama)
       const currentUri = window.location.origin + window.location.pathname;
       const redirectUri = encodeURIComponent(currentUri.replace(/\/$/, ''));
       const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${cid}&redirect_uri=${redirectUri}&response_type=token&scope=identify`;
@@ -250,31 +232,12 @@ export const SalonDeLaFama = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#4a152e] via-[#1b0613] to-[#0c0208] pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-to-b from-pink-500/20 via-amber-400/10 to-transparent blur-3xl pointer-events-none" />
 
-      {/* ── BARRA SUPERIOR DE DISCORD & SECCIONES ── */}
-      <div className="relative z-30 max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4 mb-10 pb-4 border-b border-pink-500/20">
-        
-        {/* Switch entre Gala & Reconocimiento Top 5 */}
+      {/* ── BARRA SUPERIOR DE DISCORD ── */}
+      <div className="relative z-30 max-w-5xl mx-auto flex items-center justify-between gap-4 mb-10 pb-4 border-b border-pink-500/20">
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowRachasSec(false)}
-            className={`px-5 py-2 rounded-full text-xs font-black tracking-widest uppercase transition-all ${
-              !showRachasSec
-                ? 'bg-gradient-to-r from-amber-300 to-pink-400 text-black shadow-lg scale-105'
-                : 'bg-white/5 border border-pink-500/20 text-pink-200/70 hover:text-white'
-            }`}
-          >
-            🏆 Nominaciones & Votaciones
-          </button>
-          <button
-            onClick={() => setShowRachasSec(true)}
-            className={`px-5 py-2 rounded-full text-xs font-black tracking-widest uppercase transition-all ${
-              showRachasSec
-                ? 'bg-gradient-to-r from-amber-300 to-pink-400 text-black shadow-lg scale-105'
-                : 'bg-white/5 border border-pink-500/20 text-pink-200/70 hover:text-white'
-            }`}
-          >
-            🔥 Top 5 Leyendas de Racha
-          </button>
+          <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-300 to-pink-400 text-black text-xs font-black tracking-widest uppercase shadow-lg">
+            🏆 Gala & Nominaciones
+          </span>
         </div>
 
         {/* Discord Auth Box */}
@@ -305,310 +268,217 @@ export const SalonDeLaFama = () => {
         </div>
       </div>
 
+      {/* ── HEADER PRINCIPAL DE LA GALA ── */}
+      <div className="relative z-20 text-center max-w-4xl mx-auto mb-12">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400/15 via-pink-500/15 to-amber-400/15 border border-amber-300/40 text-amber-300 text-[11px] sm:text-xs font-black tracking-widest uppercase mb-3 shadow-[0_0_20px_rgba(253,230,138,0.2)]">
+          <Trophy className="w-3.5 h-3.5 text-amber-300" /> GALA VTT (TEMPORADA {temporada})
+        </div>
+
+        <h1
+          className="text-3xl sm:text-5xl md:text-7xl font-black tracking-widest uppercase mb-2 drop-shadow-[0_4px_30px_rgba(255,133,161,0.5)]"
+          style={{
+            background: 'linear-gradient(135deg, #FFF0F5 0%, #FFB3C6 35%, #FDE68A 70%, #FF85A1 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          SALÓN DE LA FAMA
+        </h1>
+
+        <p className="text-pink-200/90 font-extrabold text-xs sm:text-sm tracking-wider max-w-xs sm:max-w-md mx-auto">
+          Recorre la alfombra roja y vota hasta 3 veces por tus favoritos en cada categoría 🏆
+        </p>
+      </div>
+
       {/* ========================================================= */}
-      {/* SECCIÓN ESPECIAL: TOP 5 RECONOCIMIENTO DE RACHAS */}
+      {/* CARTELÓN DE CONSTRUCCIÓN AMARILLO CON NEGRO (VOTACIONES CERRADAS) */}
       {/* ========================================================= */}
-      {showRachasSec ? (
-        <div className="relative z-20 max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/15 border border-amber-300/40 text-amber-300 text-xs font-black tracking-widest uppercase mb-4">
-            <Crown className="w-4 h-4 text-amber-300" /> SALÓN DE RECONOCIMIENTO TWITCH
+      {!votacionesAbiertas && (
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="relative z-30 max-w-2xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(250,204,21,0.3)] border-4 border-yellow-400 bg-black text-yellow-300"
+        >
+          <div
+            className="h-10 w-full"
+            style={{
+              background: 'repeating-linear-gradient(-45deg, #facc15, #facc15 20px, #000 20px, #000 40px)',
+            }}
+          />
+
+          <div className="p-6 sm:p-10 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-yellow-400 text-black flex items-center justify-center font-black shadow-lg animate-bounce">
+              <AlertTriangle className="w-9 h-9 stroke-[2.5]" />
+            </div>
+
+            <div className="inline-block px-4 py-1 rounded-full bg-yellow-400 text-black font-black text-xs tracking-widest uppercase mb-3">
+              🚧 ZONA DE VOTACIÓN EN CONSTRUCCIÓN 🚧
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3 tracking-wide">
+              Aún no se puede votar, espera a que se abran las votaciones oficialmente
+            </h2>
+
+            <p className="text-xs sm:text-sm text-yellow-200/80 font-bold max-w-md mx-auto leading-relaxed">
+              Las votaciones abrirán en el momento oficial fijado por ValentinaVTT. Prepara tus favoritos para la gran gala 🌸
+            </p>
           </div>
 
-          <h2
-            className="text-3xl sm:text-5xl font-black uppercase tracking-widest mb-3"
+          <div
+            className="h-10 w-full"
             style={{
-              background: 'linear-gradient(135deg, #FFF0F5, #FDE68A, #FF85A1)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              background: 'repeating-linear-gradient(-45deg, #facc15, #facc15 20px, #000 20px, #000 40px)',
+            }}
+          />
+        </motion.div>
+      )}
+
+      {/* ── PASEO DE LA ALFOMBRA ROJA ── */}
+      <div className="relative max-w-5xl mx-auto z-10">
+
+        <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-16 sm:w-28 md:w-44 pointer-events-none z-0 overflow-hidden flex flex-col items-center">
+          <motion.div
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            transition={{ duration: 1.8, ease: 'easeOut' }}
+            className="w-full h-full origin-top relative shadow-[0_0_50px_rgba(239,68,68,0.4)]"
+            style={{
+              background: 'linear-gradient(90deg, #991b1b 0%, #dc2626 30%, #ef4444 50%, #dc2626 70%, #991b1b 100%)',
+              borderLeft: '3px solid #fde047',
+              borderRight: '3px solid #fde047',
             }}
           >
-            🔥 Top 5 Leyendas de Racha
-          </h2>
-          <p className="text-pink-200/80 text-xs sm:text-sm font-semibold max-w-md mx-auto mb-10">
-            Un tributo especial a los espectadores más fieles que mantienen encendida la llama de la comunidad VTT.
-          </p>
+            <div className="absolute inset-0 opacity-25" style={{
+              backgroundImage: 'radial-gradient(circle, #fde047 1px, transparent 1px)',
+              backgroundSize: '20px 40px',
+            }} />
+          </motion.div>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-12">
-            {topRachas.map((user) => {
-              const isTop1 = user.posicion === 1;
-              const isTop2 = user.posicion === 2;
-              const isTop3 = user.posicion === 3;
+        {/* ── TARJETAS ZIG-ZAG ── */}
+        <div className="relative z-10 space-y-12 sm:space-y-16 py-6">
+          {categorias.map((cat) => {
+            const esIzquierda = cat.lado === 'left';
+            const votosCat = misVotos[cat.id] || [];
+            const tieneVotos = votosCat.length > 0;
 
-              return (
-                <div
-                  key={user.posicion}
-                  className={`relative rounded-3xl p-5 flex flex-col items-center text-center transition-all duration-300 hover:scale-105 ${
-                    isTop1
-                      ? 'bg-gradient-to-b from-amber-400/25 via-[#350f22] to-[#16050e] border-2 border-amber-300 shadow-[0_0_30px_rgba(253,230,138,0.3)] md:-translate-y-4'
-                      : isTop2
-                      ? 'bg-gradient-to-b from-pink-300/15 via-[#350f22] to-[#16050e] border border-pink-300/60 md:-translate-y-2'
-                      : isTop3
-                      ? 'bg-gradient-to-b from-amber-600/15 via-[#350f22] to-[#16050e] border border-amber-500/50'
-                      : 'bg-[#210917] border border-pink-500/20'
-                  }`}
-                >
-                  <CornerBrackets color={isTop1 ? 'border-amber-300' : 'border-pink-500/30'} />
+            return (
+              <motion.div
+                key={cat.id}
+                initial={{ opacity: 0, x: esIzquierda ? -50 : 50, y: 30 }}
+                whileInView={{ opacity: 1, x: 0, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                className={`flex w-full ${esIzquierda ? 'justify-start md:justify-start' : 'justify-end md:justify-end'}`}
+              >
+                <div className="w-[88%] sm:w-[80%] md:w-[45%] mx-auto md:mx-0 relative group">
 
                   <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-sm mb-3 shadow-md ${
-                      isTop1
-                        ? 'bg-amber-300 text-black'
-                        : isTop2
-                        ? 'bg-slate-200 text-black'
-                        : isTop3
-                        ? 'bg-amber-600 text-white'
-                        : 'bg-white/10 text-pink-300'
+                    className={`hidden md:block absolute top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-amber-300 to-pink-400 opacity-60 z-0 ${
+                      esIzquierda ? '-right-16 w-16' : '-left-16 w-16'
                     }`}
-                  >
-                    #{user.posicion}
-                  </div>
-
-                  <img
-                    src={user.avatar}
-                    alt={user.nombre}
-                    className="w-16 h-16 rounded-full border-2 border-amber-300/50 mb-3 object-cover shadow-lg"
                   />
 
-                  <h3 className="font-black text-base text-white truncate w-full mb-0.5">{user.nombre}</h3>
-                  <span className="text-[10px] font-black tracking-widest text-amber-300 uppercase mb-2">
-                    {user.rango}
-                  </span>
-
-                  <div className="px-3 py-1 rounded-full bg-black/60 border border-amber-300/30 text-xs font-black text-white flex items-center gap-1 mb-3">
-                    <Flame className="w-3.5 h-3.5 text-amber-300" /> {user.dias} Días
-                  </div>
-
-                  <p className="text-[11px] text-pink-200/70 font-semibold italic leading-tight">
-                    "{user.frase}"
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="max-w-2xl mx-auto rounded-3xl p-6 bg-gradient-to-r from-pink-900/40 via-amber-400/10 to-pink-900/40 border border-amber-300/40 text-center shadow-xl">
-            <MessageSquareHeart className="w-8 h-8 text-amber-300 mx-auto mb-3 animate-pulse" />
-            <p className="text-xs sm:text-sm font-extrabold text-pink-100 leading-relaxed">
-              "¿Tienes una racha más alta? Envía tus rachas por Discord con captura de prueba para saber que es cierto que tienes una racha más alta y te pondremos en la página. Recuerda que ValentinaVTT da recompensas a la racha más alta de vez en cuando 💖"
-            </p>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* ── HEADER PRINCIPAL DE LA GALA ── */}
-          <div className="relative z-20 text-center max-w-4xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400/15 via-pink-500/15 to-amber-400/15 border border-amber-300/40 text-amber-300 text-[11px] sm:text-xs font-black tracking-widest uppercase mb-3 shadow-[0_0_20px_rgba(253,230,138,0.2)]">
-              <Trophy className="w-3.5 h-3.5 text-amber-300" /> GALA VTT (TEMPORADA {temporada})
-            </div>
-
-            <h1
-              className="text-3xl sm:text-5xl md:text-7xl font-black tracking-widest uppercase mb-2 drop-shadow-[0_4px_30px_rgba(255,133,161,0.5)]"
-              style={{
-                background: 'linear-gradient(135deg, #FFF0F5 0%, #FFB3C6 35%, #FDE68A 70%, #FF85A1 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              SALÓN DE LA FAMA
-            </h1>
-
-            <p className="text-pink-200/90 font-extrabold text-xs sm:text-sm tracking-wider max-w-xs sm:max-w-md mx-auto">
-              Recorre la alfombra roja y vota hasta 3 veces por tus favoritos en cada categoría 🏆
-            </p>
-          </div>
-
-          {/* ========================================================= */}
-          {/* CARTELÓN DE CONSTRUCCIÓN AMARILLO CON NEGRO (VOTACIONES CERRADAS) */}
-          {/* ========================================================= */}
-          {!votacionesAbiertas && (
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="relative z-30 max-w-2xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(250,204,21,0.3)] border-4 border-yellow-400 bg-black text-yellow-300"
-            >
-              <div
-                className="h-10 w-full"
-                style={{
-                  background: 'repeating-linear-gradient(-45deg, #facc15, #facc15 20px, #000 20px, #000 40px)',
-                }}
-              />
-
-              <div className="p-6 sm:p-10 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-yellow-400 text-black flex items-center justify-center font-black shadow-lg animate-bounce">
-                  <AlertTriangle className="w-9 h-9 stroke-[2.5]" />
-                </div>
-
-                <div className="inline-block px-4 py-1 rounded-full bg-yellow-400 text-black font-black text-xs tracking-widest uppercase mb-3">
-                  🚧 ZONA DE VOTACIÓN EN CONSTRUCCIÓN 🚧
-                </div>
-
-                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3 tracking-wide">
-                  Aún no se puede votar, espera a que se abran las votaciones oficialmente
-                </h2>
-
-                <p className="text-xs sm:text-sm text-yellow-200/80 font-bold max-w-md mx-auto leading-relaxed">
-                  Las votaciones abrirán en el momento oficial fijado por ValentinaVTT. Prepara tus favoritos para la gran gala 🌸
-                </p>
-              </div>
-
-              <div
-                className="h-10 w-full"
-                style={{
-                  background: 'repeating-linear-gradient(-45deg, #facc15, #facc15 20px, #000 20px, #000 40px)',
-                }}
-              />
-            </motion.div>
-          )}
-
-          {/* ── PASEO DE LA ALFOMBRA ROJA ── */}
-          <div className="relative max-w-5xl mx-auto z-10">
-
-            <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-16 sm:w-28 md:w-44 pointer-events-none z-0 overflow-hidden flex flex-col items-center">
-              <motion.div
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ duration: 1.8, ease: 'easeOut' }}
-                className="w-full h-full origin-top relative shadow-[0_0_50px_rgba(239,68,68,0.4)]"
-                style={{
-                  background: 'linear-gradient(90deg, #991b1b 0%, #dc2626 30%, #ef4444 50%, #dc2626 70%, #991b1b 100%)',
-                  borderLeft: '3px solid #fde047',
-                  borderRight: '3px solid #fde047',
-                }}
-              >
-                <div className="absolute inset-0 opacity-25" style={{
-                  backgroundImage: 'radial-gradient(circle, #fde047 1px, transparent 1px)',
-                  backgroundSize: '20px 40px',
-                }} />
-              </motion.div>
-            </div>
-
-            {/* ── TARJETAS ZIG-ZAG ── */}
-            <div className="relative z-10 space-y-12 sm:space-y-16 py-6">
-              {categorias.map((cat) => {
-                const esIzquierda = cat.lado === 'left';
-                const votosCat = misVotos[cat.id] || [];
-                const tieneVotos = votosCat.length > 0;
-
-                return (
-                  <motion.div
-                    key={cat.id}
-                    initial={{ opacity: 0, x: esIzquierda ? -50 : 50, y: 30 }}
-                    whileInView={{ opacity: 1, x: 0, y: 0 }}
-                    viewport={{ once: true, margin: '-50px' }}
-                    transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                    className={`flex w-full ${esIzquierda ? 'justify-start md:justify-start' : 'justify-end md:justify-end'}`}
+                  <div
+                    className="relative rounded-3xl p-5 sm:p-7 overflow-hidden transition-all duration-500 hover:scale-[1.02] shadow-2xl"
+                    style={{
+                      background: 'linear-gradient(145deg, rgba(65,18,40,0.92) 0%, rgba(28,8,18,0.96) 100%)',
+                      border: '2px solid rgba(253,230,138,0.35)',
+                      boxShadow: '0 20px 50px rgba(0,0,0,0.6), 0 0 25px rgba(255,133,161,0.15)',
+                    }}
                   >
-                    <div className="w-[88%] sm:w-[80%] md:w-[45%] mx-auto md:mx-0 relative group">
+                    <CornerBrackets color="border-amber-300/70" />
 
-                      <div
-                        className={`hidden md:block absolute top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-amber-300 to-pink-400 opacity-60 z-0 ${
-                          esIzquierda ? '-right-16 w-16' : '-left-16 w-16'
-                        }`}
-                      />
-
-                      <div
-                        className="relative rounded-3xl p-5 sm:p-7 overflow-hidden transition-all duration-500 hover:scale-[1.02] shadow-2xl"
-                        style={{
-                          background: 'linear-gradient(145deg, rgba(65,18,40,0.92) 0%, rgba(28,8,18,0.96) 100%)',
-                          border: '2px solid rgba(253,230,138,0.35)',
-                          boxShadow: '0 20px 50px rgba(0,0,0,0.6), 0 0 25px rgba(255,133,161,0.15)',
-                        }}
-                      >
-                        <CornerBrackets color="border-amber-300/70" />
-
-                        <div className="flex items-center justify-between gap-2 mb-3">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-pink-500/25 to-amber-400/25 border border-amber-300/40 flex items-center justify-center text-xl sm:text-2xl shadow-lg shrink-0">
-                            {cat.emoji}
-                          </div>
-
-                          <span className={`px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-black tracking-widest uppercase border truncate ${
-                            tieneVotos
-                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
-                              : 'bg-amber-400/15 text-amber-300 border-amber-300/40'
-                          }`}>
-                            {!votacionesAbiertas
-                              ? '🔒 VOTACIONES CERRADAS'
-                              : votosCat.length > 0
-                              ? `✓ Votos: ${votosCat.length}/3`
-                              : '✨ 3 Votos'}
-                          </span>
-                        </div>
-
-                        <h3 className="text-xl sm:text-2xl font-black text-white mb-0.5 tracking-wide group-hover:text-amber-300 transition-colors">
-                          {cat.titulo}
-                        </h3>
-                        <p className="text-[11px] sm:text-xs font-bold text-amber-300/80 mb-2 uppercase tracking-wider">
-                          {cat.subtitulo}
-                        </p>
-                        <p className="text-xs text-pink-200/70 mb-5 font-semibold leading-relaxed">
-                          {cat.descripcion}
-                        </p>
-
-                        <button
-                          onClick={() => {
-                            if (!votacionesAbiertas) return;
-                            abrirModalVotacion(cat);
-                          }}
-                          disabled={!votacionesAbiertas}
-                          className={`w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-extrabold text-xs tracking-widest uppercase transition-all duration-300 ${
-                            !votacionesAbiertas
-                              ? 'bg-gray-700/60 text-gray-400 border border-gray-600/40 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-amber-300 via-pink-400 to-amber-400 text-black shadow-lg hover:scale-105 hover:shadow-[0_0_25px_rgba(253,230,138,0.6)]'
-                          }`}
-                        >
-                          {!votacionesAbiertas ? (
-                            <>
-                              <Lock className="w-4 h-4" /> Votaciones Cerradas
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles className="w-4 h-4" />
-                              {tieneVotos ? `Votar / Modificar (${votosCat.length}/3)` : 'Votar / Ver Nominados'}
-                            </>
-                          )}
-                        </button>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-pink-500/25 to-amber-400/25 border border-amber-300/40 flex items-center justify-center text-xl sm:text-2xl shadow-lg shrink-0">
+                        {cat.emoji}
                       </div>
 
+                      <span className={`px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-black tracking-widest uppercase border truncate ${
+                        tieneVotos
+                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
+                          : 'bg-amber-400/15 text-amber-300 border-amber-300/40'
+                      }`}>
+                        {!votacionesAbiertas
+                          ? '🔒 VOTACIONES CERRADAS'
+                          : votosCat.length > 0
+                          ? `✓ Votos: ${votosCat.length}/3`
+                          : '✨ 3 Votos'}
+                      </span>
                     </div>
-                  </motion.div>
-                );
-              })}
+
+                    <h3 className="text-xl sm:text-2xl font-black text-white mb-0.5 tracking-wide group-hover:text-amber-300 transition-colors">
+                      {cat.titulo}
+                    </h3>
+                    <p className="text-[11px] sm:text-xs font-bold text-amber-300/80 mb-2 uppercase tracking-wider">
+                      {cat.subtitulo}
+                    </p>
+                    <p className="text-xs text-pink-200/70 mb-5 font-semibold leading-relaxed">
+                      {cat.descripcion}
+                    </p>
+
+                    <button
+                      onClick={() => {
+                        if (!votacionesAbiertas) return;
+                        abrirModalVotacion(cat);
+                      }}
+                      disabled={!votacionesAbiertas}
+                      className={`w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-extrabold text-xs tracking-widest uppercase transition-all duration-300 ${
+                        !votacionesAbiertas
+                          ? 'bg-gray-700/60 text-gray-400 border border-gray-600/40 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-amber-300 via-pink-400 to-amber-400 text-black shadow-lg hover:scale-105 hover:shadow-[0_0_25px_rgba(253,230,138,0.6)]'
+                      }`}
+                    >
+                      {!votacionesAbiertas ? (
+                        <>
+                          <Lock className="w-4 h-4" /> Votaciones Cerradas
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4" />
+                          {tieneVotos ? `Votar / Modificar (${votosCat.length}/3)` : 'Votar / Ver Nominados'}
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 50 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: 'easeOut' }}
+          className="relative mt-20 pt-10 text-center"
+        >
+          <div className="relative max-w-md mx-auto rounded-3xl p-8 bg-gradient-to-b from-[#3a1024] to-[#16050e] border-2 border-amber-300/60 shadow-[0_0_60px_rgba(253,230,138,0.25)] overflow-hidden">
+            <div className="relative w-48 h-56 mx-auto mb-6 flex rounded-2xl overflow-hidden border-2 border-amber-300/50 shadow-2xl bg-[#0f0409]">
+              <div className="w-1/2 h-full bg-gradient-to-r from-[#4a152e] to-[#2b0c1b] border-r border-amber-300/60 flex flex-col justify-center items-end pr-2">
+                <div className="w-3 h-3 rounded-full bg-amber-300 shadow-[0_0_10px_#fde047]" />
+              </div>
+              <div className="w-1/2 h-full bg-gradient-to-l from-[#4a152e] to-[#2b0c1b] border-l border-amber-300/60 flex flex-col justify-center items-start pl-2">
+                <div className="w-3 h-3 rounded-full bg-amber-300 shadow-[0_0_10px_#fde047]" />
+              </div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 50 }}
-              whileInView={{ opacity: 1, scale: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.9, ease: 'easeOut' }}
-              className="relative mt-20 pt-10 text-center"
-            >
-              <div className="relative max-w-md mx-auto rounded-3xl p-8 bg-gradient-to-b from-[#3a1024] to-[#16050e] border-2 border-amber-300/60 shadow-[0_0_60px_rgba(253,230,138,0.25)] overflow-hidden">
-                <div className="relative w-48 h-56 mx-auto mb-6 flex rounded-2xl overflow-hidden border-2 border-amber-300/50 shadow-2xl bg-[#0f0409]">
-                  <div className="w-1/2 h-full bg-gradient-to-r from-[#4a152e] to-[#2b0c1b] border-r border-amber-300/60 flex flex-col justify-center items-end pr-2">
-                    <div className="w-3 h-3 rounded-full bg-amber-300 shadow-[0_0_10px_#fde047]" />
-                  </div>
-                  <div className="w-1/2 h-full bg-gradient-to-l from-[#4a152e] to-[#2b0c1b] border-l border-amber-300/60 flex flex-col justify-center items-start pl-2">
-                    <div className="w-3 h-3 rounded-full bg-amber-300 shadow-[0_0_10px_#fde047]" />
-                  </div>
-                </div>
-
-                <h3 className="text-2xl font-black text-amber-300 tracking-wider uppercase mb-2">
-                  Puertas del Salón de la Fama
-                </h3>
-                <p className="text-xs font-semibold text-pink-200/80 mb-4">
-                  Las puertas se abrirán oficialmente al terminar las votaciones.
-                </p>
-                <div className="inline-block px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-300/50 text-amber-300 text-xs font-black tracking-widest uppercase">
-                  ✨ Próxima Gran Gala: {diasRestantes} Días
-                </div>
-              </div>
-            </motion.div>
-
+            <h3 className="text-2xl font-black text-amber-300 tracking-wider uppercase mb-2">
+              Puertas del Salón de la Fama
+            </h3>
+            <p className="text-xs font-semibold text-pink-200/80 mb-4">
+              Las puertas se abrirán oficialmente al terminar las votaciones.
+            </p>
+            <div className="inline-block px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-300/50 text-amber-300 text-xs font-black tracking-widest uppercase">
+              ✨ Próxima Gran Gala: {diasRestantes} Días
+            </div>
           </div>
-        </>
-      )}
+        </motion.div>
+
+      </div>
 
       {/* ── MODAL DE CONFIGURACIÓN / INSTRUCCIONES DISCORD CLIENT ID ── */}
       <AnimatePresence>

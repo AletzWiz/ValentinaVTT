@@ -16,6 +16,7 @@ import { RuletaVTT } from './components/RuletaVTT';
 
 // 🌟 Aquí importamos tu nuevo componente brillante
 import { SalonDeLaFama } from './components/SalonDeLaFama';
+import { KawaiiScheduleRuler } from './components/KawaiiScheduleRuler';
 
 import './App.css';
 
@@ -46,8 +47,9 @@ const Inicio = () => {
 export default function App() {
   return (
     <Router>
-      <main className="min-h-screen bg-[#FFF0F5]">
+      <main className="min-h-screen bg-[#FFF0F5] relative">
         <Navbar />
+        <KawaiiScheduleRuler />
         
         <Routes>
           {/* Ruta principal: valentinavtt.com */}

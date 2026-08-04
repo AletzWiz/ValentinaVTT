@@ -80,8 +80,11 @@ export default function Hero() {
     >
       {/* ── Soft ambient background (no busy image) ── */}
       <div className="absolute inset-0" style={{
-        background: 'linear-gradient(160deg, #FFF0F7 0%, #F5EEFF 40%, #EAF4FF 75%, #FFF0F7 100%)',
+        background: 'linear-gradient(180deg, #FFF0F7 0%, #F5EEFF 35%, #EFF6FF 65%, #FFF0F5 100%)',
       }} />
+
+      {/* Smooth gradient transition overlay at bottom of Hero */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent via-[#FFF0F5]/80 to-[#FFF0F5] pointer-events-none z-10" />
 
       {/* Subtle animated blobs — dreamy & understated */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

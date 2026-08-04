@@ -1,0 +1,62 @@
+{
+  "tituloSemana": "Horario Semanal VTT",
+  "subtituloSemana": "Semana del 3 al 9 de Agosto",
+  "dias": [
+    {
+      "id": "lunes",
+      "diaNombre": "Lunes",
+      "fecha": "03 Ago",
+      "estado": "offline",
+      "horaMexico": "20:00",
+      "tituloStream": "Día de Descanso"
+    },
+    {
+      "id": "martes",
+      "diaNombre": "Martes",
+      "fecha": "04 Ago",
+      "estado": "en_vivo",
+      "horaMexico": "20:00",
+      "tituloStream": "🎉 Gala & Ruleta de la Fama"
+    },
+    {
+      "id": "miercoles",
+      "diaNombre": "Miércoles",
+      "fecha": "05 Ago",
+      "estado": "stream_hoy",
+      "horaMexico": "19:30",
+      "tituloStream": "💬 Just Chatting & Juegos con Viewers"
+    },
+    {
+      "id": "jueves",
+      "diaNombre": "Jueves",
+      "fecha": "06 Ago",
+      "estado": "offline",
+      "horaMexico": "20:00",
+      "tituloStream": "Sin directo programado"
+    },
+    {
+      "id": "viernes",
+      "diaNombre": "Viernes",
+      "fecha": "07 Ago",
+      "estado": "stream_hoy",
+      "horaMexico": "20:00",
+      "tituloStream": "🎮 Especial de Fin de Semana"
+    },
+    {
+      "id": "sabado",
+      "diaNombre": "Sábado",
+      "fecha": "08 Ago",
+      "estado": "stream_hoy",
+      "horaMexico": "18:00",
+      "tituloStream": "✨ Stream Sorpresa Kawaii"
+    },
+    {
+      "id": "domingo",
+      "diaNombre": "Domingo",
+      "fecha": "09 Ago",
+      "estado": "offline",
+      "horaMexico": "20:00",
+      "tituloStream": "Día de Descanso"
+    }
+  ]
+}
