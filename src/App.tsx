@@ -31,6 +31,7 @@ const Inicio = () => {
 
   return (
     <>
+      <KawaiiScheduleRuler />
       <Hero />
       <LiveStream />
       <SocialGrid />
@@ -49,7 +50,6 @@ export default function App() {
     <Router>
       <main className="min-h-screen bg-[#FFF0F5] relative">
         <Navbar />
-        <KawaiiScheduleRuler />
         
         <Routes>
           {/* Ruta principal: valentinavtt.com */}

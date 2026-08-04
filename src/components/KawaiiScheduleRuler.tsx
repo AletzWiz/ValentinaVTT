@@ -1,24 +1,25 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Radio, Sparkles, ExternalLink, ChevronLeft, ChevronRight, X, Clock } from 'lucide-react';
+import { Calendar, Radio, Sparkles, ExternalLink, ChevronLeft, ChevronRight, X, Play, Clock } from 'lucide-react';
 
-interface DiaHorario {
+interface DiaHorarioConfig {
   id: string;
+  diaIndex: number; // 0 para Lunes, 1 para Martes... 6 para Domingo
   diaNombre: string;
-  fecha: string;
   estado: 'offline' | 'en_vivo' | 'stream_hoy';
   horaMexico: string;
   tituloStream: string;
+  vodUrl?: string;
+  vodThumbnail?: string;
 }
 
-interface ConfigHorario {
-  tituloSemana: string;
-  subtituloSemana: string;
-  dias: DiaHorario[];
+interface DiaCalculado extends DiaHorarioConfig {
+  fechaTexto: string;
+  esHoy: boolean;
 }
 
-// Convertir hora de México (CDMX UTC-6) a la zona horaria local del espectador
-function obtenerHoraLocal(horaMexicoStr: string): string {
+// Convertir hora de México (CDMX UTC-6) a la hora local del usuario
+function formatearHoraUnicaLocal(horaMexicoStr: string): string {
   try {
     if (!horaMexicoStr || horaMexicoStr.toLowerCase() === 'offline') return '';
     const parts = horaMexicoStr.split(':');
@@ -26,189 +27,287 @@ function obtenerHoraLocal(horaMexicoStr: string): string {
     const mm = parseInt(parts[1] || '00', 10);
 
     const now = new Date();
-    // CDMX es UTC-6 (o UTC-5 en verano si aplica)
     const fechaCDMX = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hh + 6, mm));
 
-    const formateador = new Intl.DateTimeFormat([], {
+    return new Intl.DateTimeFormat([], {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-    });
-
-    return formateador.format(fechaCDMX);
+    }).format(fechaCDMX);
   } catch {
-    return `${horaMexicoStr} CDMX`;
+    return horaMexicoStr;
   }
 }
 
+// Calcular las fechas exactas de la semana actual (Lunes a Domingo)
+function obtenerDiasSemanaActual(diasConfig: DiaHorarioConfig[]): { dias: DiaCalculado[]; rangoSemana: string } {
+  const ahora = new Date();
+  const diaSemanaActual = ahora.getDay(); // 0 = Domingo, 1 = Lunes, ... 6 = Sábado
+  // Ajustar para que Lunes sea 0 y Domingo sea 6
+  const indexLunesActual = (diaSemanaActual === 0 ? 6 : diaSemanaActual - 1);
+
+  // Encontrar la fecha del Lunes de esta semana
+  const fechaLunes = new Date(ahora);
+  fechaLunes.setDate(ahora.getDate() - indexLunesActual);
+
+  const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+  const diasResultado: DiaCalculado[] = (diasConfig || []).map((configDia) => {
+    const fechaDia = new Date(fechaLunes);
+    fechaDia.setDate(fechaLunes.getDate() + configDia.diaIndex);
+
+    const diaNum = String(fechaDia.getDate()).padStart(2, '0');
+    const mesNom = meses[fechaDia.getMonth()];
+    const fechaTexto = `${diaNum} ${mesNom}`;
+
+    const esHoy = (
+      ahora.getDate() === fechaDia.getDate() &&
+      ahora.getMonth() === fechaDia.getMonth() &&
+      ahora.getFullYear() === fechaDia.getFullYear()
+    );
+
+    return {
+      ...configDia,
+      fechaTexto,
+      esHoy,
+    };
+  });
+
+  const fechaDomingo = new Date(fechaLunes);
+  fechaDomingo.setDate(fechaLunes.getDate() + 6);
+
+  const rangoSemana = `${fechaLunes.getDate()} ${meses[fechaLunes.getMonth()]} - ${fechaDomingo.getDate()} ${meses[fechaDomingo.getMonth()]}`;
+
+  return { dias: diasResultado, rangoSemana };
+}
+
 export const KawaiiScheduleRuler = () => {
-  const [config, setConfig] = useState<ConfigHorario | null>(null);
-  const [openRuler, setOpenRuler] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-  const [userTz, setUserTz] = useState('');
+  const [diasCalculados, setDiasCalculados] = useState<DiaCalculado[]>([]);
+  const [rangoSemana, setRangoSemana]       = useState('');
+  const [openRuler, setOpenRuler]           = useState(true);
+  const [isMobile, setIsMobile]             = useState(false);
+  const [isRealTimeLive, setIsRealTimeLive] = useState(false);
 
   useEffect(() => {
-    // Detectar pantalla pequeña y zona horaria
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (mobile) setOpenRuler(false); // Cerrado por defecto en teléfono
+    };
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    try {
-      const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      setUserTz(tzName.replace('_', ' '));
-    } catch {}
-
-    // Cargar horario_semanal.json
+    // 1. Cargar horario_semanal.json
     fetch('/horario_semanal.json?v=' + Date.now())
       .then(res => res.json())
-      .then(data => setConfig(data))
+      .then(data => {
+        const { dias, rangoSemana } = obtenerDiasSemanaActual(data.dias || []);
+        setDiasCalculados(dias);
+        setRangoSemana(rangoSemana);
+      })
       .catch(err => console.error("Error al cargar horario_semanal.json:", err));
 
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+    // 2. Detección automática en tiempo real si ValentinaVTT está En Vivo en Twitch
+    const comprobarDirectoEnVivo = async () => {
+      try {
+        const res = await fetch('https://decapi.me/twitch/uptime/valentinavtt');
+        if (res.ok) {
+          const text = await res.text();
+          if (text && !text.toLowerCase().includes('offline')) {
+            setIsRealTimeLive(true);
+          } else {
+            setIsRealTimeLive(false);
+          }
+        }
+      } catch {}
+    };
 
-  if (!config) return null;
+    comprobarDirectoEnVivo();
+    const intervalLive = setInterval(comprobarDirectoEnVivo, 60000); // Comprobar cada minuto
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      clearInterval(intervalLive);
+    };
+  }, []);
 
   return (
     <>
-      {/* ── BOTÓN FLOTANTE LATERAL PARA PANTALLAS O CUANDO ESTÁ PLEGADO ── */}
-      {!openRuler && (
+      {/* ── BOTÓN FLOTANTE EN TELÉFONO ("¿Quieres ver mi horario? ¡Pica aquí!") ── */}
+      {isMobile && !openRuler && (
+        <motion.button
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          onClick={() => setOpenRuler(true)}
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-pink-500 via-purple-500 to-amber-400 text-white font-black text-xs px-5 py-3.5 rounded-full shadow-[0_8px_30px_rgba(255,133,161,0.6)] flex items-center gap-2 border-2 border-white text-center hover:scale-105 active:scale-95 transition-all"
+        >
+          <Calendar className="w-4 h-4 text-amber-200 animate-bounce" />
+          <span>📅 ¿Quieres ver mi horario? ¡Pica aquí! 🌸</span>
+        </motion.button>
+      )}
+
+      {/* ── PESTAÑA LATERAL DE APERTURA EN PC ── */}
+      {!isMobile && !openRuler && (
         <motion.button
           initial={{ x: -60, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           onClick={() => setOpenRuler(true)}
-          className="fixed left-0 top-1/3 z-40 bg-gradient-to-r from-pink-400 via-purple-400 to-amber-300 text-white font-black text-xs px-3.5 py-3 rounded-r-2xl shadow-[0_4px_25px_rgba(255,133,161,0.5)] flex items-center gap-2 border-y-2 border-r-2 border-white/60 hover:scale-105 transition-all group"
+          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-gradient-to-r from-pink-400 via-purple-400 to-amber-300 text-white font-black text-xs px-3 py-4 rounded-r-2xl shadow-xl flex flex-col items-center gap-2 border-y-2 border-r-2 border-white hover:scale-105 transition-all"
         >
-          <Calendar className="w-4 h-4 animate-bounce" />
-          <span className="writing-vertical hidden sm:inline tracking-wider uppercase text-[10px]">
-            📏 Horario VTT
-          </span>
-          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <Calendar className="w-4 h-4" />
+          <ChevronRight className="w-4 h-4" />
         </motion.button>
       )}
 
-      {/* ── REGLA DE 60CM KAWAII FLOTANTE IZQUIERDA ── */}
+      {/* ── REGLA COMPLETA VERTICAL LATERAL (DE ARRIBA HASTA ABAJO - 0 ESPACIOS) ── */}
       <AnimatePresence>
         {openRuler && (
-          <motion.div
-            initial={{ x: -350, opacity: 0 }}
+          <motion.aside
+            initial={{ x: -380, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -350, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className={`fixed left-2 top-20 z-40 ${
-              isMobile ? 'w-[92vw] max-w-sm left-1/2 -translate-x-1/2 top-16' : 'w-80'
+            exit={{ x: -380, opacity: 0 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 240 }}
+            className={`fixed top-0 bottom-0 left-0 h-screen z-50 flex ${
+              isMobile ? 'w-full max-w-xs' : 'w-80'
             }`}
           >
+            {/* TIRA DE LA REGLA VERTICAL CON PALITOS / MARCAS LATERALES DE 0 A ABAJO */}
             <div
-              className="relative rounded-3xl p-5 shadow-[0_15px_40px_rgba(255,133,161,0.35)] border-4 border-white/80 overflow-hidden backdrop-blur-xl"
+              className="relative w-full h-full flex flex-col shadow-[10px_0_30px_rgba(255,133,161,0.25)] border-r-4 border-pink-300/60 overflow-hidden backdrop-blur-xl"
               style={{
-                background: 'linear-gradient(165deg, rgba(255,240,245,0.96) 0%, rgba(245,238,255,0.96) 50%, rgba(234,244,255,0.96) 100%)',
+                background: 'linear-gradient(180deg, rgba(255,240,247,0.98) 0%, rgba(245,238,255,0.98) 50%, rgba(234,244,255,0.98) 100%)',
               }}
             >
-              {/* Botón Plegar / Cerrar */}
-              <button
-                onClick={() => setOpenRuler(false)}
-                className="absolute top-3 right-3 w-7 h-7 rounded-full bg-pink-100 text-pink-500 hover:bg-pink-200 flex items-center justify-center font-bold transition-colors z-20"
-                title="Cerrar regla"
-              >
-                {isMobile ? <X className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-              </button>
 
-              {/* Marca de Regla Kawaii 60 CM Superior */}
-              <div className="flex items-center justify-between border-b-2 border-pink-300/40 pb-2 mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">📏</span>
-                  <div>
-                    <h3 className="font-black text-sm text-pink-600 tracking-wide leading-none">
-                      {config.tituloSemana}
-                    </h3>
-                    <span className="text-[10px] font-extrabold text-purple-500 uppercase tracking-widest">
-                      {config.subtituloSemana}
-                    </span>
-                  </div>
-                </div>
-
-                <span className="text-[10px] font-black text-amber-500 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
-                  60 CM
-                </span>
-              </div>
-
-              {/* Marcas de Regla de Centímetros (Líneas Kawaii) */}
-              <div className="flex justify-between items-end h-3 px-1 mb-3 opacity-60">
-                {[0, 10, 20, 30, 40, 50, 60].map((cm) => (
-                  <div key={cm} className="flex flex-col items-center">
-                    <div className="w-0.5 h-2 bg-pink-400" />
-                    <span className="text-[8px] font-bold text-pink-400 leading-none">{cm}</span>
-                  </div>
+              {/* Marcas de palitos de regla a lo largo de todo el borde izquierdo */}
+              <div className="absolute top-0 bottom-0 left-0 w-3 flex flex-col justify-between pointer-events-none opacity-40 z-10 py-2">
+                {Array.from({ length: 45 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`bg-pink-500 rounded-r-full ${i % 5 === 0 ? 'w-3 h-0.5 opacity-90' : 'w-1.5 h-0.5 opacity-50'}`}
+                  />
                 ))}
               </div>
 
-              {/* Nota de Zona Horaria Autodetectada */}
-              {userTz && (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-100/70 border border-purple-200 text-purple-700 text-[10px] font-extrabold mb-3">
-                  <Clock className="w-3 h-3 text-purple-500 shrink-0" />
-                  <span className="truncate">Horarios adaptados a tu hora local ({userTz})</span>
+              {/* HEADER DE LA REGLA */}
+              <div className="p-4 pt-6 border-b-2 border-pink-300/40 relative z-20 flex items-center justify-between pl-6">
+                <div>
+                  <h3 className="font-black text-base text-pink-600 tracking-wider uppercase leading-none">
+                    Horario Semanal
+                  </h3>
+                  <p className="text-[11px] font-extrabold text-purple-600 uppercase tracking-widest mt-1">
+                    {rangoSemana || 'Esta Semana'}
+                  </p>
                 </div>
-              )}
 
-              {/* LISTA DE 7 DÍAS DE LA SEMANA */}
-              <div className="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
-                {config.dias.map((d) => {
-                  const isEnVivo = d.estado === 'en_vivo';
-                  const isStreamHoy = d.estado === 'stream_hoy';
-                  const isOffline = d.estado === 'offline';
-                  const horaLocal = obtenerHoraLocal(d.horaMexico);
+                <button
+                  onClick={() => setOpenRuler(false)}
+                  className="w-8 h-8 rounded-full bg-pink-100 text-pink-500 hover:bg-pink-200 flex items-center justify-center font-bold transition-colors"
+                  title="Cerrar horario"
+                >
+                  {isMobile ? <X className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {/* LISTA DE DÍAS (DESPLAZABLE VERTICALMENTE CON PALITOS Y TARJETAS) */}
+              <div className="flex-1 overflow-y-auto p-4 pl-6 space-y-3 relative z-20">
+                {diasCalculados.map((d) => {
+                  // Si el sistema detecta que está En Vivo real HOY, forzamos el estado a en_vivo
+                  const realmenteEnVivo = isRealTimeLive && d.esHoy;
+                  const estadoFinal = realmenteEnVivo ? 'en_vivo' : d.estado;
+
+                  const isEnVivo = estadoFinal === 'en_vivo';
+                  const isStreamHoy = estadoFinal === 'stream_hoy';
+                  const isOffline = estadoFinal === 'offline';
+                  const horaLocal = formatearHoraUnicaLocal(d.horaMexico);
 
                   return (
                     <div
                       key={d.id}
-                      className={`relative p-3 rounded-2xl border transition-all duration-300 ${
+                      className={`relative p-3.5 rounded-2xl border transition-all duration-300 ${
                         isEnVivo
-                          ? 'bg-gradient-to-r from-red-500/15 via-pink-400/20 to-amber-300/20 border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse'
+                          ? 'bg-gradient-to-r from-red-500/20 via-pink-400/25 to-amber-300/25 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)] animate-pulse'
+                          : d.esHoy
+                          ? 'bg-white border-pink-400 shadow-md ring-2 ring-pink-300/50'
                           : isStreamHoy
-                          ? 'bg-white/80 border-purple-300/60 shadow-sm hover:border-pink-400'
-                          : 'bg-gray-100/60 border-gray-200 opacity-60'
+                          ? 'bg-white/80 border-purple-300/70 shadow-sm hover:border-pink-400'
+                          : 'bg-gray-100/70 border-gray-200 opacity-60'
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-2 mb-1">
+                      {/* Cabecera del día */}
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
                         <div className="flex items-center gap-2">
                           <span className="font-black text-xs text-gray-800 uppercase tracking-wider">
                             {d.diaNombre}
                           </span>
-                          <span className="text-[10px] font-extrabold text-pink-500 bg-pink-100 px-2 py-0.5 rounded-full">
-                            {d.fecha}
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                            d.esHoy ? 'bg-pink-500 text-white shadow-sm' : 'bg-pink-100 text-pink-600'
+                          }`}>
+                            {d.fechaTexto}
                           </span>
                         </div>
 
-                        {/* BADGES SEGÚN ESTADO */}
+                        {/* BADGES ÚNICOS */}
                         {isEnVivo ? (
                           <a
                             href="https://www.twitch.tv/valentinavtt"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-2.5 py-1 rounded-full bg-red-600 hover:bg-red-700 text-white font-black text-[10px] uppercase tracking-widest flex items-center gap-1 shadow-md hover:scale-105 transition-all animate-bounce"
+                            className="px-3 py-1 rounded-full bg-red-600 hover:bg-red-700 text-white font-black text-[10px] uppercase tracking-widest flex items-center gap-1 shadow-md hover:scale-105 transition-all"
                           >
-                            <Radio className="w-3 h-3 text-white" /> EN VIVO AHORA
+                            <Radio className="w-3 h-3 text-white animate-spin" /> EN VIVO AHORA
                           </a>
                         ) : isStreamHoy ? (
-                          <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 text-white font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center gap-1">
+                          <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 text-white font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center gap-1">
                             <Sparkles className="w-2.5 h-2.5" /> STREAM HOY
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-full bg-gray-300 text-gray-600 font-bold text-[9px] uppercase tracking-wider">
+                          <span className="px-2 py-0.5 rounded-full bg-gray-300 text-gray-600 font-extrabold text-[9px] uppercase tracking-wider">
                             OFFLINE
                           </span>
                         )}
                       </div>
 
-                      <div className="text-[11px] font-bold text-gray-700 truncate">
+                      {/* Título del Directo */}
+                      <div className="text-xs font-bold text-gray-800 truncate mb-1">
                         {d.tituloStream}
                       </div>
 
-                      {!isOffline && (
-                        <div className="mt-1 text-[10px] font-black text-purple-600 flex items-center justify-between border-t border-pink-200/50 pt-1">
-                          <span>🇲🇽 MX: {d.horaMexico} HRS</span>
-                          <span className="text-pink-600">📍 Tu hora: {horaLocal}</span>
+                      {/* HORA ÚNICA ADAPTADA A ZONA HORARIA LOCAL */}
+                      {!isOffline && horaLocal && (
+                        <div className="text-[10px] font-black text-purple-600 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-pink-500" />
+                          <span>Horario: {horaLocal}</span>
+                        </div>
+                      )}
+
+                      {/* MINIATURA Y ENLACE DE VODS PASADOS SI ESTÁ DISPONIBLE */}
+                      {d.vodUrl && (
+                        <div className="mt-2.5 pt-2 border-t border-pink-200/60">
+                          <a
+                            href={d.vodUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group block relative rounded-xl overflow-hidden border border-purple-300 shadow-sm"
+                          >
+                            {d.vodThumbnail ? (
+                              <img
+                                src={d.vodThumbnail}
+                                alt={`VOD ${d.diaNombre}`}
+                                className="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-16 bg-purple-900/80 flex items-center justify-center text-pink-200 text-xs font-bold">
+                                ▶ Ver Resumen / VOD
+                              </div>
+                            )}
+
+                            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 flex items-center justify-center transition-colors">
+                              <span className="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                <Play className="w-4 h-4 fill-current ml-0.5" />
+                              </span>
+                            </div>
+                          </a>
                         </div>
                       )}
                     </div>
@@ -216,18 +315,20 @@ export const KawaiiScheduleRuler = () => {
                 })}
               </div>
 
-              {/* Botón ver directo completo */}
-              <a
-                href="https://www.twitch.tv/valentinavtt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 w-full py-2.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-md hover:scale-[1.02] transition-all"
-              >
-                Ir a Twitch.tv/ValentinaVTT <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+              {/* FOOTER DE LA REGLA */}
+              <div className="p-4 border-t-2 border-pink-300/40 relative z-20 pl-6 bg-white/40">
+                <a
+                  href="https://www.twitch.tv/valentinavtt"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-amber-400 text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-md hover:scale-[1.02] transition-all"
+                >
+                  Ir a Twitch.tv/ValentinaVTT <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
 
             </div>
-          </motion.div>
+          </motion.aside>
         )}
       </AnimatePresence>
     </>
