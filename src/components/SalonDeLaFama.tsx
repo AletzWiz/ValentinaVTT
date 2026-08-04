@@ -62,7 +62,6 @@ export const SalonDeLaFama = () => {
   const [discordClientId, setClientId]    = useState('');
   const [loading, setLoading]             = useState(true);
 
-  // Votaciones: mapa de catId -> Array de nId elegidos (máx 3)
   const [misVotos, setMisVotos]           = useState<Record<string, string[]>>({});
   const [votosServer, setVotosServer]     = useState<Record<string, number>>({});
   const [modalCat, setModalCat]           = useState<CategoriaGala | null>(null);
@@ -150,16 +149,17 @@ export const SalonDeLaFama = () => {
     loadConfig();
   }, []);
 
-  // Iniciar flujo de autorización de Discord
+  // Iniciar flujo de autorización de Discord usando el origen actual exacto
   const conectarDiscord = () => {
     const cid = discordClientId ? discordClientId.trim() : '';
 
-    if (cid && cid !== "1234567890123456789" && cid !== "") {
-      const redirectUri = encodeURIComponent(window.location.origin + '/salon-de-la-fama');
+    if (cid && cid !== "") {
+      // Usar exactamente la URL del navegador actual (ej: https://www.valentinavtt.com/salon-de-la-fama)
+      const currentUri = window.location.origin + window.location.pathname;
+      const redirectUri = encodeURIComponent(currentUri.replace(/\/$/, ''));
       const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${cid}&redirect_uri=${redirectUri}&response_type=token&scope=identify`;
       window.location.href = oauthUrl;
     } else {
-      // Mostrar instrucciones para colocar el Discord Client ID real
       setShowSetupModal(true);
     }
   };
@@ -640,14 +640,17 @@ export const SalonDeLaFama = () => {
 
               <h3 className="text-xl font-black text-amber-300 mb-2">Configurar tu Aplicación de Discord</h3>
               <p className="text-xs text-pink-200/90 font-semibold mb-4 leading-relaxed">
-                Para autorizar la aplicación en Discord sin el mensaje de "Aplicación desconocida", solo necesitas crear tu Client ID gratuito en 1 minuto:
+                Para autorizar la aplicación en Discord sin el mensaje de "redirect_uri no válido", debes agregar la URL exacta en tu panel de Discord:
               </p>
 
               <ol className="text-left text-xs space-y-2 mb-6 p-4 rounded-2xl bg-black/50 border border-amber-300/30 text-amber-100 font-semibold">
                 <li>1. Entra a <a href="https://discord.com/developers/applications" target="_blank" rel="noreferrer" className="text-pink-300 underline font-bold">discord.com/developers/applications</a></li>
-                <li>2. Haz clic en <strong>"New Application"</strong>, ponle <strong>ValentinaVTT</strong> y copia el <strong>APPLICATION ID</strong> (Client ID).</li>
-                <li>3. En la pestaña <strong>OAuth2 -&gt; Redirects</strong> agrega: <br /><code className="text-pink-300 bg-white/10 px-1 py-0.5 rounded">https://www.valentinavtt.com/salon-de-la-fama</code></li>
-                <li>4. Pega ese Client ID en tu archivo <strong>gala_config.json</strong> en la casilla <code className="text-amber-300 bg-white/10 px-1 py-0.5 rounded">"discordClientId"</code>.</li>
+                <li>2. Selecciona tu aplicación <strong>ValentinaVTT</strong> y entra a <strong>OAuth2 -&gt; Redirects</strong>.</li>
+                <li>3. Haz clic en <strong>"Add Redirect"</strong> y agrega exactamente estas URLs: <br />
+                  <code className="text-pink-300 bg-white/10 px-1.5 py-0.5 rounded block mt-1">https://www.valentinavtt.com/salon-de-la-fama</code>
+                  <code className="text-pink-300 bg-white/10 px-1.5 py-0.5 rounded block mt-1">https://valentina-vtt.vercel.app/salon-de-la-fama</code>
+                </li>
+                <li>4. Guarda los cambios presionando el botón azul <strong>"Save Changes"</strong> abajo.</li>
               </ol>
 
               <button
