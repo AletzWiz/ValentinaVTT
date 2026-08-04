@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Flame, Check, Sparkles, X, Play, Crown, LogIn, LogOut, Lock, AlertTriangle, MessageSquareHeart, ExternalLink } from 'lucide-react';
+import { Trophy, Flame, Check, Sparkles, X, Play, Crown, LogIn, LogOut, Lock, AlertTriangle, MessageSquareHeart, ExternalLink, Settings } from 'lucide-react';
 
 interface Nominado {
   id: string;
@@ -69,6 +69,7 @@ export const SalonDeLaFama = () => {
   const [discordUser, setDiscordUser]     = useState<DiscordUser | null>(null);
   const [showRachasSec, setShowRachasSec] = useState(false);
   const [showAuthWarning, setShowAuthWarning] = useState(false);
+  const [showSetupModal, setShowSetupModal]   = useState(false);
   const [errorMsg, setErrorMsg]           = useState<string | null>(null);
 
   // 1. Manejar OAuth2 Redirect Hash Oficial de Discord (#access_token=...)
@@ -78,7 +79,6 @@ export const SalonDeLaFama = () => {
       const params = new URLSearchParams(hash.replace('#', '?'));
       const token = params.get('access_token');
       if (token) {
-        // Consultar API oficial de Discord para obtener la ID NUMÉRICA REAL E INALTERABLE
         fetch('https://discord.com/api/users/@me', {
           headers: { Authorization: `Bearer ${token}` }
         })
@@ -89,7 +89,6 @@ export const SalonDeLaFama = () => {
                 ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`
                 : `https://cdn.discordapp.com/embed/avatars/${parseInt(data.discriminator || '0') % 5}.png`;
 
-              // La ID es la Snowflake ID numérica oficial de Discord (ej: 248192039182938102)
               const userObj: DiscordUser = {
                 id: `discord_real_${data.id}`,
                 username: `@${data.global_name || data.username}`,
@@ -151,13 +150,18 @@ export const SalonDeLaFama = () => {
     loadConfig();
   }, []);
 
-  // Redirigir al inicio de sesión oficial en Discord
+  // Iniciar flujo de autorización de Discord
   const conectarDiscord = () => {
-    // ID de la aplicación de Discord o ID predeterminada para autenticación real
-    const cid = (discordClientId && discordClientId.trim() !== "") ? discordClientId : "1234567890123456789";
-    const redirectUri = encodeURIComponent(window.location.origin + '/salon-de-la-fama');
-    const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${cid}&redirect_uri=${redirectUri}&response_type=token&scope=identify`;
-    window.location.href = oauthUrl;
+    const cid = discordClientId ? discordClientId.trim() : '';
+
+    if (cid && cid !== "1234567890123456789" && cid !== "") {
+      const redirectUri = encodeURIComponent(window.location.origin + '/salon-de-la-fama');
+      const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${cid}&redirect_uri=${redirectUri}&response_type=token&scope=identify`;
+      window.location.href = oauthUrl;
+    } else {
+      // Mostrar instrucciones para colocar el Discord Client ID real
+      setShowSetupModal(true);
+    }
   };
 
   const desconectarDiscord = () => {
@@ -173,7 +177,6 @@ export const SalonDeLaFama = () => {
     setModalCat(cat);
   };
 
-  // Registrar o retirar voto comprobando la ID NUMÉRICA REAL en el servidor
   const toggleVoto = async (catId: string, nomId: string) => {
     if (!discordUser) {
       setShowAuthWarning(true);
@@ -190,7 +193,7 @@ export const SalonDeLaFama = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          discordUserId: discordUser.id, // ID real infalsificable entregada por Discord
+          discordUserId: discordUser.id,
           categoryId: catId,
           nomineeId: nomId,
           action
@@ -607,7 +610,58 @@ export const SalonDeLaFama = () => {
         </>
       )}
 
-      {/* ── MODAL AVISO AUTENTICACIÓN DISCORD REAL OBLIGATORIA ── */}
+      {/* ── MODAL DE CONFIGURACIÓN / INSTRUCCIONES DISCORD CLIENT ID ── */}
+      <AnimatePresence>
+        {showSetupModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSetupModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.85 }}
+              className="relative max-w-lg w-full rounded-3xl p-6 sm:p-8 text-center bg-[#2b0a19] border-2 border-amber-300 text-white z-10 shadow-2xl"
+            >
+              <button
+                onClick={() => setShowSetupModal(false)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"
+              >
+                <X className="w-4 h-4 text-amber-300" />
+              </button>
+
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#5865F2] flex items-center justify-center shadow-lg">
+                <Settings className="w-7 h-7 text-white" />
+              </div>
+
+              <h3 className="text-xl font-black text-amber-300 mb-2">Configurar tu Aplicación de Discord</h3>
+              <p className="text-xs text-pink-200/90 font-semibold mb-4 leading-relaxed">
+                Para autorizar la aplicación en Discord sin el mensaje de "Aplicación desconocida", solo necesitas crear tu Client ID gratuito en 1 minuto:
+              </p>
+
+              <ol className="text-left text-xs space-y-2 mb-6 p-4 rounded-2xl bg-black/50 border border-amber-300/30 text-amber-100 font-semibold">
+                <li>1. Entra a <a href="https://discord.com/developers/applications" target="_blank" rel="noreferrer" className="text-pink-300 underline font-bold">discord.com/developers/applications</a></li>
+                <li>2. Haz clic en <strong>"New Application"</strong>, ponle <strong>ValentinaVTT</strong> y copia el <strong>APPLICATION ID</strong> (Client ID).</li>
+                <li>3. En la pestaña <strong>OAuth2 -&gt; Redirects</strong> agrega: <br /><code className="text-pink-300 bg-white/10 px-1 py-0.5 rounded">https://www.valentinavtt.com/salon-de-la-fama</code></li>
+                <li>4. Pega ese Client ID en tu archivo <strong>gala_config.json</strong> en la casilla <code className="text-amber-300 bg-white/10 px-1 py-0.5 rounded">"discordClientId"</code>.</li>
+              </ol>
+
+              <button
+                onClick={() => setShowSetupModal(false)}
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-300 to-pink-400 text-black font-black text-xs uppercase tracking-widest shadow-lg"
+              >
+                Entendido
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL AVISO AUTENTICACIÓN DISCORD OBLIGATORIA ── */}
       <AnimatePresence>
         {showAuthWarning && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -637,7 +691,7 @@ export const SalonDeLaFama = () => {
 
               <h3 className="text-xl font-black text-amber-300 mb-2">Conexión Oficial con Discord Obligatoria</h3>
               <p className="text-xs text-pink-200/80 font-bold mb-6 leading-relaxed">
-                Para prevenir votos duplicados o falsos nombres de usuario, es obligatorio autenticarse con tu cuenta oficial de Discord a través del portal de autorización oficial.
+                Para garantizar votaciones limpias y únicas, es obligatorio conectar tu cuenta oficial de Discord antes de abrir las nominaciones y votar.
               </p>
 
               <button
