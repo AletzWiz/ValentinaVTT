@@ -64,12 +64,15 @@ export const SalonDeLaFama = () => {
 
   // Votaciones: mapa de catId -> Array de nId elegidos (máx 3)
   const [misVotos, setMisVotos]           = useState<Record<string, string[]>>({});
+  // Conteo de votos globales obtenidos del servidor (nomineeId -> total)
+  const [votosServer, setVotosServer]     = useState<Record<string, number>>({});
   const [modalCat, setModalCat]           = useState<CategoriaGala | null>(null);
   const [discordUser, setDiscordUser]     = useState<DiscordUser | null>(null);
   const [showRachasSec, setShowRachasSec] = useState(false);
   const [showAuthWarning, setShowAuthWarning] = useState(false);
   const [showLoginModal, setShowLoginModal]   = useState(false);
   const [inputDiscordUser, setInputDiscordUser] = useState('');
+  const [errorMsg, setErrorMsg]           = useState<string | null>(null);
 
   // 1. Manejar OAuth2 Redirect Hash de Discord (#access_token=...)
   useEffect(() => {
@@ -78,7 +81,6 @@ export const SalonDeLaFama = () => {
       const params = new URLSearchParams(hash.replace('#', '?'));
       const token = params.get('access_token');
       if (token) {
-        // Consultar el perfil oficial público de Discord (solo scope: identify)
         fetch('https://discord.com/api/users/@me', {
           headers: { Authorization: `Bearer ${token}` }
         })
@@ -96,8 +98,6 @@ export const SalonDeLaFama = () => {
               };
               setDiscordUser(userObj);
               localStorage.setItem('vtt_discord_user', JSON.stringify(userObj));
-
-              // Limpiar token de la URL por seguridad
               window.history.replaceState(null, '', window.location.pathname);
             }
           })
@@ -106,7 +106,7 @@ export const SalonDeLaFama = () => {
     }
   }, []);
 
-  // 2. Cargar configuración editable desde JSON
+  // 2. Cargar configuración editable y conteos globales del servidor
   useEffect(() => {
     const loadConfig = async () => {
       try {
@@ -128,6 +128,15 @@ export const SalonDeLaFama = () => {
           setTopRachas(dataRachas || []);
         }
 
+        // Obtener votos globales del servidor antidesduplicación
+        try {
+          const resVotes = await fetch('/api/votes?v=' + Date.now());
+          if (resVotes.ok) {
+            const dataVotes = await resVotes.json();
+            if (dataVotes.votosGlobales) setVotosServer(dataVotes.votosGlobales);
+          }
+        } catch {}
+
         const savedVotos = localStorage.getItem('vtt_votos_multi');
         if (savedVotos) setMisVotos(JSON.parse(savedVotos));
 
@@ -144,15 +153,12 @@ export const SalonDeLaFama = () => {
     loadConfig();
   }, []);
 
-  // Iniciar flujo oficial de Discord OAuth2 o Modal de Usuario
   const conectarDiscord = () => {
     if (discordClientId && discordClientId.trim() !== "") {
-      // Redirigir al servidor oficial OAuth2 de Discord (Scope identify únicamente)
       const redirectUri = encodeURIComponent(window.location.origin + '/salon-de-la-fama');
       const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${redirectUri}&response_type=token&scope=identify`;
       window.location.href = oauthUrl;
     } else {
-      // Abrir modal seguro para ingresar nombre de usuario de Discord
       setShowLoginModal(true);
     }
   };
@@ -162,8 +168,11 @@ export const SalonDeLaFama = () => {
     const tag = inputDiscordUser.trim();
     if (!tag) return;
 
+    // Normalizar ID del usuario de Discord para antifraude único
+    const normalizedId = 'discord_id_' + tag.toLowerCase().replace(/[^a-z0-9_]/g, '');
+
     const userObj: DiscordUser = {
-      id: 'discord_' + Math.floor(Math.random() * 899999 + 100000),
+      id: normalizedId,
       username: tag.startsWith('@') ? tag : `@${tag}`,
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(tag)}&background=5865F2&color=fff&bold=true`,
     };
@@ -188,27 +197,66 @@ export const SalonDeLaFama = () => {
     setModalCat(cat);
   };
 
-  const toggleVoto = (catId: string, nomId: string) => {
+  // Votar / Desvotar procesado y validado en el Servidor Antifraude
+  const toggleVoto = async (catId: string, nomId: string) => {
     if (!discordUser) {
       setShowAuthWarning(true);
       return;
     }
 
-    const votosActuales = misVotos[catId] || [];
-    let nuevosVotosCat: string[];
+    setErrorMsg(null);
+    const votosCat = misVotos[catId] || [];
+    const estaVotado = votosCat.includes(nomId);
+    const action = estaVotado ? 'remove' : 'add';
 
-    if (votosActuales.includes(nomId)) {
-      nuevosVotosCat = votosActuales.filter(id => id !== nomId);
-    } else {
-      if (votosActuales.length >= 3) return;
-      nuevosVotosCat = [...votosActuales, nomId];
-    }
-
-    const nuevoMapa = { ...misVotos, [catId]: nuevosVotosCat };
-    setMisVotos(nuevoMapa);
+    // 1. Enviar voto al servidor para validación estricta por ID de Discord
     try {
+      const res = await fetch('/api/votes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discordUserId: discordUser.id,
+          categoryId: catId,
+          nomineeId: nomId,
+          action
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setErrorMsg(data.error || "No se pudo registrar el voto en el servidor.");
+        return;
+      }
+
+      // Actualizar conteos del servidor
+      if (data.votosGlobales) setVotosServer(data.votosGlobales);
+
+      // Actualizar lista local de mis votos
+      let nuevosVotosCat: string[];
+      if (estaVotado) {
+        nuevosVotosCat = votosCat.filter(id => id !== nomId);
+      } else {
+        nuevosVotosCat = [...votosCat, nomId];
+      }
+
+      const nuevoMapa = { ...misVotos, [catId]: nuevosVotosCat };
+      setMisVotos(nuevoMapa);
       localStorage.setItem('vtt_votos_multi', JSON.stringify(nuevoMapa));
-    } catch {}
+
+    } catch (err) {
+      // Fallback local en caso de error de red
+      let nuevosVotosCat: string[];
+      if (estaVotado) {
+        nuevosVotosCat = votosCat.filter(id => id !== nomId);
+      } else {
+        if (votosCat.length >= 3) return;
+        nuevosVotosCat = [...votosCat, nomId];
+      }
+
+      const nuevoMapa = { ...misVotos, [catId]: nuevosVotosCat };
+      setMisVotos(nuevoMapa);
+      localStorage.setItem('vtt_votos_multi', JSON.stringify(nuevoMapa));
+    }
   };
 
   if (loading) {
@@ -587,7 +635,7 @@ export const SalonDeLaFama = () => {
         </>
       )}
 
-      {/* ── MODAL CONEXIÓN DISCORD (OAUTH2 OFICIAL O USUARIO DIRECTO) ── */}
+      {/* ── MODAL CONEXIÓN DISCORD ── */}
       <AnimatePresence>
         {showLoginModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -725,6 +773,14 @@ export const SalonDeLaFama = () => {
                 </div>
               </div>
 
+              {/* Mensaje de error si se alcanza el límite */}
+              {errorMsg && (
+                <div className="mb-4 p-3 rounded-2xl bg-red-500/20 border border-red-500/50 text-red-200 text-xs font-bold text-center">
+                  ⚠️ {errorMsg}
+                </div>
+              )}
+
+              {/* Indicador de votos 3/3 */}
               <div className="flex items-center justify-between mb-6 p-3 rounded-2xl bg-white/5 border border-pink-500/20">
                 <span className="text-xs font-bold text-pink-200">
                   Puedes seleccionar hasta <strong className="text-amber-300">3 candidatos</strong>:
@@ -734,11 +790,13 @@ export const SalonDeLaFama = () => {
                 </span>
               </div>
 
+              {/* Lista de Nominados */}
               <div className="space-y-4 mb-6">
                 {modalCat.nominados.map((nom) => {
                   const misVotosCat = misVotos[modalCat.id] || [];
                   const selec = misVotosCat.includes(nom.id);
                   const clipSlug = getTwitchClipSlug(nom.clipUrl);
+                  const totalVotosGlobales = (nom.votos || 0) + (votosServer[nom.id] || 0);
 
                   return (
                     <div
@@ -761,6 +819,9 @@ export const SalonDeLaFama = () => {
                             </span>
                           )}
                           <div className="text-xs text-pink-200/70 font-semibold mt-0.5">{nom.detalle}</div>
+                          <span className="text-[10px] font-black text-amber-300/90 mt-1 block">
+                            📊 Total Votos: {totalVotosGlobales}
+                          </span>
                         </div>
 
                         <button
