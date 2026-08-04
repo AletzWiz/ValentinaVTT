@@ -3,6 +3,7 @@
   "diasRestantesGala": 30,
   "maxVotosPorCategoria": 3,
   "votacionesAbiertas": false,
+  "discordClientId": "",
   "categorias": [
     {
       "id": "clip-oro",

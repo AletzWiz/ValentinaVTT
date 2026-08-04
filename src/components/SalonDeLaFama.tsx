@@ -59,6 +59,7 @@ export const SalonDeLaFama = () => {
   const [temporada, setTemporada]         = useState(1);
   const [diasRestantes, setDias]         = useState(30);
   const [votacionesAbiertas, setAbiertas] = useState(false);
+  const [discordClientId, setClientId]    = useState('');
   const [loading, setLoading]             = useState(true);
 
   // Votaciones: mapa de catId -> Array de nId elegidos (máx 3)
@@ -67,14 +68,50 @@ export const SalonDeLaFama = () => {
   const [discordUser, setDiscordUser]     = useState<DiscordUser | null>(null);
   const [showRachasSec, setShowRachasSec] = useState(false);
   const [showAuthWarning, setShowAuthWarning] = useState(false);
+  const [showLoginModal, setShowLoginModal]   = useState(false);
+  const [inputDiscordUser, setInputDiscordUser] = useState('');
 
-  // Cargar configuración editable desde JSON
+  // 1. Manejar OAuth2 Redirect Hash de Discord (#access_token=...)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.replace('#', '?'));
+      const token = params.get('access_token');
+      if (token) {
+        // Consultar el perfil oficial público de Discord (solo scope: identify)
+        fetch('https://discord.com/api/users/@me', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.id && data.username) {
+              const avatarUrl = data.avatar
+                ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`
+                : `https://cdn.discordapp.com/embed/avatars/${parseInt(data.discriminator || '0') % 5}.png`;
+
+              const userObj: DiscordUser = {
+                id: data.id,
+                username: data.global_name || data.username,
+                avatar: avatarUrl
+              };
+              setDiscordUser(userObj);
+              localStorage.setItem('vtt_discord_user', JSON.stringify(userObj));
+
+              // Limpiar token de la URL por seguridad
+              window.history.replaceState(null, '', window.location.pathname);
+            }
+          })
+          .catch(err => console.error("Error OAuth Discord:", err));
+      }
+    }
+  }, []);
+
+  // 2. Cargar configuración editable desde JSON
   useEffect(() => {
     const loadConfig = async () => {
       try {
         setLoading(true);
 
-        // 1. Cargar gala_config.json
         const resGala = await fetch('/gala_config.json?v=' + Date.now());
         if (resGala.ok) {
           const dataGala = await resGala.json();
@@ -82,16 +119,15 @@ export const SalonDeLaFama = () => {
           setTemporada(dataGala.temporada || 1);
           setDias(dataGala.diasRestantesGala || 30);
           setAbiertas(dataGala.votacionesAbiertas ?? false);
+          setClientId(dataGala.discordClientId || '');
         }
 
-        // 2. Cargar top_rachas.json
         const resRachas = await fetch('/top_rachas.json?v=' + Date.now());
         if (resRachas.ok) {
           const dataRachas = await resRachas.json();
           setTopRachas(dataRachas || []);
         }
 
-        // 3. Cargar votos y usuario Discord local
         const savedVotos = localStorage.getItem('vtt_votos_multi');
         if (savedVotos) setMisVotos(JSON.parse(savedVotos));
 
@@ -108,16 +144,35 @@ export const SalonDeLaFama = () => {
     loadConfig();
   }, []);
 
-  // Simular conexión segura con Discord OAuth2
+  // Iniciar flujo oficial de Discord OAuth2 o Modal de Usuario
   const conectarDiscord = () => {
-    const userSimulado: DiscordUser = {
+    if (discordClientId && discordClientId.trim() !== "") {
+      // Redirigir al servidor oficial OAuth2 de Discord (Scope identify únicamente)
+      const redirectUri = encodeURIComponent(window.location.origin + '/salon-de-la-fama');
+      const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${redirectUri}&response_type=token&scope=identify`;
+      window.location.href = oauthUrl;
+    } else {
+      // Abrir modal seguro para ingresar nombre de usuario de Discord
+      setShowLoginModal(true);
+    }
+  };
+
+  const confirmarLoginManual = (e: React.FormEvent) => {
+    e.preventDefault();
+    const tag = inputDiscordUser.trim();
+    if (!tag) return;
+
+    const userObj: DiscordUser = {
       id: 'discord_' + Math.floor(Math.random() * 899999 + 100000),
-      username: 'ViewerVTT_' + Math.floor(Math.random() * 90 + 10),
-      avatar: 'https://ui-avatars.com/api/?name=Discord+User&background=5865F2&color=fff&bold=true',
+      username: tag.startsWith('@') ? tag : `@${tag}`,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(tag)}&background=5865F2&color=fff&bold=true`,
     };
-    setDiscordUser(userSimulado);
-    localStorage.setItem('vtt_discord_user', JSON.stringify(userSimulado));
+
+    setDiscordUser(userObj);
+    localStorage.setItem('vtt_discord_user', JSON.stringify(userObj));
+    setShowLoginModal(false);
     setShowAuthWarning(false);
+    setInputDiscordUser('');
   };
 
   const desconectarDiscord = () => {
@@ -125,7 +180,6 @@ export const SalonDeLaFama = () => {
     localStorage.removeItem('vtt_discord_user');
   };
 
-  // Intentar abrir modal de votación (requiere Discord obligatoriamente)
   const abrirModalVotacion = (cat: CategoriaGala) => {
     if (!discordUser) {
       setShowAuthWarning(true);
@@ -134,7 +188,6 @@ export const SalonDeLaFama = () => {
     setModalCat(cat);
   };
 
-  // Votar o desvotar (hasta 3 votos por categoría)
   const toggleVoto = (catId: string, nomId: string) => {
     if (!discordUser) {
       setShowAuthWarning(true);
@@ -204,14 +257,14 @@ export const SalonDeLaFama = () => {
         {/* Discord Auth Box */}
         <div className="flex items-center gap-3">
           {discordUser ? (
-            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 shadow-md">
+              <img src={discordUser.avatar} alt="Avatar" className="w-5 h-5 rounded-full object-cover" />
               <span className="text-xs font-extrabold text-emerald-300">
-                {discordUser.username} (Conectado)
+                {discordUser.username}
               </span>
               <button
                 onClick={desconectarDiscord}
-                title="Desconectar"
+                title="Desconectar cuenta"
                 className="text-pink-300 hover:text-red-400 ml-1 transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -311,7 +364,6 @@ export const SalonDeLaFama = () => {
             })}
           </div>
 
-          {/* ── NOTA DE RECONOCIMIENTO DE RACHAS EN EL PIE ── */}
           <div className="max-w-2xl mx-auto rounded-3xl p-6 bg-gradient-to-r from-pink-900/40 via-amber-400/10 to-pink-900/40 border border-amber-300/40 text-center shadow-xl">
             <MessageSquareHeart className="w-8 h-8 text-amber-300 mx-auto mb-3 animate-pulse" />
             <p className="text-xs sm:text-sm font-extrabold text-pink-100 leading-relaxed">
@@ -353,7 +405,6 @@ export const SalonDeLaFama = () => {
               animate={{ scale: 1, opacity: 1 }}
               className="relative z-30 max-w-2xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(250,204,21,0.3)] border-4 border-yellow-400 bg-black text-yellow-300"
             >
-              {/* Franja Diagonal de Peligro / Construcción (Amarillo y Negro) */}
               <div
                 className="h-10 w-full"
                 style={{
@@ -379,7 +430,6 @@ export const SalonDeLaFama = () => {
                 </p>
               </div>
 
-              {/* Franja Diagonal Inferior */}
               <div
                 className="h-10 w-full"
                 style={{
@@ -392,7 +442,6 @@ export const SalonDeLaFama = () => {
           {/* ── PASEO DE LA ALFOMBRA ROJA ── */}
           <div className="relative max-w-5xl mx-auto z-10">
 
-            {/* ── ALFOMBRA ROJA PERSPECTIVA ── */}
             <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-16 sm:w-28 md:w-44 pointer-events-none z-0 overflow-hidden flex flex-col items-center">
               <motion.div
                 initial={{ scaleY: 0 }}
@@ -436,7 +485,6 @@ export const SalonDeLaFama = () => {
                         }`}
                       />
 
-                      {/* Tarjeta Flotante */}
                       <div
                         className="relative rounded-3xl p-5 sm:p-7 overflow-hidden transition-all duration-500 hover:scale-[1.02] shadow-2xl"
                         style={{
@@ -447,7 +495,6 @@ export const SalonDeLaFama = () => {
                       >
                         <CornerBrackets color="border-amber-300/70" />
 
-                        {/* Card Header */}
                         <div className="flex items-center justify-between gap-2 mb-3">
                           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-pink-500/25 to-amber-400/25 border border-amber-300/40 flex items-center justify-center text-xl sm:text-2xl shadow-lg shrink-0">
                             {cat.emoji}
@@ -466,7 +513,6 @@ export const SalonDeLaFama = () => {
                           </span>
                         </div>
 
-                        {/* Title & Desc */}
                         <h3 className="text-xl sm:text-2xl font-black text-white mb-0.5 tracking-wide group-hover:text-amber-300 transition-colors">
                           {cat.titulo}
                         </h3>
@@ -508,7 +554,6 @@ export const SalonDeLaFama = () => {
               })}
             </div>
 
-            {/* Puertas del Salón al final */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 50 }}
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -541,6 +586,61 @@ export const SalonDeLaFama = () => {
           </div>
         </>
       )}
+
+      {/* ── MODAL CONEXIÓN DISCORD (OAUTH2 OFICIAL O USUARIO DIRECTO) ── */}
+      <AnimatePresence>
+        {showLoginModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowLoginModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.85 }}
+              className="relative max-w-md w-full rounded-3xl p-6 text-center bg-[#2b0a19] border-2 border-amber-300 text-white z-10 shadow-2xl"
+            >
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"
+              >
+                <X className="w-4 h-4 text-amber-300" />
+              </button>
+
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#5865F2] flex items-center justify-center shadow-lg">
+                <ShieldCheck className="w-7 h-7 text-white" />
+              </div>
+
+              <h3 className="text-xl font-black text-amber-300 mb-1">Identifícate con tu Discord</h3>
+              <p className="text-xs text-pink-200/80 font-bold mb-5 leading-relaxed">
+                Escribe tu nombre de usuario de Discord para registrar tus 3 votos únicos por categoría de forma segura.
+              </p>
+
+              <form onSubmit={confirmarLoginManual} className="space-y-4">
+                <input
+                  type="text"
+                  value={inputDiscordUser}
+                  onChange={e => setInputDiscordUser(e.target.value)}
+                  placeholder="Tu usuario de Discord (ej: @MiUsuario)"
+                  maxLength={35}
+                  required
+                  className="w-full px-4 py-3 rounded-2xl bg-black/60 border-2 border-pink-500/40 text-white text-sm font-bold focus:outline-none focus:border-amber-300 transition-colors"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-3.5 rounded-2xl bg-[#5865F2] hover:bg-[#4752C4] font-black text-xs tracking-widest uppercase text-white shadow-lg flex items-center justify-center gap-2 transition-all"
+                >
+                  <LogIn className="w-4 h-4" /> Conectar mi Cuenta
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* ── MODAL AVISO AUTENTICACIÓN DISCORD OBLIGATORIA ── */}
       <AnimatePresence>
@@ -625,7 +725,6 @@ export const SalonDeLaFama = () => {
                 </div>
               </div>
 
-              {/* Indicador de votos 3/3 */}
               <div className="flex items-center justify-between mb-6 p-3 rounded-2xl bg-white/5 border border-pink-500/20">
                 <span className="text-xs font-bold text-pink-200">
                   Puedes seleccionar hasta <strong className="text-amber-300">3 candidatos</strong>:
@@ -635,7 +734,6 @@ export const SalonDeLaFama = () => {
                 </span>
               </div>
 
-              {/* Lista de Nominados */}
               <div className="space-y-4 mb-6">
                 {modalCat.nominados.map((nom) => {
                   const misVotosCat = misVotos[modalCat.id] || [];
@@ -679,7 +777,6 @@ export const SalonDeLaFama = () => {
                         </button>
                       </div>
 
-                      {/* Vista Previa de Clip de Twitch Embed */}
                       {nom.clipUrl && (
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <div className="flex items-center justify-between mb-2">
