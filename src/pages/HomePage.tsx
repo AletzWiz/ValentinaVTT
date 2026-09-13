@@ -3,7 +3,6 @@ import type { FormEvent } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
-  BarChart3,
   CalendarDays,
   ChevronRight,
   Clock3,
@@ -57,28 +56,16 @@ const socials = [
 ];
 const campaigns = [
   [
-    "Streams patrocinados",
-    "Integración natural de marca durante un directo con espacio para interacción real.",
+    "Directos patrocinados",
+    "Un stream de gaming con presencia de marca integrada de forma clara y natural.",
   ],
   [
-    "Integraciones de producto",
-    "Demostraciones, menciones y formatos adaptados al producto y a la audiencia.",
+    "Videojuegos y lanzamientos",
+    "Gameplay, primeras impresiones o una sesión dedicada a conocer un videojuego.",
   ],
   [
-    "Contenido vertical",
-    "TikTok, Shorts y Reels diseñados para alcance, retención y conversación.",
-  ],
-  [
-    "Lanzamientos gaming",
-    "Primeras impresiones, gameplay y activaciones para videojuegos y plataformas.",
-  ],
-  [
-    "Activaciones de comunidad",
-    "Dinámicas, retos, giveaways y experiencias participativas en vivo.",
-  ],
-  [
-    "Campañas sociales",
-    "Contenido multiplataforma con una voz consistente y cercana.",
+    "Integraciones en stream",
+    "Menciones o presentación de productos relacionados con gaming durante el directo.",
   ],
 ];
 interface ScheduleDay {
@@ -162,6 +149,7 @@ function Hero() {
           </h1>
 
           <div
+            id="redes"
             className="mt-7 flex flex-wrap justify-center gap-2 lg:justify-start"
             aria-label="Redes sociales"
           >
@@ -233,7 +221,7 @@ function Collaborations() {
         <Title
           eyebrow="Para marcas y agencias"
           title="Colabora con Valentina"
-          body="Campañas pensadas para integrarse al contenido sin perder la voz de la creadora ni la confianza de su comunidad."
+          body="Opciones sencillas para integrar una marca o videojuego en sus directos de gaming."
         />
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {campaigns.map(([title, body], i) => (
@@ -256,9 +244,9 @@ function Collaborations() {
     </section>
   );
 }
-function SocialStats() {
+function MediaKit() {
   return (
-    <section id="redes" className="section-shell pt-4">
+    <section id="media-kit" className="section-shell pb-8 pt-12 sm:pb-12">
       <Reveal>
         <div className="social-presence-panel">
           <div className="social-presence-art" aria-hidden="true">
@@ -274,13 +262,13 @@ function SocialStats() {
           </div>
 
           <div className="social-presence-content">
-            <p className="eyebrow">Redes y comunidad</p>
+            <p className="eyebrow">Media kit</p>
             <h2 className="mt-3 text-3xl font-black leading-tight text-white sm:text-5xl">
-              Siempre cerca de Valentina
+              Audiencia de Valentina
             </h2>
             <p className="mt-4 max-w-xl leading-7 text-white/55">
-              Directos, clips, videos y un espacio para compartir con toda la
-              comunidad.
+              Una comunidad de gaming presente en Twitch y en sus principales
+              redes sociales.
             </p>
 
             <div className="social-network-grid mt-8">
@@ -328,37 +316,6 @@ function SocialStats() {
               </a>
             </div>
           </div>
-        </div>
-      </Reveal>
-    </section>
-  );
-}
-function Metrics() {
-  return (
-    <section className="section-shell pt-4">
-      <Reveal>
-        <Title
-          eyebrow="Media kit"
-          title="Valentina en números"
-          body="La estructura está lista para mostrar datos verificables. Ninguna cifra se publicará hasta ser confirmada."
-        />
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {[
-            "Comunidad total",
-            "Visualizaciones mensuales",
-            "Average viewers",
-            "Engagement",
-          ].map((label) => (
-            <div key={label} className="metric-card">
-              <BarChart3 size={20} className="text-violet-400" />
-              <p className="mt-8 text-xl font-black text-white/35 sm:text-2xl">
-                Dato pendiente
-              </p>
-              <p className="mt-2 text-sm font-semibold text-white/50">
-                {label}
-              </p>
-            </div>
-          ))}
         </div>
       </Reveal>
     </section>
@@ -626,7 +583,6 @@ export default function HomePage() {
     <main>
       <Hero />
       <Presence />
-      <SocialStats />
       <StreamCommunity {...stream} />
       <Footer />
     </main>
@@ -639,15 +595,15 @@ export function CommercialPage() {
       <div className="commercial-intro relative z-10 mx-auto max-w-7xl px-5 pb-2 pt-20 lg:px-8">
         <p className="eyebrow">ValentinaVTT para marcas</p>
         <h1 className="mt-4 max-w-4xl font-display text-4xl font-black leading-tight text-white sm:text-6xl">
-          Contenido que conecta con una comunidad real.
+          Gaming en directo con ValentinaVTT.
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-white/55">
-          Propuestas comerciales para gaming, entretenimiento y plataformas
-          digitales, adaptadas a la voz de Valentina.
+          Valentina es streamer de gaming. Comparte sus partidas en Twitch y
+          mantiene a su comunidad conectada a través de sus redes sociales.
         </p>
       </div>
+      <MediaKit />
       <Collaborations />
-      <Metrics />
       <Contact />
       <Footer />
     </main>
