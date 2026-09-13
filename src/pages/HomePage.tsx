@@ -157,7 +157,6 @@ function Hero() {
           </h1>
 
           <div
-            id="redes"
             className="mt-7 flex flex-wrap justify-center gap-2 lg:justify-start"
             aria-label="Redes sociales"
           >
@@ -252,48 +251,74 @@ function Collaborations() {
     </section>
   );
 }
-function Content() {
+function SocialStats() {
   return (
-    <section id="contenido" className="section-shell pt-4">
+    <section id="redes" className="section-shell pt-4">
       <Reveal>
-        <Title
-          eyebrow="Showreel"
-          title="Contenido destacado"
-          body="Una selección breve para conocer su personalidad, ritmo y relación con la comunidad."
-        />
-        <div className="grid gap-4 lg:grid-cols-3">
-          {[
-            "Personalidad en directo",
-            "Gaming y entretenimiento",
-            "Momentos con la comunidad",
-          ].map((title, i) => (
-            <article
-              key={title}
-              className="group overflow-hidden rounded-3xl border border-white/10 bg-[#0d0b12]"
-            >
-              <div className="digital-grid relative aspect-video bg-gradient-to-br from-violet-950 to-[#08070b]">
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="grid h-14 w-14 place-items-center rounded-full border border-white/15 bg-white/10 text-white backdrop-blur transition group-hover:scale-105 group-hover:bg-violet-500">
-                    <Play size={20} fill="currentColor" />
+        <div className="social-presence-panel digital-grid">
+          <div className="social-presence-art" aria-hidden="true">
+            <div className="social-presence-glow" />
+            <img
+              src="/valentina-community.png"
+              alt=""
+              className="social-presence-character"
+              width="1008"
+              height="876"
+              loading="lazy"
+            />
+          </div>
+
+          <div className="social-presence-content">
+            <p className="eyebrow">Redes y comunidad</p>
+            <h2 className="mt-3 text-3xl font-black leading-tight text-white sm:text-5xl">
+              Siempre cerca de Valentina
+            </h2>
+            <p className="mt-4 max-w-xl leading-7 text-white/55">
+              Directos, clips, videos y un espacio para compartir con toda la
+              comunidad.
+            </p>
+
+            <div className="social-network-grid mt-8">
+              {socials.map(({ name, detail, href, icon: Icon }) => (
+                <a
+                  key={name}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="social-network-card group"
+                >
+                  <div className="social-network-icon">
+                    <Icon size={20} />
                   </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-extrabold text-white">{name}</h3>
+                    <p className="truncate text-xs text-white/40">{detail}</p>
+                  </div>
+                  <span className="social-network-link">
+                    Ver perfil <ArrowRight size={14} />
+                  </span>
+                </a>
+              ))}
+
+              <a
+                href="https://discord.gg/TvbUCvdsaN"
+                target="_blank"
+                rel="noreferrer"
+                className="social-network-card social-network-discord group"
+              >
+                <div className="social-network-icon social-network-icon-discord">
+                  <img src="/discord-logo.webp" alt="" />
                 </div>
-                <span className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] font-bold uppercase tracking-[.16em] text-white/65">
-                  Video por añadir
-                </span>
-              </div>
-              <div className="p-6">
-                <p className="text-xs font-bold text-violet-300">
-                  0{i + 1} / DESTACADO
-                </p>
-                <h3 className="mt-2 text-lg font-extrabold text-white">
-                  {title}
-                </h3>
-                <p className="mt-2 text-sm text-white/40">
-                  Espacio preparado para el enlace y miniatura final.
-                </p>
-              </div>
-            </article>
-          ))}
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-extrabold text-white">Discord</h3>
+                  <p className="truncate text-xs text-white/40">
+                    SótanoVTT
+                  </p>
+                </div>
+                <strong className="social-network-stat">+400 miembros</strong>
+              </a>
+            </div>
+          </div>
         </div>
       </Reveal>
     </section>
@@ -383,8 +408,8 @@ function StreamCommunity({ status, isLive }: StreamState) {
               />
             </div>
           </div>
-          <div>
-            <div className="schedule-card rounded-3xl border border-white/10 bg-white/[.025] p-5 sm:p-6">
+          <div className="h-full">
+            <div className="schedule-card flex h-full flex-col rounded-3xl border border-white/10 bg-white/[.025] p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-xl bg-violet-500/10 text-violet-300">
@@ -400,7 +425,7 @@ function StreamCommunity({ status, isLive }: StreamState) {
                   </div>
                 </div>
               </div>
-              <div className="mt-5 space-y-2">
+              <div className="mt-5 grid flex-1 grid-rows-3 gap-2">
                 {days.map((d) => (
                   <div key={d.id} className="schedule-row">
                     <div>
@@ -426,9 +451,7 @@ function StreamCommunity({ status, isLive }: StreamState) {
           className="discord-banner group mt-5"
         >
           <div className="discord-icon" aria-hidden="true">
-            <svg viewBox="0 0 16 16" role="presentation">
-              <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011c.05.061.098.125.141.19a12.47 12.47 0 0 0-4.573 0 6.1 6.1 0 0 1 .145-.19 12.7 12.7 0 0 0-3.22 1.01C.744 5.953.195 8.981.47 11.967c1.365 1.001 2.693 1.608 3.988 2.01q.486-.665.93-1.396a8 8 0 0 1-1.46-.703c.122-.089.242-.182.357-.278 2.811 1.304 5.857 1.304 8.634 0 .118.096.238.19.361.28-.466.269-.943.389-1.431.97 1.135 2.4 1.8 3.79 2.245.164 2.39-2.952 1.64-5.98-.005-9.015m-8.29 7.275c-.845 0-1.544-.774-1.544-1.73s.682-1.734 1.544-1.734c.87 0 1.56.78 1.544 1.734 0 .955-.683 1.73-1.544 1.73m5.69 0c-.846 0-1.545-.774-1.545-1.73s.683-1.734 1.544-1.734c.87 0 1.56.78 1.545 1.734 0 .955-.682 1.73-1.544 1.73" />
-            </svg>
+            <img src="/discord-logo.webp" alt="" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#aeb3ff]">
@@ -594,7 +617,7 @@ export default function HomePage() {
     <main>
       <Hero />
       <Presence />
-      <Content />
+      <SocialStats />
       <StreamCommunity {...stream} />
       <Footer />
     </main>
