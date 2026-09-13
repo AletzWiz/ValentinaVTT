@@ -153,7 +153,9 @@
   height: auto;
   object-fit: contain;
   object-position: bottom center;
-  filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.52));
+  clip-path: inset(0 0 0 2px);
+  filter: url("#remove-green-artifacts")
+    drop-shadow(0 24px 38px rgba(0, 0, 0, 0.52));
   transform: none;
 }
 .commercial-intro:after {
@@ -243,6 +245,11 @@
   background: #5865f2;
   color: white;
   box-shadow: 0 0 32px rgba(88, 101, 242, 0.22);
+}
+.discord-icon svg {
+  width: 1.8rem;
+  height: 1.8rem;
+  fill: currentColor;
 }
 .discord-cta {
   position: relative;
