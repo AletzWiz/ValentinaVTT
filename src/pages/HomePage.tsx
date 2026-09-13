@@ -22,30 +22,35 @@ const socials = [
   {
     name: "Twitch",
     detail: "Directos y VODs",
+    stat: "7.459",
     href: "https://www.twitch.tv/valentinavtt",
     icon: Twitch,
   },
   {
     name: "TikTok",
     detail: "Clips y momentos",
+    stat: "9.866",
     href: "https://www.tiktok.com/@valentinavtt",
     icon: Play,
   },
   {
     name: "YouTube",
     detail: "Videos y highlights",
+    stat: "1.700",
     href: "https://www.youtube.com/@valentinavtt",
     icon: Youtube,
   },
   {
     name: "Instagram",
     detail: "Novedades y stories",
+    stat: "11.500",
     href: "https://www.instagram.com/valentinavtt/",
     icon: Instagram,
   },
   {
     name: "X",
     detail: "Anuncios y conversación",
+    stat: "259",
     href: "https://x.com/valentina_vtt",
     icon: Twitter,
   },
@@ -255,7 +260,7 @@ function SocialStats() {
   return (
     <section id="redes" className="section-shell pt-4">
       <Reveal>
-        <div className="social-presence-panel digital-grid">
+        <div className="social-presence-panel">
           <div className="social-presence-art" aria-hidden="true">
             <div className="social-presence-glow" />
             <img
@@ -279,7 +284,7 @@ function SocialStats() {
             </p>
 
             <div className="social-network-grid mt-8">
-              {socials.map(({ name, detail, href, icon: Icon }) => (
+              {socials.map(({ name, detail, stat, href, icon: Icon }) => (
                 <a
                   key={name}
                   href={href}
@@ -294,9 +299,10 @@ function SocialStats() {
                     <h3 className="font-extrabold text-white">{name}</h3>
                     <p className="truncate text-xs text-white/40">{detail}</p>
                   </div>
-                  <span className="social-network-link">
-                    Ver perfil <ArrowRight size={14} />
-                  </span>
+                  <strong className="social-network-stat">
+                    <span>{stat}</span>
+                    <small>seguidores</small>
+                  </strong>
                 </a>
               ))}
 
@@ -315,7 +321,10 @@ function SocialStats() {
                     SótanoVTT
                   </p>
                 </div>
-                <strong className="social-network-stat">+400 miembros</strong>
+                <strong className="social-network-stat">
+                  <span>+400</span>
+                  <small>miembros</small>
+                </strong>
               </a>
             </div>
           </div>
