@@ -148,13 +148,13 @@
   position: relative;
   z-index: 1;
   display: block;
-  width: min(150%, 1080px);
+  width: min(132%, 940px);
   max-width: none;
   height: auto;
   object-fit: contain;
   object-position: bottom center;
   filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.52));
-  transform: translateX(4%);
+  transform: none;
 }
 .commercial-intro:after {
   content: "";
@@ -197,6 +197,72 @@
   color: #c4b5fd;
   font-size: 0.78rem;
   font-weight: 800;
+}
+.discord-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(137, 145, 255, 0.28);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at 12% 50%, rgba(88, 101, 242, 0.2), transparent 34%),
+    linear-gradient(105deg, rgba(88, 101, 242, 0.11), rgba(139, 92, 246, 0.06));
+  padding: 1.4rem 1.5rem;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+.discord-banner:after {
+  content: "DISCORD";
+  position: absolute;
+  right: 9rem;
+  color: rgba(255, 255, 255, 0.025);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  pointer-events: none;
+}
+.discord-banner:hover {
+  border-color: rgba(137, 145, 255, 0.55);
+  background-color: rgba(88, 101, 242, 0.05);
+  transform: translateY(-2px);
+}
+.discord-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 1rem;
+  background: #5865f2;
+  color: white;
+  box-shadow: 0 0 32px rgba(88, 101, 242, 0.22);
+}
+.discord-cta {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  min-height: 2.9rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: rgba(88, 101, 242, 0.92);
+  padding: 0.7rem 1.1rem;
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 800;
+  transition: background 180ms ease;
+}
+.discord-banner:hover .discord-cta {
+  background: #6975f5;
 }
 .minimal-hero-fade {
   position: absolute;
@@ -451,9 +517,9 @@
     bottom: -5%;
   }
   .hero-character {
-    width: min(122%, 650px);
+    width: min(128%, 680px);
     max-width: none;
-    transform: none;
+    transform: translateX(3%);
   }
   .hero-social span {
     display: none;
@@ -485,6 +551,37 @@
   }
   .character-frame > div:last-child p:last-child {
     font-size: 0.8rem;
+  }
+  .discord-banner {
+    align-items: flex-start;
+    padding: 1.25rem;
+  }
+  .discord-banner:after {
+    display: none;
+  }
+  .discord-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+  .discord-cta {
+    width: 100%;
+  }
+}
+@media (max-width: 767px) {
+  .discord-banner {
+    flex-wrap: wrap;
+  }
+  .discord-banner .min-w-0 {
+    flex-basis: calc(100% - 4.75rem);
+  }
+}
+@media (min-width: 1024px) {
+  .hero-character {
+    width: min(185%, 1280px);
+    transform: translateX(20%);
+  }
+  .hero-character-glow {
+    transform: translateX(14%);
   }
 }
 @media (prefers-reduced-motion: reduce) {
