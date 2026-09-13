@@ -7,7 +7,6 @@ import {
   CalendarDays,
   ChevronRight,
   Clock3,
-  ExternalLink,
   Instagram,
   Mail,
   MessageCircle,
@@ -144,6 +143,7 @@ function Hero() {
           </h1>
 
           <div
+            id="redes"
             className="mt-7 flex flex-wrap justify-center gap-2 lg:justify-start"
             aria-label="Redes sociales"
           >
@@ -316,43 +316,6 @@ function Metrics() {
     </section>
   );
 }
-function SocialHub() {
-  return (
-    <section id="redes" className="section-shell pt-4">
-      <Reveal>
-        <Title
-          eyebrow="Hub oficial"
-          title="Encuentra a Valentina"
-          body="Directos, videos, clips y actualizaciones desde un solo lugar."
-        />
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[.025]">
-          {socials.map(({ name, detail, href, icon: Icon }, i) => (
-            <a
-              key={name}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              className={`group flex items-center gap-4 p-5 transition hover:bg-violet-500/10 sm:p-6 ${i ? "border-t border-white/10" : ""}`}
-            >
-              <div className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/5 text-violet-300">
-                <Icon size={20} />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-extrabold text-white">{name}</h3>
-                <p className="text-sm text-white/45">{detail}</p>
-              </div>
-              <ExternalLink
-                size={17}
-                className="text-white/25 transition group-hover:text-violet-300"
-              />
-            </a>
-          ))}
-        </div>
-      </Reveal>
-    </section>
-  );
-}
-
 function StreamCommunity({ status, isLive }: StreamState) {
   const [days, setDays] = useState<ScheduleDay[]>([]);
   useEffect(() => {
@@ -406,7 +369,7 @@ function StreamCommunity({ status, isLive }: StreamState) {
               />
             </div>
           </div>
-          <div className="grid gap-4">
+          <div>
             <div className="schedule-card rounded-3xl border border-white/10 bg-white/[.025] p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -440,23 +403,32 @@ function StreamCommunity({ status, isLive }: StreamState) {
                 ))}
               </div>
             </div>
-            <a
-              href="https://discord.gg/TvbUCvdsaN"
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-3xl border border-[#5865F2]/35 bg-[#5865F2]/10 p-6 transition hover:bg-[#5865F2]/20"
-            >
-              <MessageCircle className="text-[#8991ff]" />
-              <h3 className="mt-5 text-xl font-extrabold">SotanoVTT</h3>
-              <p className="mt-2 text-sm leading-6 text-white/50">
-                Conversación, novedades y comunidad en Discord.
-              </p>
-              <span className="mt-5 inline-flex items-center gap-2 text-sm font-extrabold text-[#aab0ff]">
-                Entrar al servidor <ArrowRight size={15} />
-              </span>
-            </a>
           </div>
         </div>
+        <a
+          href="https://discord.gg/TvbUCvdsaN"
+          target="_blank"
+          rel="noreferrer"
+          className="discord-banner group mt-5"
+        >
+          <div className="discord-icon" aria-hidden="true">
+            <MessageCircle size={27} strokeWidth={2.2} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#aeb3ff]">
+              Discord oficial
+            </p>
+            <h3 className="mt-1 text-xl font-extrabold text-white sm:text-2xl">
+              Únete al SótanoVTT
+            </h3>
+            <p className="mt-1 text-sm leading-6 text-white/50">
+              Conversa, recibe novedades y comparte con la comunidad.
+            </p>
+          </div>
+          <span className="discord-cta">
+            Entrar al Discord <ArrowRight size={17} />
+          </span>
+        </a>
       </Reveal>
     </section>
   );
@@ -607,7 +579,6 @@ export default function HomePage() {
       <Hero />
       <Presence />
       <Content />
-      <SocialHub />
       <StreamCommunity {...stream} />
       <Footer />
     </main>
