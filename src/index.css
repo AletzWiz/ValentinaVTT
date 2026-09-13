@@ -96,6 +96,72 @@
   background-clip: text;
   color: transparent;
 }
+.minimal-hero {
+  background-color: #08060c;
+}
+.minimal-hero-glow {
+  position: absolute;
+  width: min(54vw, 760px);
+  aspect-ratio: 1;
+  right: 1%;
+  bottom: -16%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.28),
+    rgba(76, 29, 149, 0.08) 46%,
+    transparent 70%
+  );
+  filter: blur(12px);
+  pointer-events: none;
+}
+.hero-social {
+  display: inline-flex;
+  min-height: 2.65rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.55rem 0.3rem;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease;
+}
+.hero-social:hover {
+  color: #ddd6fe;
+  border-color: rgba(167, 139, 250, 0.7);
+}
+.hero-character-glow {
+  position: absolute;
+  inset: 17% 4% 1%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.26),
+    transparent 66%
+  );
+  filter: blur(28px);
+}
+.hero-character {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(100%, 760px);
+  height: auto;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.52));
+}
+.minimal-hero-fade {
+  position: absolute;
+  z-index: 12;
+  inset: auto 0 0;
+  height: 14%;
+  background: linear-gradient(to bottom, transparent, #07060a);
+  pointer-events: none;
+}
 .digital-grid {
   background-image:
     linear-gradient(rgba(139, 92, 246, 0.075) 1px, transparent 1px),
@@ -331,6 +397,26 @@
   .hero-orb {
     width: 330px;
     height: 330px;
+  }
+  .minimal-hero {
+    min-height: auto;
+  }
+  .minimal-hero-glow {
+    width: 120vw;
+    right: -42%;
+    bottom: -5%;
+  }
+  .hero-character {
+    width: min(112%, 590px);
+    max-width: none;
+  }
+  .hero-social span {
+    display: none;
+  }
+  .hero-social {
+    width: 2.7rem;
+    justify-content: center;
+    padding-inline: 0;
   }
   .character-frame {
     aspect-ratio: 1/0.92;

@@ -130,58 +130,21 @@ function Title({
   );
 }
 
-function Hero({ status, isLive }: StreamState) {
-  const reduced = useReducedMotion();
+function Hero() {
   return (
     <section
       id="inicio"
-      className="digital-grid hero-grid relative flex min-h-[760px] items-center overflow-hidden pt-24"
+      className="digital-grid minimal-hero relative flex min-h-screen items-center overflow-hidden pt-20"
     >
-      <div className="hero-orb absolute left-[58%] top-[14%] h-[500px] w-[500px] rounded-full bg-violet-700/25 blur-[115px]" />
-      <div className="pixel-field" aria-hidden="true">
-        {Array.from({ length: 9 }, (_, i) => (
-          <i key={i} />
-        ))}
-      </div>
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-8 px-5 py-16 lg:grid-cols-[1.02fr_.98fr] lg:px-8">
-        <Reveal>
-          <div className="hud-kicker mb-7">
-            <span>CH.01</span>
-            <i />
-            <span>CREATOR ONLINE</span>
-          </div>
-          <h1 className="font-display text-[clamp(3.2rem,9vw,7.8rem)] font-black leading-[.82] tracking-[-.075em] text-white">
-            VALENTINA
-            <br />
-            <span className="purple-text">VTT</span>
+      <div className="minimal-hero-glow" aria-hidden="true" />
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center px-5 pb-0 pt-14 lg:min-h-[780px] lg:grid-cols-[0.88fr_1.12fr] lg:px-8 lg:pt-20">
+        <Reveal className="relative z-20 pb-10 text-center lg:pb-20 lg:text-left">
+          <h1 className="font-display text-[clamp(3.25rem,8vw,7rem)] font-black leading-[0.86] tracking-[-0.075em] text-white">
+            VALENTINA<span className="purple-text">VTT</span>
           </h1>
-          <p className="mt-7 text-lg font-bold text-white/85 sm:text-2xl">
-            VTuber · Streamer · Creadora de contenido
-          </p>
-          <p className="mt-4 max-w-xl text-base leading-7 text-white/55 sm:text-lg">
-            Gaming, momentos inesperados y una comunidad que siempre forma parte
-            del directo.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <span className="creator-chip">GAMING</span>
-            <span className="creator-chip">VARIETY</span>
-            <span className="creator-chip">VTUBER</span>
-          </div>
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a href="#contacto" className="primary-cta">
-              Colabora con Valentina <ArrowRight size={18} />
-            </a>
-            <a
-              href="https://www.twitch.tv/valentinavtt"
-              target="_blank"
-              rel="noreferrer"
-              className="secondary-cta"
-            >
-              <Play size={17} /> Ver contenido / en vivo
-            </a>
-          </div>
+
           <div
-            className="mt-8 flex flex-wrap gap-2"
+            className="mt-7 flex flex-wrap justify-center gap-2 lg:justify-start"
             aria-label="Redes sociales"
           >
             {socials.map(({ name, href, icon: Icon }) => (
@@ -191,62 +154,36 @@ function Hero({ status, isLive }: StreamState) {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={name}
-                className="social-pill"
+                title={name}
+                className="hero-social"
               >
-                <Icon size={16} />
+                <Icon size={18} />
                 <span>{name}</span>
               </a>
             ))}
           </div>
+
+          <a href="#contacto" className="primary-cta mt-8 px-8">
+            Colabora conmigo <ArrowRight size={18} />
+          </a>
         </Reveal>
-        <Reveal className="relative mx-auto w-full max-w-[570px] lg:ml-auto">
-          <motion.div
-            className="character-stage relative min-h-[430px] sm:min-h-[560px]"
-            animate={reduced ? undefined : { y: [0, -6, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <div className="character-aura" />
-            <div className="hud-corner hud-corner-a" />
-            <div className="hud-corner hud-corner-b" />
-            <div className="absolute right-0 top-4 z-20 flex items-center gap-2 text-[10px] font-black tracking-[.18em] text-violet-200">
-              <span
-                className={`h-2 w-2 rounded-sm ${isLive ? "bg-red-400 shadow-[0_0_12px_#f87171]" : "bg-white/35"}`}
-              />
-              {status === "loading"
-                ? "COMPROBANDO SEÑAL"
-                : isLive
-                  ? "EN VIVO AHORA"
-                  : "OFFLINE"}
-            </div>
-            <div className="avatar-figure absolute -inset-x-[3%] bottom-0 top-10 z-10">
-              <img
-                src="/valentina-hero.png"
-                alt="ValentinaVTT sonriendo con su atuendo rojo y negro"
-                className="h-full w-full object-contain object-bottom"
-                fetchPriority="high"
-              />
-            </div>
-            <div className="absolute bottom-3 left-0 z-20 border-l border-violet-400/60 pl-4">
-              <p className="text-[10px] font-black tracking-[.22em] text-violet-300">
-                VALENTINA // VTT
-              </p>
-              <p className="mt-1 text-sm font-bold text-white/65">
-                Gaming, variedad y comunidad en vivo.
-              </p>
-            </div>
-            <div className="absolute bottom-24 right-0 z-20 hidden flex-col items-end gap-2 sm:flex">
-              <span className="hud-label">STREAM // ES</span>
-              <span className="hud-label">
-                SIGNAL // {isLive ? "LIVE" : "STANDBY"}
-              </span>
-            </div>
-          </motion.div>
+
+        <Reveal className="relative z-10 flex min-h-[420px] items-end justify-center self-end sm:min-h-[540px] lg:min-h-[700px] lg:justify-end">
+          <div className="hero-character-glow" aria-hidden="true" />
+          <img
+            src="/valentina-hero.png"
+            alt="ValentinaVTT sonriendo con su atuendo rojo y negro"
+            className="hero-character"
+            width="1050"
+            height="814"
+            fetchPriority="high"
+          />
         </Reveal>
       </div>
+      <div className="minimal-hero-fade" aria-hidden="true" />
     </section>
   );
 }
-
 function Presence() {
   return (
     <section className="border-y border-white/10 bg-white/[.025]">
@@ -659,7 +596,7 @@ export default function HomePage() {
 
   return (
     <main>
-      <Hero {...stream} />
+      <Hero />
       <Presence />
       <Collaborations />
       <Content />
