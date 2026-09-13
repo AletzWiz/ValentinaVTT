@@ -148,12 +148,13 @@
   position: relative;
   z-index: 1;
   display: block;
-  width: min(122%, 920px);
+  width: min(150%, 1080px);
   max-width: none;
   height: auto;
   object-fit: contain;
   object-position: bottom center;
   filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.52));
+  transform: translateX(4%);
 }
 .commercial-intro:after {
   content: "";
@@ -162,6 +163,40 @@
   height: 1px;
   margin-top: 2.5rem;
   background: linear-gradient(90deg, #8b5cf6, transparent);
+}
+.schedule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.025);
+  padding: 0.8rem 0.9rem;
+}
+.schedule-day {
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.schedule-title {
+  margin-top: 0.12rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.schedule-time {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.12);
+  padding: 0.45rem 0.65rem;
+  color: #c4b5fd;
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 .minimal-hero-fade {
   position: absolute;
@@ -416,8 +451,9 @@
     bottom: -5%;
   }
   .hero-character {
-    width: min(112%, 590px);
+    width: min(122%, 650px);
     max-width: none;
+    transform: none;
   }
   .hero-social span {
     display: none;

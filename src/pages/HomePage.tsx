@@ -190,7 +190,7 @@ function Presence() {
       <div className="mx-auto grid max-w-7xl grid-cols-2 px-5 py-7 sm:grid-cols-4 lg:px-8">
         {[
           ["Contenido", "Gaming + variedad"],
-          ["Formato", "Directo + vertical"],
+          ["Formato", "Directos"],
           ["Idioma", "Español"],
           ["Enfoque", "Comunidad real"],
         ].map(([k, v]) => (
@@ -407,27 +407,35 @@ function StreamCommunity({ status, isLive }: StreamState) {
             </div>
           </div>
           <div className="grid gap-4">
-            <div className="rounded-3xl border border-white/10 bg-white/[.025] p-6">
-              <div className="flex items-center gap-3">
-                <CalendarDays className="text-violet-300" />
-                <h3 className="text-lg font-extrabold">Horario semanal</h3>
+            <div className="schedule-card rounded-3xl border border-white/10 bg-white/[.025] p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-violet-500/10 text-violet-300">
+                    <CalendarDays size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-extrabold">
+                      Horario de streams
+                    </h3>
+                    <p className="text-xs font-semibold text-white/35">
+                      Hora de México
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="mt-5 space-y-3">
+              <div className="mt-5 space-y-2">
                 {days.map((d) => (
-                  <div
-                    key={d.id}
-                    className="flex items-center justify-between border-b border-white/10 pb-3 text-sm last:border-0"
-                  >
+                  <div key={d.id} className="schedule-row">
                     <div>
-                      <p className="font-bold text-white">{d.diaNombre}</p>
-                      <p className="text-white/40">
+                      <p className="schedule-day">{d.diaNombre}</p>
+                      <p className="schedule-title">
                         {d.tituloStream.replace(/🎉|🎮|✨/gu, "").trim()}
                       </p>
                     </div>
-                    <span className="inline-flex items-center gap-1.5 font-bold text-violet-300">
+                    <time className="schedule-time" dateTime={d.horaMexico}>
                       <Clock3 size={14} />
-                      {d.horaMexico} MX
-                    </span>
+                      {d.horaMexico}
+                    </time>
                   </div>
                 ))}
               </div>
