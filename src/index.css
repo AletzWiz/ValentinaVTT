@@ -118,7 +118,12 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(7, 6, 10, 0.14), transparent 48%, rgba(7, 6, 10, 0.08));
+  background: linear-gradient(
+    90deg,
+    rgba(7, 6, 10, 0.14),
+    transparent 48%,
+    rgba(7, 6, 10, 0.08)
+  );
 }
 .hud-kicker {
   display: inline-flex;
@@ -143,7 +148,14 @@
   font-weight: 800;
   letter-spacing: 0.17em;
   padding: 0.45rem 0.7rem;
-  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  clip-path: polygon(
+    6px 0,
+    100% 0,
+    100% calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    0 100%,
+    0 6px
+  );
 }
 .character-stage {
   filter: drop-shadow(0 32px 55px rgba(0, 0, 0, 0.55));
@@ -152,22 +164,24 @@
   position: absolute;
   inset: 12% 8% 5%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.28), rgba(76, 29, 149, 0.08) 48%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.28),
+    rgba(76, 29, 149, 0.08) 48%,
+    transparent 70%
+  );
   filter: blur(18px);
 }
-.avatar-placeholder {
-  border: 1px solid rgba(196, 181, 253, 0.12);
-  box-shadow: inset 0 0 55px rgba(139, 92, 246, 0.08);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+.avatar-figure {
+  filter: drop-shadow(0 24px 36px rgba(0, 0, 0, 0.56))
+    drop-shadow(0 0 24px rgba(124, 58, 237, 0.16));
 }
-.avatar-placeholder img {
-  transform: scale(0.93);
-}
-.avatar-fade {
+.avatar-figure:after {
+  content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 55%, #08060c 97%);
+  inset: auto 8% 0;
+  height: 18%;
+  background: linear-gradient(to bottom, transparent, rgba(7, 6, 10, 0.84));
   pointer-events: none;
 }
 .hud-corner {
@@ -203,15 +217,50 @@
   opacity: 0.12;
   animation: pixel-pulse 5.5s ease-in-out infinite;
 }
-.pixel-field i:nth-child(1) { left: 8%; top: 21%; }
-.pixel-field i:nth-child(2) { left: 39%; top: 18%; animation-delay: -1s; }
-.pixel-field i:nth-child(3) { left: 53%; top: 37%; animation-delay: -3s; }
-.pixel-field i:nth-child(4) { left: 88%; top: 28%; animation-delay: -2s; }
-.pixel-field i:nth-child(5) { left: 72%; top: 68%; animation-delay: -4s; }
-.pixel-field i:nth-child(6) { left: 31%; top: 73%; animation-delay: -2.5s; }
-.pixel-field i:nth-child(7) { left: 94%; top: 82%; animation-delay: -1.5s; }
-.pixel-field i:nth-child(8) { left: 15%; top: 87%; animation-delay: -3.5s; }
-.pixel-field i:nth-child(9) { left: 61%; top: 13%; animation-delay: -4.5s; }
+.pixel-field i:nth-child(1) {
+  left: 8%;
+  top: 21%;
+}
+.pixel-field i:nth-child(2) {
+  left: 39%;
+  top: 18%;
+  animation-delay: -1s;
+}
+.pixel-field i:nth-child(3) {
+  left: 53%;
+  top: 37%;
+  animation-delay: -3s;
+}
+.pixel-field i:nth-child(4) {
+  left: 88%;
+  top: 28%;
+  animation-delay: -2s;
+}
+.pixel-field i:nth-child(5) {
+  left: 72%;
+  top: 68%;
+  animation-delay: -4s;
+}
+.pixel-field i:nth-child(6) {
+  left: 31%;
+  top: 73%;
+  animation-delay: -2.5s;
+}
+.pixel-field i:nth-child(7) {
+  left: 94%;
+  top: 82%;
+  animation-delay: -1.5s;
+}
+.pixel-field i:nth-child(8) {
+  left: 15%;
+  top: 87%;
+  animation-delay: -3.5s;
+}
+.pixel-field i:nth-child(9) {
+  left: 61%;
+  top: 13%;
+  animation-delay: -4.5s;
+}
 .character-frame {
   box-shadow:
     0 25px 90px rgba(0, 0, 0, 0.5),
@@ -264,8 +313,16 @@
   }
 }
 @keyframes pixel-pulse {
-  0%, 72%, 100% { opacity: 0.08; transform: scale(0.8); }
-  82% { opacity: 0.85; transform: scale(1.25); }
+  0%,
+  72%,
+  100% {
+    opacity: 0.08;
+    transform: scale(0.8);
+  }
+  82% {
+    opacity: 0.85;
+    transform: scale(1.25);
+  }
 }
 @media (max-width: 640px) {
   .digital-grid {
@@ -278,8 +335,13 @@
   .character-frame {
     aspect-ratio: 1/0.92;
   }
-  .character-stage { min-height: 410px; }
-  .avatar-placeholder { inset-inline: 7%; }
+  .character-stage {
+    min-height: 410px;
+  }
+  .avatar-figure {
+    inset-inline: -6%;
+    top: 2.5rem;
+  }
   .character-frame > div:nth-child(2) {
     left: 1.4rem;
     right: 1.4rem;

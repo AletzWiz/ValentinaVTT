@@ -218,14 +218,13 @@ function Hero({ status, isLive }: StreamState) {
                   ? "EN VIVO AHORA"
                   : "OFFLINE"}
             </div>
-            <div className="avatar-placeholder absolute inset-x-[12%] bottom-8 top-12 overflow-hidden rounded-[46%_46%_30%_30%]">
+            <div className="avatar-figure absolute -inset-x-[3%] bottom-0 top-10 z-10">
               <img
-                src="/avatar.png"
-                alt="Avatar actual de ValentinaVTT; imagen provisional"
-                className="h-full w-full object-cover object-center"
+                src="/valentina-hero.png"
+                alt="ValentinaVTT sonriendo con su atuendo rojo y negro"
+                className="h-full w-full object-contain object-bottom"
                 fetchPriority="high"
               />
-              <div className="avatar-fade" />
             </div>
             <div className="absolute bottom-3 left-0 z-20 border-l border-violet-400/60 pl-4">
               <p className="text-[10px] font-black tracking-[.22em] text-violet-300">
