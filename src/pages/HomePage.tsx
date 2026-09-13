@@ -9,7 +9,6 @@ import {
   Clock3,
   Instagram,
   Mail,
-  MessageCircle,
   Play,
   Radio,
   Send,
@@ -135,6 +134,21 @@ function Hero() {
       id="inicio"
       className="digital-grid minimal-hero relative flex min-h-screen items-center overflow-hidden pt-20"
     >
+      <svg aria-hidden="true" className="absolute h-0 w-0">
+        <filter
+          id="remove-green-artifacts"
+          x="-5%"
+          y="-5%"
+          width="110%"
+          height="110%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feColorMatrix
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  3 -3 0 1 0"
+          />
+        </filter>
+      </svg>
       <div className="minimal-hero-glow" aria-hidden="true" />
       <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center px-5 pb-0 pt-14 lg:min-h-[780px] lg:grid-cols-[0.88fr_1.12fr] lg:px-8 lg:pt-20">
         <Reveal className="relative z-20 pb-10 text-center lg:pb-20 lg:text-left">
@@ -412,7 +426,9 @@ function StreamCommunity({ status, isLive }: StreamState) {
           className="discord-banner group mt-5"
         >
           <div className="discord-icon" aria-hidden="true">
-            <MessageCircle size={27} strokeWidth={2.2} />
+            <svg viewBox="0 0 16 16" role="presentation">
+              <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011c.05.061.098.125.141.19a12.47 12.47 0 0 0-4.573 0 6.1 6.1 0 0 1 .145-.19 12.7 12.7 0 0 0-3.22 1.01C.744 5.953.195 8.981.47 11.967c1.365 1.001 2.693 1.608 3.988 2.01q.486-.665.93-1.396a8 8 0 0 1-1.46-.703c.122-.089.242-.182.357-.278 2.811 1.304 5.857 1.304 8.634 0 .118.096.238.19.361.28-.466.269-.943.389-1.431.97 1.135 2.4 1.8 3.79 2.245.164 2.39-2.952 1.64-5.98-.005-9.015m-8.29 7.275c-.845 0-1.544-.774-1.544-1.73s.682-1.734 1.544-1.734c.87 0 1.56.78 1.544 1.734 0 .955-.683 1.73-1.544 1.73m5.69 0c-.846 0-1.545-.774-1.545-1.73s.683-1.734 1.544-1.734c.87 0 1.56.78 1.545 1.734 0 .955-.682 1.73-1.544 1.73" />
+            </svg>
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#aeb3ff]">
