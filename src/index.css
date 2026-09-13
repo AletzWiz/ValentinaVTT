@@ -75,9 +75,6 @@
   .premium-card {
     @apply rounded-3xl border border-white/10 bg-white/[.025] p-6 transition duration-300 hover:-translate-y-1 hover:border-violet-400/30 hover:bg-violet-500/[.06] sm:p-7;
   }
-  .metric-card {
-    @apply min-h-44 rounded-3xl border border-white/10 bg-gradient-to-br from-white/[.04] to-transparent p-5 sm:p-6;
-  }
   form label {
     @apply text-xs font-bold uppercase tracking-[.1em] text-white/50;
   }
