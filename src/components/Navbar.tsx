@@ -5,7 +5,6 @@ import { Menu, X } from "lucide-react";
 const links = [
   ["Inicio", "#inicio"],
   ["Contenido", "#contenido"],
-  ["Colaboraciones", "#colaboraciones"],
   ["Redes", "#redes"],
   ["Comunidad", "#comunidad"],
 ];
@@ -57,12 +56,12 @@ export function Navbar() {
           >
             Ruleta
           </Link>
-          <a
-            href="/#contacto"
+          <Link
+            to="/colaboraciones"
             className="rounded-full bg-violet-500 px-5 py-2.5 text-sm font-extrabold text-white shadow-[0_0_24px_rgba(139,92,246,.25)] hover:bg-violet-400"
           >
             Trabaja conmigo
-          </a>
+          </Link>
         </div>
         <button
           type="button"
@@ -94,13 +93,13 @@ export function Navbar() {
             >
               Ruleta
             </Link>
-            <a
-              href="/#contacto"
+            <Link
+              to="/colaboraciones"
               onClick={() => setOpen(false)}
               className="mt-2 rounded-xl bg-violet-500 px-4 py-3 text-center font-extrabold"
             >
               Trabaja conmigo
-            </a>
+            </Link>
           </div>
         </div>
       )}

@@ -148,11 +148,20 @@
   position: relative;
   z-index: 1;
   display: block;
-  width: min(100%, 760px);
+  width: min(122%, 920px);
+  max-width: none;
   height: auto;
   object-fit: contain;
   object-position: bottom center;
   filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.52));
+}
+.commercial-intro:after {
+  content: "";
+  display: block;
+  width: 6rem;
+  height: 1px;
+  margin-top: 2.5rem;
+  background: linear-gradient(90deg, #8b5cf6, transparent);
 }
 .minimal-hero-fade {
   position: absolute;

@@ -163,7 +163,7 @@ function Hero() {
             ))}
           </div>
 
-          <a href="#contacto" className="primary-cta mt-8 px-8">
+          <a href="/colaboraciones" className="primary-cta mt-8 px-8">
             Colabora conmigo <ArrowRight size={18} />
           </a>
         </Reveal>
@@ -598,11 +598,29 @@ export default function HomePage() {
     <main>
       <Hero />
       <Presence />
-      <Collaborations />
       <Content />
-      <Metrics />
       <SocialHub />
       <StreamCommunity {...stream} />
+      <Footer />
+    </main>
+  );
+}
+
+export function CommercialPage() {
+  return (
+    <main className="digital-grid relative overflow-hidden pt-20">
+      <div className="commercial-intro relative z-10 mx-auto max-w-7xl px-5 pb-2 pt-20 lg:px-8">
+        <p className="eyebrow">ValentinaVTT para marcas</p>
+        <h1 className="mt-4 max-w-4xl font-display text-4xl font-black leading-tight text-white sm:text-6xl">
+          Contenido que conecta con una comunidad real.
+        </h1>
+        <p className="mt-5 max-w-2xl text-lg leading-8 text-white/55">
+          Propuestas comerciales para gaming, entretenimiento y plataformas
+          digitales, adaptadas a la voz de Valentina.
+        </p>
+      </div>
+      <Collaborations />
+      <Metrics />
       <Contact />
       <Footer />
     </main>
