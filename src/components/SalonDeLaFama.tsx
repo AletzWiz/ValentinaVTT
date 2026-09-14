@@ -114,7 +114,9 @@ export const SalonDeLaFama = () => {
             const dataVotes = await resVotes.json();
             if (dataVotes.votosGlobales) setVotosServer(dataVotes.votosGlobales);
           }
-        } catch {}
+        } catch {
+          // La ruta puede no estar disponible durante previews estáticas.
+        }
 
         const savedVotos = localStorage.getItem('vtt_votos_multi');
         if (savedVotos) setMisVotos(JSON.parse(savedVotos));
@@ -201,7 +203,7 @@ export const SalonDeLaFama = () => {
       setMisVotos(nuevoMapa);
       localStorage.setItem('vtt_votos_multi', JSON.stringify(nuevoMapa));
 
-    } catch (err) {
+    } catch {
       let nuevosVotosCat: string[];
       if (estaVotado) {
         nuevosVotosCat = votosCat.filter(id => id !== nomId);
