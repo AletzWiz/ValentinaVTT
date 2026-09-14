@@ -368,6 +368,12 @@ export const RuletaVTT = () => {
                     perpendicularText
                     textDistance={62}
                     spinDuration={0.8}
+                    pointerProps={{
+                      style: {
+                        filter:
+                          "hue-rotate(250deg) saturate(1.25) brightness(1.15) drop-shadow(0 6px 12px rgba(124,58,237,.45))",
+                      },
+                    }}
                     onStopSpinning={onStopSpinning}
                   />
                 </div>
