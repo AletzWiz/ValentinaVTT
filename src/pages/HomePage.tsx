@@ -67,6 +67,10 @@ const campaigns = [
     "Integraciones en stream",
     "Menciones o presentación de productos relacionados con gaming durante el directo.",
   ],
+  [
+    "Contenido para redes",
+    "Menciones y piezas para TikTok, Reels o Shorts sobre videojuegos, lanzamientos y productos relacionados con gaming.",
+  ],
 ];
 interface ScheduleDay {
   id: string;
